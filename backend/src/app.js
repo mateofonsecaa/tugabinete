@@ -25,3 +25,5 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+export default app;
+export { app };
