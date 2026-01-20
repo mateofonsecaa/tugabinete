@@ -25,3 +25,68 @@ body {
   color: var(--color-text);
   min-height: 100vh;
 }
+
+/* ==========================================================
+   Mobile Gate (solo NO computadora)
+   - Se muestra en pantallas <= 1024px
+   ========================================================== */
+
+.mobile-only-gate{
+  display: none; /* default desktop */
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  padding: 22px;
+  align-items: center;
+  justify-content: center;
+
+  /* overlay suave que deja ver el fondo */
+  background: rgba(255, 245, 245, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.mobile-only-gate__card{
+  width: min(520px, 100%);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 173, 173, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  padding: 22px 20px;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+}
+
+.mobile-only-gate__brand{
+  font-weight: 900;
+  letter-spacing: .3px;
+  color: #ffadad;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.mobile-only-gate__title{
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #1c1e21;
+  line-height: 1.2;
+}
+
+.mobile-only-gate__text{
+  margin: 0 0 10px;
+  color: #65676b;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.mobile-only-gate__thanks{
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ff8f8f;
+}
+
+/* Mostrar SOLO en mobile/tablet */
+@media (max-width: 1024px){
+  .mobile-only-gate{ display: flex; }
+  html, body{ overflow: hidden; } /* bloquea scroll del sitio debajo */
+}
