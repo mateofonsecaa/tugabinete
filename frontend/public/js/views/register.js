@@ -132,7 +132,7 @@ async function registerUser(event) {
   }
 
   try {
-    const res = await fetch("http://localhost:4000/api/auth/register", {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
