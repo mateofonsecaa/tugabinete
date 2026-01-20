@@ -37,43 +37,75 @@ export function Profile() {
       <div id="drawer-overlay" class="drawer-overlay"></div>
 
       <!-- CONTENIDO PERFIL -->
-      <main>
-        <h1>Mi Perfil Profesional</h1>
+      <main class="profile-main">
+        <div class="profile-container">
 
-        <div class="profile-header">
-          <img src="" alt="Foto de perfil" class="profile-pic">
+          <div class="profile-grid">
 
-          <div class="profile-info">
-            <h2 id="userName">—</h2>
-            <p class="subtitle" id="professionLabel">—</p>
-            <p><i class="fa-solid fa-envelope"></i><span id="userEmail">—</span></p>
-            <p><i class="fa-solid fa-phone"></i><span id="userPhone">—</span></p>
+            <!-- IZQUIERDA -->
+            <section class="profile-col profile-left">
+
+              <div class="profile-card profile-header-card">
+                <div class="profile-header">
+                  <img src="" alt="Foto de perfil" class="profile-pic">
+
+                  <div class="profile-info">
+                    <h2 id="userName">—</h2>
+                    <p class="subtitle" id="professionLabel">—</p>
+
+                    <div class="profile-contact">
+                      <p><i class="fa-solid fa-envelope"></i><span id="userEmail">—</span></p>
+                      <p><i class="fa-solid fa-phone"></i><span id="userPhone">—</span></p>
+                    </div>
+                  </div>
+
+                  <button class="btn-edit" id="editProfileBtn">
+                    <i class="fa-solid fa-pen"></i> Editar perfil
+                  </button>
+                </div>
+              </div>
+
+              <div class="profile-card profile-stats-card">
+                <!-- IMPORTANTE: mantener .stat + span (orden) para loadStats() -->
+                <section class="stats">
+                  <div class="stat">
+                    <div class="stat-top">
+                      <i class="fa-solid fa-spa"></i>
+                      <span>0</span>
+                    </div>
+                    <small>Tratamientos realizados</small>
+                  </div>
+
+                  <div class="stat clickable" data-go="/patients">
+                    <div class="stat-top">
+                      <i class="fa-solid fa-user-check"></i>
+                      <span>0</span>
+                    </div>
+                    <small>Pacientes activos</small>
+                  </div>
+
+                  <div class="stat clickable" data-go="/agenda">
+                    <div class="stat-top">
+                      <i class="fa-solid fa-calendar-check"></i>
+                      <span>0</span>
+                    </div>
+                    <small>Turnos próximos</small>
+                  </div>
+                </section>
+              </div>
+
+            </section>
+
+            <!-- DERECHA -->
+            <section class="profile-col profile-right">
+              <div class="profile-card turnos">
+                <h3>Próximos turnos</h3>
+                <p class="muted">Cargando...</p>
+              </div>
+            </section>
+
           </div>
-
-          <button class="btn-edit" id="editProfileBtn">
-            <i class="fa-solid fa-pen"></i> Editar perfil
-          </button>
         </div>
-
-        <!-- IMPORTANTE: 4 stats para que tu loadStats() no quede desfasado -->
-        <section class="stats">
-          <div class="stat">
-            <i class="fa-solid fa-spa"></i><span>0</span><small>Tratamientos realizados</small>
-          </div>
-
-          <div class="stat clickable" data-go="/patients">
-            <i class="fa-solid fa-user-check"></i><span>0</span><small>Pacientes activos</small>
-          </div>
-
-          <div class="stat clickable" data-go="/agenda">
-            <i class="fa-solid fa-calendar-check"></i><span>0</span><small>Turnos próximos</small>
-          </div>
-        </section>
-
-        <section class="turnos">
-          <h3>Próximos turnos</h3>
-          <p style="color:#777;">Cargando...</p>
-        </section>
       </main>
     </div>
   `;
@@ -213,34 +245,41 @@ async function loadAppointments() {
     container.innerHTML = `<h3>Próximos turnos</h3>`;
 
     if (!upcoming.length) {
-      container.innerHTML += `<p style="color:#777;">No hay turnos próximos registrados.</p>`;
+      container.innerHTML += `<p class="muted">No hay turnos próximos registrados.</p>`;
       return;
     }
 
-    let html = `
-      <table class="tabla-turnos">
-        <thead>
-          <tr><th>Nombre</th><th>Hora</th><th>Fecha</th></tr>
-        </thead>
-        <tbody>
-    `;
+    let html = `<div class="turnos-list">`;
 
     upcoming.forEach(a => {
       const d = new Date(a.date);
-      const fecha = d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+      const fecha = d.toLocaleDateString("es-AR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
       const hora = a.time || d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
 
       html += `
-        <tr>
-          <td>${a.name || "-"}</td>
-          <td>${hora}</td>
-          <td>${fecha}</td>
-        </tr>
+        <div class="turno-card clickable" data-go="/agenda">
+          <div class="turno-main">
+            <div class="turno-name">${a.name || "-"}</div>
+            <div class="turno-meta">
+              <span class="turno-time">${hora}</span>
+              <span class="turno-dot">•</span>
+              <span class="turno-date">${fecha}</span>
+            </div>
+          </div>
+          <div class="turno-icon" aria-hidden="true">
+            <i class="fa-regular fa-calendar"></i>
+          </div>
+        </div>
       `;
     });
 
-    html += "</tbody></table>";
+    html += `</div>`;
     container.innerHTML += html;
+    bindNav();
 
   } catch (err) {
     console.error("Error turnos:", err);
