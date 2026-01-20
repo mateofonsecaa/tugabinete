@@ -1,4 +1,5 @@
 import { API_URL } from "../core/config.js";
+console.log("REGISTER VERSION 2026-01-20 12:xx");
 
 export function Register() {
   return `
