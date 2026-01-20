@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  password            String
+  createdAt           DateTime             @default(now())
+  isVerified          Boolean              @default(false)
+  profileImage        String?
+  phone               String?
+  profession          String?
+  appointments        Appointment[]
+  passwordResetTokens PasswordResetToken[]
+  patients            Patient[]
+  simpleAppointments  SimpleAppointment[]
+  verificationTokens  VerificationToken[]
+  reminders           Reminder[]
+}
+
+model Patient {
+  id           Int           @id @default(autoincrement())
+  fullName     String
+  birthDate    DateTime
+  age          Int
+  address      String?
+  phone        String
+  profession   String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       Int
+  appointments Appointment[]
+  interview    Interview?
+  observation  Observation?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  treatment   String?
+  patientId   Int?
+  notes       String?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  amount      Float?
+  time        String?
+  afterPhoto  String?
+  beforePhoto String?
+  method      String?
+  status      String?
+  userId      Int
+  patient     Patient? @relation(fields: [patientId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SimpleAppointment {
+  id        Int      @id @default(autoincrement())
+  name      String
+  date      DateTime
+  time      String
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Interview {
+  id                 Int      @id @default(autoincrement())
+  patientId          Int      @unique
+  alcohol            String?
+  celiac             String?
+  createdAt          DateTime @default(now())
+  device             String?
+  hormones           String?
+  illness            String?
+  lenses             String?
+  oncology           String?
+  pregnancy          String?
+  screenTime         String?
+  smoke              String?
+  sport              String?
+  surgery            String?
+  updatedAt          DateTime @updatedAt
+  adverseDetails     String?
+  adverseReaction    String?
+  cleanser           String?
+  concerns           String?
+  expectedResults    String?
+  eyeCream           String?
+  moisturizerDay     String?
+  moisturizerNight   String?
+  routineFrequency   String?
+  routineTime        String?
+  serum              String?
+  skinType           String?
+  sunscreen          String?
+  toner              String?
+  treatmentFrequency String?
+  allergy            String?
+  allergyExtra       String?
+  celiacExtra        String?
+  family             String?
+  familyExtra        String?
+  hormonal           String?
+  hormonalExtra      String?
+  hormonesExtra      String?
+  illnessExtra       String?
+  keloid             String?
+  medication         String?
+  medicationExtra    String?
+  oncologyExtra      String?
+  pregnancyExtra     String?
+  skin               String?
+  sleep              String?
+  sportExtra         String?
+  stress             String?
+  sun                String?
+  surgeryExtra       String?
+  water              String?
+  biotipo            String?
+  fototipo           String?
+  patient            Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Observation {
+  id        Int      @id @default(autoincrement())
+  patientId Int      @unique
+  biotipo   String?
+  fototipo  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  patient   Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Reminder {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

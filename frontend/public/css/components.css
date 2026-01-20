@@ -1,0 +1,237 @@
+/* public/css/components.css */
+
+/* ==============================
+   🌸 BOTONES (reusables)
+============================== */
+.btn-save,
+.btn-cancel,
+.btn-login,
+.btn-register {
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+}
+
+/* Principal (Guardar / Confirmar / etc) */
+.btn-save,
+.btn-login,
+.btn-register {
+  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+  color: #fff;
+}
+.btn-save:hover,
+.btn-login:hover,
+.btn-register:hover {
+  background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
+  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 173, 173, 0.35);
+}
+
+/* Secundario (Cancelar / Volver / Cerrar) */
+.btn-cancel {
+  background: transparent;
+  border: 2px solid #ffadad;
+  color: #ffadad;
+}
+.btn-cancel:hover {
+  background: #ffadad;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 173, 173, 0.25);
+}
+
+/* Íconos dentro del botón */
+.btn-save i,
+.btn-cancel i,
+.btn-login i,
+.btn-register i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+.btn-save:hover i,
+.btn-cancel:hover i,
+.btn-login:hover i,
+.btn-register:hover i {
+  transform: translateY(-1px);
+}
+
+/* ==============================
+   🌸 SISTEMA DE MODALES UNIFICADO
+============================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 245, 245, 0.7);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.modal-overlay.active {
+  display: flex !important;
+  overflow: hidden;
+  padding: 0;
+}
+
+.modal-box,
+.modal-content {
+  background: #fffdf9;
+  border-radius: 18px;
+  padding: 40px 45px;
+  width: 90%;
+  max-width: 800px;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 10px 25px rgba(255, 173, 173, 0.25);
+  animation: slideUp 0.3s ease;
+  overflow-y: auto;
+  max-height: 90vh;
+  scrollbar-width: thin;
+  transform-origin: top center;
+  transition: transform 0.25s ease;
+}
+
+/* Scrollbar */
+.modal-box::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-box::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 173, 173, 0.5);
+  border-radius: 4px;
+}
+
+/* Título y cuerpo del modal */
+.modal-content h2 {
+  color: #ff9b9b;
+  font-weight: 700;
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.modal-body p {
+  margin: 6px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+/* Escalado automático por altura */
+@media (min-height: 901px) {
+  .modal-overlay.active .modal-box,
+  .modal-overlay.active .modal-content { transform: scale(1); }
+}
+@media (max-height: 900px) and (min-height: 801px) {
+  .modal-overlay.active .modal-box,
+  .modal-overlay.active .modal-content { transform: scale(0.95); }
+}
+@media (max-height: 800px) and (min-height: 721px) {
+  .modal-overlay.active .modal-box,
+  .modal-overlay.active .modal-content { transform: scale(0.88); }
+}
+@media (max-height: 720px) {
+  .modal-overlay.active .modal-box,
+  .modal-overlay.active .modal-content { transform: scale(0.84); }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ==============================
+   🖼️ Imágenes en detalle (reusable)
+============================== */
+.detail-images {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.detail-images img {
+  width: 190px;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 173, 173, 0.3);
+  box-shadow: 0 3px 12px rgba(255, 173, 173, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.detail-images img:hover {
+  transform: scale(1.03);
+}
+
+/* Modal preview de imagen (si lo usás) */
+#imagePreviewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+#imagePreviewModal img {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+#imagePreviewModal img:hover {
+  transform: scale(1.02);
+}
+
+/* Responsive modal */
+@media (max-width: 1024px) {
+  .modal-box, .modal-content {
+    padding: 25px 20px;
+    max-height: 85vh;
+  }
+}
+@media (max-width: 768px) {
+  .modal-box, .modal-content {
+    width: 94%;
+    max-height: 80vh;
+    padding: 20px 16px;
+  }
+  .detail-images {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  .detail-images img {
+    max-width: 180px;
+  }
+}

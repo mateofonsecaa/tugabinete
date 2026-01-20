@@ -1,0 +1,332 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: url("../../public/images/body.png") no-repeat center center fixed;
+        background-size: cover;
+        background-color: #ffadad;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+    header {
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffadad;
+      text-decoration: none;
+    }
+
+    /* LOGIN */
+    .login-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 50px 20px;
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 40px 50px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .login-card h2 {
+      color: #ffadad;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .login-card p {
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ffe3e3;
+      background: #fffdf7;
+      font-size: 15px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #ffadad;
+      box-shadow: 0 0 6px rgba(255, 173, 173, 0.4);
+      outline: none;
+    }
+
+    .show-password {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 53px;
+      cursor: pointer;
+      color: #ffadad;
+      font-size: 14px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background: #ffadad;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+    }
+
+    button[type="submit"]:hover {
+      background: #fff3c2;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    .extra-links {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .extra-links a {
+      color: #ffadad;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .extra-links a:hover {
+      text-decoration: underline;
+    }
+
+    .bottom-links {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 15px;
+    }
+
+    .bottom-links a {
+      color: #333;
+      text-decoration: none;
+      margin: 0 12px;
+      transition: color 0.3s;
+    }
+
+    .bottom-links a:hover {
+      color: #ffadad;
+    }
+
+    .social {
+      margin-top: 10px;
+    }
+
+    .social i {
+      font-size: 22px;
+      color: #ffadad;
+      margin: 0 10px;
+      transition: transform 0.2s;
+    }
+
+    .social i:hover {
+      transform: scale(1.15);
+    }
+
+    .copyright {
+      text-align: right;
+      font-size: 13px;
+      color: rgba(51, 51, 51, 0.7);
+      margin: 30px 25px 15px 0;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 173, 173, 0.3);
+    }
+
+    /* 🔔 Notificaciones */
+    .notification-toast {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      background: #90d26d;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 10px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(-15px);
+      transition: all 0.4s ease;
+    }
+
+    .notification-toast.error {
+      background: #ff7171;
+    }
+
+    @media (max-width: 600px) {
+      .login-card {
+        padding: 30px 20px;
+      }
+    }
+
+    /* ✅ Centrado vertical del login (SPA) */
+body.is-login #app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El primer bloque del login (el card) queda centrado */
+body.is-login #app > :first-child {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+    /*RESPONSIVEEEEEEEEEEEEEEEE*/
+
+    /* ===============  MOBILE (max 480px) =============== */
+@media (max-width: 480px) {
+
+  body {
+    background-attachment: scroll; /* evita bugs en iOS */
+    padding: 0;
+  }
+
+  header {
+    height: 60px;
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .login-section {
+    padding: 20px 15px;
+  }
+
+  .login-card {
+    padding: 25px 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+  }
+
+  .login-card h2 {
+    font-size: 22px;
+  }
+
+  .login-card p {
+    font-size: 14px;
+  }
+
+  .input-group input {
+    padding: 11px;
+    font-size: 14px;
+  }
+
+  .toggle-password {
+    top: 46px; /* reacomodado */
+    right: 12px;
+    font-size: 13px;
+  }
+
+  button[type="submit"] {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .bottom-links {
+    font-size: 14px;
+    padding: 10px 5px;
+  }
+
+  .social i {
+    font-size: 18px;
+  }
+
+  .copyright {
+    text-align: center;
+    font-size: 12px;
+    margin: 20px 0;
+  }
+}
+
+/* =============== TABLET (481px – 768px) =============== */
+@media (min-width: 481px) and (max-width: 768px) {
+
+  .login-card {
+    padding: 35px 35px;
+    max-width: 500px;
+  }
+
+  .toggle-password {
+    right: 18px;
+  }
+}
+
+/* =============== LARGE SCREENS (1200px+) =============== */
+@media (min-width: 1200px) {
+  .login-card {
+    transform: scale(1.05);
+  }
+
+  .bottom-links {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+        background: url("../../public/images/body.png") no-repeat center center fixed;
+        background-size: cover;
+        background-color: #ffadad;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+}

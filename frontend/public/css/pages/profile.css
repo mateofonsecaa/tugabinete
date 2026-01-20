@@ -1,0 +1,226 @@
+.profile-page { 
+    font-family: "Poppins", sans-serif; 
+    margin: 0; 
+    padding: 0; 
+  }
+
+.profile-page * { 
+    box-sizing: border-box; 
+  }
+
+
+    /* ===== MAIN ===== */
+    .profile-page main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 20px;
+    }
+
+    .profile-page h1 {
+      color: #ffadad;
+      font-size: 32px;
+      margin-bottom: 25px;
+      animation: profileFadeIn 1s ease-in-out;
+      text-align: center;
+    }
+
+    @keyframes profileFadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== PERFIL HEADER ===== */
+    .profile-page .profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      padding: 30px 40px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      gap: 25px;
+      max-width: 950px;
+      width: 100%;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .profile-page .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ffadad;
+      box-shadow: 0 0 12px rgba(255,173,173,0.3);
+    }
+
+    .profile-page .profile-info {
+      flex: 1;
+    }
+
+    .profile-page .profile-info h2 {
+      color: #333;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .profile-page .profile-info p {
+      font-size: 15px;
+      color: #555;
+      margin: 2px 0;
+    }
+
+    .profile-page .btn-edit {
+      background: #ffadad;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: absolute;
+      right: 30px;
+      top: 30px;
+    }
+
+    .profile-page .btn-edit:hover {
+      background: #fff3c2;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    /* ===== STATS SECTION ===== */
+    .profile-page .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 50px;
+      max-width: 950px;
+      width: 100%;
+    }
+
+    .profile-page .stat {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255,173,173,0.3);
+      border-radius: 14px;
+      width: 210px;
+      height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .profile-page .stat:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(255, 173, 173, 0.25);
+    }
+
+    .profile-page .stat i {
+      font-size: 30px;
+      color: #ffadad;
+      margin-bottom: 8px;
+    }
+
+    .profile-page .stat span {
+      font-weight: 700;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .profile-page .stat small {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* ===== TURNOS ===== */
+    .profile-page .turnos {
+      background: rgba(255,255,255,0.9);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 30px;
+      max-width: 950px;
+      width: 100%;
+      text-align: left;
+      animation: profileFadeIn 1.2s ease-in-out;
+    }
+
+    .profile-page .turnos h3 {
+      font-size: 22px;
+      color: #444;
+      margin-bottom: 20px;
+      border-left: 5px solid #ffadad;
+      padding-left: 12px;
+    }
+
+    .profile-page .turno {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fffdf7;
+      border: 1px solid rgba(255,173,173,0.3);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 12px;
+      transition: transform 0.2s;
+    }
+
+    .profile-page .turno:hover { transform: translateY(-2px); }
+
+    .profile-page .turno span {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .profile-page .turno small {
+      color: #666;
+    }
+
+    /* ===== TABLA DE TURNOS ===== */
+.profile-page .tabla-turnos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+.profile-page .tabla-turnos th {
+  background-color: #ffadad;
+  color: white;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 6px 6px 0 0;
+}
+
+.profile-page .tabla-turnos td {
+  background-color: #fffdf7;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,173,173,0.3);
+}
+
+.profile-page .tabla-turnos tr:hover td {
+  background-color: #fff3f3;
+  transition: 0.2s;
+}
+
+/* ==== Tarjetas clickeables ==== */
+.profile-page .stat.clickable {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.profile-page .stat.clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: #fffdfc; /* leve efecto de realce */
+}

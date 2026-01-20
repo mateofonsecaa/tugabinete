@@ -1,0 +1,72 @@
+/* ================================
+   Editar paciente (SPA)
+================================ */
+
+body.is-patient-edit .patients-page main{
+  max-width: 1100px;
+}
+
+/* Form en grid */
+body.is-patient-edit .patients-page main form{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+/* En mobile baja a 1 columna */
+@media (max-width: 768px){
+  body.is-patient-edit .patients-page main form{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Labels e inputs prolijos */
+body.is-patient-edit .patients-page main label{
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+body.is-patient-edit .patients-page main input,
+body.is-patient-edit .patients-page main select,
+body.is-patient-edit .patients-page main textarea{
+  width: 100%;
+  border: 1.5px solid #ffd6d6;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fffdf9;
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+body.is-patient-edit .patients-page main input:focus,
+body.is-patient-edit .patients-page main select:focus,
+body.is-patient-edit .patients-page main textarea:focus{
+  outline: none;
+  border-color: #ffadad;
+  box-shadow: 0 0 8px rgba(255, 173, 173, 0.25);
+}
+
+/* ===== Patient Edit: botones arriba bien alineados ===== */
+body.is-patient-edit .patients-page main .main-top-actions{
+  position: relative !important; /* pisa el absolute de patients.css */
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  width:100% !important;
+  margin: 0 0 18px 0 !important;
+}
+
+body.is-patient-edit .patients-page main .main-top-actions .right-actions{
+  margin-left:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+}
