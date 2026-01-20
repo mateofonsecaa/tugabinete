@@ -63,6 +63,13 @@ app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* ===============================================
+   Healthcheck (Render / monitoreo)
+   =============================================== */
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ ok: true, service: "tugabinete-backend" });
+});
+
+/* ===============================================
    Rutas API
    =============================================== */
 app.use("/api", routes);
