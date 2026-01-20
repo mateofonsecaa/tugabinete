@@ -8,7 +8,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000
+app.listen(PORT, () => console.log("API running on", PORT));
 
 app.listen(PORT, "0.0.0.0", () => {
 console.log(`🚀 Backend MiGabinete escuchando en http://0.0.0.0:${PORT}`);

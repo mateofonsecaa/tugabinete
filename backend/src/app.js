@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:5500",
-  "https://migabinete-frontend.onrender.com",
+  "https://gleeful-moxie-181612.netlify.app",
   "https://tugabinete.com",
   "https://www.tugabinete.com"
 ];
