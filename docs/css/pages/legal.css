@@ -1,0 +1,164 @@
+/* ============================================================
+   🌸 MiGabinete — LEGAL (SPA)
+   Aplica a: .legal-page (Policies / Terms / Help)
+   ============================================================ */
+
+.legal-page {
+  font-family: "Poppins", sans-serif;
+}
+
+.legal-page * { box-sizing: border-box; }
+
+/* ---------- Header público sticky ---------- */
+.legal-page .public-header {
+  position: sticky;
+  top: 0;
+  z-index: 4000;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.65);
+  border-bottom: 1px solid rgba(255, 173, 173, 0.25);
+  transition: transform .25s ease, opacity .25s ease;
+}
+
+.legal-page .public-header.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.legal-page .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #ffadad;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.legal-page .public-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.legal-page .public-nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: .2s;
+}
+
+.legal-page .public-nav a:hover { color: #ffadad; }
+
+.legal-page .public-nav .btn {
+  background: #ffadad;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.legal-page .public-nav .btn:hover {
+  background: #fff3c2;
+  color: #333;
+}
+
+/* ---------- Card principal ---------- */
+.legal-page .legal-card {
+  max-width: 1000px;
+  margin: 35px auto 60px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 40px 34px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  backdrop-filter: blur(8px);
+}
+
+.legal-page h1 {
+  text-align: center;
+  color: #ffadad;
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.legal-page .updated {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.legal-page h2 {
+  color: #333;
+  font-size: 21px;
+  margin-top: 24px;
+  margin-bottom: 10px;
+  border-left: 5px solid #ffadad;
+  padding-left: 12px;
+}
+
+.legal-page p {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.legal-page .highlight { color: #ffadad; font-weight: 700; }
+
+.legal-page ul {
+  margin: 8px 0 14px 22px;
+  color: #444;
+  line-height: 1.7;
+}
+
+/* ---------- Footer ---------- */
+.legal-page .bottom-links {
+  text-align: center;
+  padding: 25px 0;
+  font-size: 15px;
+}
+
+.legal-page .bottom-links a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.3s;
+}
+
+.legal-page .bottom-links a:hover { color: #ffadad; }
+
+.legal-page .social {
+  margin-top: 10px;
+}
+
+.legal-page .social i {
+  font-size: 22px;
+  color: #ffadad;
+  margin: 0 10px;
+  transition: transform 0.2s;
+}
+
+.legal-page .social i:hover { transform: scale(1.15); }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .legal-page .legal-card {
+    margin: 25px 14px 50px;
+    padding: 26px 20px;
+  }
+  .legal-page h1 { font-size: 28px; }
+  .legal-page h2 { font-size: 18px; }
+  .legal-page .public-header { height: 64px; padding: 0 14px; }
+  .legal-page .brand { font-size: 19px; }
+}
+
+@media (max-width: 480px) {
+  .legal-page .public-nav a:not(.btn) { display: none; } /* deja solo botones */
+}

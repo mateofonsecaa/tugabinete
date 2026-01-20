@@ -1,0 +1,555 @@
+    .agenda-page main{
+      flex: 1;
+      width: 100%;
+      max-width: 1700px;
+      margin: 30px auto 0;
+
+      display: grid !important;
+      grid-template-columns: 1fr 300px !important;  /* calendario | recordatorios */
+      gap: 20px;
+
+      padding: 40px 20px;
+      align-items: start;
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+    /* ===== CALENDARIO ===== */
+    .agenda-page .calendar-container {
+      flex:1;
+      background:rgba(255,255,255,0.95);
+      border-radius:20px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+      padding:30px;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    .agenda-page .calendar-header {
+      display:flex; justify-content:space-between; align-items:center;
+      width:100%; margin-bottom:20px;
+    }
+    .agenda-page .calendar-header h2 { color:#ffadad; font-size:28px; font-weight:700; text-transform:capitalize; }
+    .agenda-page .calendar-header button {
+      background:none; border:none; color:#ffadad; font-size:22px; cursor:pointer; transition:0.3s;
+    }
+    .agenda-page .calendar-header button:hover { color:#ff7f7f; transform:scale(1.2); }
+
+    .agenda-page .day {
+      background:#fffdf7;
+      border:1px solid rgba(255,173,173,0.3);
+      border-radius:10px; padding:8px;
+      cursor:pointer; transition:0.2s;
+      min-height:100px; position:relative; overflow:auto;
+    }
+    .agenda-page .day:hover { background:#fff3c2; transform:translateY(-2px); }
+    .agenda-page .day.today { border:2px solid #ffadad; }
+    .agenda-page .appointment {
+      background:#fff0f0;
+      border:1px solid #ffd6d6;
+      border-radius:6px;
+      font-size:12px;
+      padding:3px 5px;
+      margin-top:3px;
+      text-align:left;
+      color:#333;
+    }
+    .agenda-page .appointment strong { color:#ff7f7f; }
+
+    /* ===== PANEL LATERAL FIJO ===== */
+    .agenda-page .side-panel {
+      width:300px;
+      background:rgba(255,255,255,0.95);
+      border-radius:20px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+      padding:25px;
+      height:fit-content;
+    }
+
+    .agenda-page .side-panel h3 { color:#ffadad; text-align:center; margin-bottom:10px; }
+    .agenda-page .reminder-list { list-style:none; margin-top:15px; max-height:350px; overflow-y:auto; }
+    .agenda-page .reminder-list li {
+      background:#fffdf7; border:1px solid rgba(255,173,173,0.3);
+      border-radius:10px; padding:10px; margin-bottom:10px; position:relative;
+    }
+    .agenda-page .reminder-list li button {
+      position:absolute; right:10px; top:8px; background:none; border:none;
+      color:#ff7f7f; cursor:pointer; font-size:16px;
+    }
+    .agenda-page .add-reminder { margin-top:10px; display:flex; gap:5px; }
+    .agenda-page .add-reminder input {
+      flex:1; padding:8px; border:1px solid #ffd6d6; border-radius:8px; font-size:14px;
+    }
+    .agenda-page .add-reminder button {
+      background:#ffadad; border:none; color:white; padding:8px 12px;
+      border-radius:8px; cursor:pointer; transition:0.3s;
+    }
+    .agenda-page .add-reminder button:hover { background:#fff3c2; color:#333; }
+
+    /* ===== MODAL ===== */
+    .agenda-page .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 20px;
+    }
+
+    .agenda-page .modal:not(.hidden) {
+      display: flex;
+    }
+    
+    .agenda-page .modal.hidden {
+      display: none !important;
+    }
+    
+    .agenda-page .modal-buttons {
+      display:flex; justify-content:center; gap:15px; margin-top:20px;
+    }
+    .agenda-page .modal-buttons button {
+      border:none; padding:10px 20px; border-radius:8px; font-weight:600; cursor:pointer;
+    }
+
+    .agenda-page .hidden {
+      display: none !important;
+    }
+
+    /* ===== ALERTAS ESTILO MiGabinete ===== */
+.agenda-page .toast {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #ffadad;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+  z-index: 9999;
+}
+.agenda-page .toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.agenda-page .toast.success {
+  background: #4caf50; /* verde suave */
+}
+.agenda-page .toast.error {
+  background: #ff6b6b; /* rojo coral */
+}
+.agenda-page .toast.info {
+  background: #ffadad; /* rosa */
+}
+
+  /* ===== CORRECCIÓN DE ALINEACIÓN DE DÍAS ===== */
+.agenda-page .weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 columnas iguales */
+  gap: 8px; /* 🔹 Debe ser igual al gap del calendario */
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 10px;
+  margin-top: 5px;
+  padding: 0; /* Sin padding para alinear perfecto */
+  box-sizing: border-box;
+}
+
+.agenda-page .weekdays div {
+  background: #f1e0f0;
+  border: 1px solid rgba(255, 173, 173, 0.3);
+  border-radius: 10px;
+  padding: 10px 0;
+  box-shadow: 0 2px 6px rgba(255, 173, 173, 0.1);
+}
+
+/* 🔸 Asegurate que el calendario tenga el mismo esquema */
+.agenda-page .calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px; /* mismo valor que arriba */
+  width: 100%;
+  text-align: center;
+}
+
+/* ====== Inputs de Fecha y Hora (Estilo coherente con MiGabinete) ====== */
+.agenda-page input[type="date"],
+.agenda-page input[type="time"] {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+  border: 1px solid rgba(255, 173, 173, 0.5);
+  border-radius: 12px;
+  background-color: #fffdf9;
+  color: #333;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(255, 173, 173, 0.15);
+}
+
+.agenda-page input[type="date"]:focus,
+.agenda-page input[type="time"]:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 0 3px rgba(255, 173, 173, 0.25);
+}
+
+/* Estilo de selector nativo (solo en Chrome/Edge) */
+.agenda-page input[type="date"]::-webkit-calendar-picker-indicator,
+.agenda-page input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(64%) sepia(50%) saturate(500%) hue-rotate(320deg);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.agenda-page input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.agenda-page input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* ===== Corrección visual de Flatpickr dentro de inputs ===== */
+
+/* El input visual (altInput) que Flatpickr genera */
+.agenda-page .flatpickr-input[readonly],
+.agenda-page input.flatpickr-input[readonly] {
+  background-color: #fffdf9 !important;
+  color: #333 !important;
+  border: 1px solid rgba(255, 173, 173, 0.5) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 15px !important;
+  box-shadow: 0 2px 6px rgba(255, 173, 173, 0.15) !important;
+  width: 100% !important;
+  cursor: pointer !important;
+}
+
+/* Al enfocar (abrir calendario) */
+.agenda-page .flatpickr-input[readonly]:focus {
+  outline: none !important;
+  border-color: #ffadad !important;
+  box-shadow: 0 0 0 3px rgba(255, 173, 173, 0.25) !important;
+}
+
+/* Oculta el input “original” que Flatpickr reemplaza */
+.agenda-page input[type="date"].flatpickr-input,
+.agenda-page input[type="time"].flatpickr-input {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Corrección del contenedor si el campo se deforma */
+.agenda-page .flatpickr-wrapper {
+  width: 100% !important;
+}
+
+/* 🔒 Evita que los recordatorios se vayan para los costados */
+.agenda-page .reminder-list li {
+  width: 100%;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  padding-right: 40px; /* Espacio para el botón borrar */
+}
+
+/* 🔒 Evita cualquier scroll horizontal */
+.agenda-page .reminder-list {
+  overflow-x: hidden !important;
+}
+
+/* 🔒 El botón borrar no empuja el texto */
+.agenda-page .reminder-list li button {
+  flex-shrink: 0;
+}
+
+/* =============================
+   🌸 MODAL PROFESIONAL DEL DÍA
+============================= */
+.agenda-page #dayModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+  padding: 20px;
+}
+
+.agenda-page .day-modal-content {
+  width: 750px;
+  max-width: 90%;
+  background: #ffffff;
+  padding: 35px 40px;
+  border-radius: 22px;
+  box-shadow: 0 12px 45px rgba(0,0,0,0.25);
+  animation: fadeInUp .25s ease-out;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+@keyframes fadeInUp {
+  from { opacity:0; transform: translateY(20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.agenda-page .day-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.agenda-page .day-modal-actions button {
+  margin-left: 8px;
+}
+
+.agenda-page .close-btn {
+  background: #ffe3e3;
+  color: #ff7f7f;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(255, 120, 120, 0.25);
+}
+
+.agenda-page .close-btn:hover {
+  background: #ffadad;
+  color: white;
+  transform: scale(1.12);
+  box-shadow: 0 4px 10px rgba(255, 120, 120, 0.35);
+}
+
+.agenda-page .close-btn i {
+  pointer-events: none;
+}
+
+.agenda-page .primary-btn {
+  background: #ffadad;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.agenda-page .secondary-btn {
+  background: #eee;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.agenda-page .total-appointments {
+  margin: 10px 0 18px;
+  font-weight: bold;
+}
+
+.agenda-page .appointments-list .item {
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.agenda-page .app-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.agenda-page .app-buttons button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #ffadad;
+  font-size: 18px;
+}
+
+/* =============================
+   SUBMODAL NUEVO TURNO
+============================= */
+.agenda-page #newSimpleModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  justify-content: center;
+  align-items: center;
+  z-index: 6000;
+}
+
+.agenda-page .new-simple-content {
+  width: 350px;
+  background: #fffdfc;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+  animation: fadeInUp .25s ease-out;
+}
+
+.agenda-page .new-simple-content input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 14px;
+}
+
+.agenda-page .modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ff7f7f;
+}
+
+.field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 600;
+  color: #444;
+  font-size: 14px;
+}
+
+.patient-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.agenda-page #simpleTimeInput {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,173,173,0.5);
+  background: #fffdfc;
+  box-shadow: 0 2px 6px rgba(255,173,173,0.15);
+  font-size: 15px;
+}
+
+/* Nuevo estilo correcto del select */
+.agenda-page #simplePatientSelect {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,173,173,0.5);
+  background: #fffdfc;
+  box-shadow: 0 2px 6px rgba(255,173,173,0.15);
+  font-size: 15px;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#simplePatientSelect:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 0 3px rgba(255,173,173,0.25);
+}
+
+.patient-row {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  align-items: center;
+}
+
+.small-btn {
+  background: #ffadad !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  cursor: pointer;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s;
+}
+
+.small-btn:hover {
+  background: #ff8f8f !important;
+}
+
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+.patient-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.patient-input-wrapper {
+  position: relative;   /* 🔥 Esto evita que el dropdown se abra gigante */
+  width: 100%;
+}
+
+.dropdown-list {
+  position: absolute;
+  overflow-x: hidden; 
+  top: 100%;
+  left: 0;
+  width: 100%;           /* Ahora coincide EXACTO con el input */
+  background: white;
+  border-radius: 10px;
+  border: 1px solid rgba(255,173,173,0.5);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  max-height: 160px;
+  overflow-y: auto;
+  display: none;
+  z-index: 9999;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: normal;     /* permite que el texto salte de línea */
+  word-wrap: break-word;   /* fuerza el corte si es EXTREMADAMENTE largo */
+  overflow-wrap: break-word;
+}
+
+.dropdown-item:hover {
+  background: #fff4f4;
+}
+
+/* AGENDA: sacar la tarjeta grande (main) */
+.agenda-page main {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}

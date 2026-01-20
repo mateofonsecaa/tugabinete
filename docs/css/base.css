@@ -1,0 +1,27 @@
+/* public/css/base.css */
+
+/* ====== Variables globales ====== */
+:root {
+  --color-primary: #ffadad;
+  --color-secondary: #fff3c2;
+  --color-bg: #fffdf9;
+  --color-text: #333;
+  --radius: 14px;
+  --shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+}
+
+/* ====== Reset / Base ====== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: url("../images/body.png") no-repeat center center fixed;
+  background-size: cover;
+  background-color: #fff5f5;
+  color: var(--color-text);
+  min-height: 100vh;
+}

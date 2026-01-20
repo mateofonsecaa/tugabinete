@@ -1,0 +1,338 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: url("../../public/images/body.png") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #ffadad;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    header {
+      height: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffadad;
+      text-decoration: none;
+    }
+
+    /* REGISTRO */
+    .register-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 50px 20px;
+    }
+
+    .register-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 40px 50px;
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .register-card h2 {
+      color: #ffadad;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .register-card p {
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ffe3e3;
+      background: #fffdf7;
+      font-size: 15px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #ffadad;
+      box-shadow: 0 0 6px rgba(255, 173, 173, 0.4);
+      outline: none;
+    }
+
+    .show-password {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 53px;
+      cursor: pointer;
+      color: #ffadad;
+      font-size: 14px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      background: #ffadad;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+    }
+
+    button[type="submit"]:hover {
+      background: #fff3c2;
+      color: #333;
+      transform: translateY(-2px);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .login-link a {
+      color: #ffadad;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .bottom-links {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 15px;
+    }
+
+    .bottom-links a {
+      color: #333;
+      text-decoration: none;
+      margin: 0 12px;
+      transition: color 0.3s;
+    }
+
+    .bottom-links a:hover {
+      color: #ffadad;
+    }
+
+    .social {
+      margin-top: 10px;
+    }
+
+    .social i {
+      font-size: 22px;
+      color: #ffadad;
+      margin: 0 10px;
+      transition: transform 0.2s;
+    }
+
+    .social i:hover {
+      transform: scale(1.15);
+    }
+
+    .copyright {
+      text-align: right;
+      font-size: 13px;
+      color: rgba(51, 51, 51, 0.7);
+      margin: 30px 25px 15px 0;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 173, 173, 0.3);
+    }
+
+    /* 🧊 CONTENEDOR DE NOTIFICACIONES */
+    .notification-container {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 9999;
+      max-width: 340px;
+    }
+
+    /* ✨ NOTIFICACIONES MODERNAS */
+    .notification-toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border-left: 6px solid #ffadad;
+      color: #333;
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translateY(-15px);
+      transition: all 0.4s ease;
+      font-weight: 500;
+    }
+
+    .notification-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification-toast.success {
+      border-left-color: #90d26d;
+    }
+
+    .notification-toast.error {
+      border-left-color: #ff7171;
+    }
+
+    .notification-toast i {
+      font-size: 20px;
+    }
+
+    .notification-toast.success i {
+      color: #90d26d;
+    }
+
+    .notification-toast.error i {
+      color: #ff7171;
+    }
+
+    body.is-login #app,
+body.is-register #app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.is-login #app > :first-child,
+body.is-register #app > :first-child {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+    /* ============================
+   📱 RESPONSIVE SOLO PARA MÓVIL
+   ============================ */
+@media (max-width: 480px) {
+
+  body {
+    background-size: cover !important;
+    background-attachment: scroll !important; /* fix iOS */
+    padding: 0;
+  }
+
+  header {
+    height: 60px;
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .register-section {
+    padding: 20px 15px; /* menos espacio */
+  }
+
+  .register-card {
+    padding: 25px 20px;
+    max-width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  }
+
+  .register-card h2 {
+    font-size: 22px;
+  }
+
+  .register-card p {
+    font-size: 14px;
+  }
+
+  .input-group input {
+    padding: 11px;
+    font-size: 14px;
+  }
+
+  .toggle-password {
+    top: 46px; /* recalibrado */
+    right: 12px;
+    font-size: 13px;
+  }
+
+  button[type="submit"] {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .login-link {
+    font-size: 13px;
+    margin-top: 15px;
+  }
+
+  .bottom-links {
+    font-size: 13px;
+    padding: 10px 0;
+  }
+
+  .social i {
+    font-size: 18px;
+  }
+
+  .copyright {
+    text-align: center;
+    font-size: 12px;
+    margin: 20px 0;
+    padding-top: 10px;
+  }
+
+  /* Ajuste de notificaciones */
+  .notification-container {
+    right: 10px;
+    top: 10px;
+    max-width: 90%;
+  }
+}

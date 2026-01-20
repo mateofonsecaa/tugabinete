@@ -1,0 +1,183 @@
+/* public/css/interviews/facial-interview.css */
+/* Scope: /patients/:id/interview/edit/1 */
+body.is-interview-edit-1 section.form-card {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 950;
+  width: calc(100% - 40px);
+  margin: 90px auto;
+  backdrop-filter: blur(6px);
+}
+
+body.is-interview-edit-1 .form-card h2 {
+  color: #ffadad;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+body.is-interview-edit-1 .question {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 173, 173, 0.3);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+body.is-interview-edit-1 .question:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+body.is-interview-edit-1 .question label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+}
+
+body.is-interview-edit-1 .options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+body.is-interview-edit-1 .options input[type="checkbox"],
+body.is-interview-edit-1 .options input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffadad;
+  border-radius: 6px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+body.is-interview-edit-1 .options input[type="checkbox"]:checked,
+body.is-interview-edit-1 .options input[type="radio"]:checked {
+  background-color: #ffadad;
+  border-color: #ffadad;
+}
+
+body.is-interview-edit-1 .options input[type="checkbox"]:checked::after,
+body.is-interview-edit-1 .options input[type="radio"]:checked::after {
+  content: "✔";
+  position: absolute;
+  color: #fff;
+  font-size: 13px;
+  left: 3px;
+  top: 0;
+}
+
+body.is-interview-edit-1 .options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+body.is-interview-edit-1 textarea,
+body.is-interview-edit-1 input[type="text"],
+body.is-interview-edit-1 input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ffd6d6;
+  background: #fffdf7;
+  font-size: 15px;
+  margin-top: 8px;
+  transition: all 0.3s;
+}
+
+body.is-interview-edit-1 textarea:focus,
+body.is-interview-edit-1 input:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 5px rgba(255, 173, 173, 0.3);
+  outline: none;
+}
+
+body.is-interview-edit-1 .actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
+}
+
+/* Mantengo tus clases .btn/.btn-back/.btn-next/.btn-save pero scoped */
+body.is-interview-edit-1 .btn {
+  border: none;
+  border-radius: 12px;
+  padding: 14px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.is-interview-edit-1 .btn-back,
+body.is-interview-edit-1 .btn-next {
+  background: #ffadad;
+  color: white;
+}
+
+body.is-interview-edit-1 .btn-back:hover,
+body.is-interview-edit-1 .btn-next:hover {
+  background: #fff3c2;
+  color: #333;
+  transform: translateY(-2px);
+}
+
+body.is-interview-edit-1 .btn-save {
+  background: white;
+  color: #ffadad;
+  border: 2px solid #ffadad;
+}
+
+body.is-interview-edit-1 .btn-save:hover {
+  background: #ffadad;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Top-bar scoped */
+body.is-interview-edit-1 .top-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+
+body.is-interview-edit-1 .top-bar .btn-back {
+  background: white;
+  color: #ffadad;
+  border: 2px solid #ffadad;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(255, 173, 173, 0.15);
+}
+
+body.is-interview-edit-1 .top-bar .btn-back:hover {
+  background: #ffadad;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* SweetAlert (scoped, por si te afecta otras vistas) */
+body.is-interview-edit-1 .swal2-popup {
+  font-family: "Poppins", sans-serif !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 25px rgba(255, 173, 173, 0.2) !important;
+}
+body.is-interview-edit-1 .swal2-title {
+  color: #ffadad !important;
+  font-weight: 700 !important;
+}

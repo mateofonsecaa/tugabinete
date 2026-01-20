@@ -1,0 +1,121 @@
+/* public/css/interviews/interview-view.css */
+/* Scope: /patients/:id/interview */
+body.is-interview-view main {
+  max-width: 950px;
+  margin: 100px auto;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+body.is-interview-view h1 {
+  color: #ffadad;
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 30px;
+  letter-spacing: 0.5px;
+}
+
+body.is-interview-view h2 {
+  color: #444;
+  border-left: 6px solid #ffadad;
+  padding-left: 12px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body.is-interview-view h2 i {
+  color: #ffadad;
+}
+
+body.is-interview-view .section {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 173, 173, 0.3);
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 35px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+body.is-interview-view .entry {
+  border-bottom: 1px solid rgba(255, 173, 173, 0.25);
+  padding: 12px 0;
+}
+
+body.is-interview-view .entry:last-child {
+  border-bottom: none;
+}
+
+body.is-interview-view .question {
+  font-weight: 600;
+  color: #ff7f7f;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+body.is-interview-view .answer {
+  color: #444;
+  font-size: 15px;
+  line-height: 1.6;
+  padding-left: 8px;
+}
+
+body.is-interview-view .answer em {
+  color: #666;
+  font-style: italic;
+  font-size: 14px;
+}
+
+body.is-interview-view .btn-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+body.is-interview-view .btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.is-interview-view .btn-back {
+  background: white;
+  color: #ffadad;
+  border: 2px solid #ffadad;
+}
+
+body.is-interview-view .btn-back:hover {
+  background: #ffadad;
+  color: white;
+  transform: translateY(-2px);
+}
+
+body.is-interview-view .btn-edit {
+  background: #ffadad;
+  color: white;
+  border: none;
+}
+
+body.is-interview-view .btn-edit:hover {
+  background: #fff3c2;
+  color: #333;
+  transform: translateY(-2px);
+}
+
+body.is-interview-view .no-data {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  margin: 10px 0;
+}

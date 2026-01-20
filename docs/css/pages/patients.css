@@ -1,0 +1,103 @@
+    .patients-page main {
+      flex: 1;
+      max-width: 750px;
+      width: 100%;
+      margin: 100px auto 60px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 40px;
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.8s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .patients-page h1 { color: #ffadad; text-align: center; margin-bottom: 30px; font-size: 30px; }
+
+    .patients-page:not(.patient-details-page):not(.patient-edit-page):not(.patient-new-page) .main-top-actions {
+        position: absolute;
+        top: 30px;
+        left: 40px;
+    }
+
+    .patients-page .btn-back {
+      background: transparent; color: #ffadad; border: 2px solid #ffadad;
+      border-radius: 10px; padding: 10px 18px; font-weight: 600; cursor: pointer;
+      transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .patients-page .btn-back:hover { background: #ffadad; color: white; transform: translateY(-2px); }
+
+    .patients-page .search-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; margin-bottom: 25px; flex-wrap: wrap;
+    }
+    .patients-page .search-bar input {
+      flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ffd6d6;
+      background: #fffdf7; font-size: 15px; transition: 0.3s;
+    }
+    .patients-page .search-bar input:focus {
+      border-color: #ffadad; box-shadow: 0 0 5px rgba(255,173,173,0.3);
+      outline: none;
+    }
+
+    .patients-page .btn-add {
+      background: #ffadad; color: white; border: none; border-radius: 10px;
+      padding: 12px 20px; font-weight: 600; cursor: pointer;
+      transition: 0.3s; display: flex; align-items: center; gap: 8px;
+    }
+    .patients-page .btn-add:hover { background: #fff3c2; color: #333; transform: translateY(-2px); }
+
+    /* Contenedor normal: NO tiene altura fija (queda “justo”) */
+    .patients-page .table-container{
+      height: auto;
+      max-height: none;
+      overflow: visible;
+
+      border-radius: 10px;
+      border: 1px solid rgba(255,173,173,0.3);
+      background: rgba(255,255,255,0.6);
+      scrollbar-width: thin;
+      scrollbar-color: #ffadad #fff3c2;
+
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Solo los que deben scrollear */
+    .patients-page .table-container.table-scroll{
+      height: auto;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .patients-page .table-container::-webkit-scrollbar { width: 8px; }
+    .patients-page .table-container::-webkit-scrollbar-thumb { background-color: #ffadad; border-radius: 4px; }
+    .patients-page .table-container::-webkit-scrollbar-track { background-color: #fff3c2; }
+
+    .patients-page table { width: 100%; border-collapse: collapse; text-align: left; }
+    .patients-page th, td { padding: 14px 18px; border-bottom: 1px solid rgba(255,173,173,0.3); }
+    .patients-page th { background: rgba(255,243,194,0.8); position: sticky; top: 0; }
+    .patients-page tr:hover { background: rgba(255,255,255,0.7); transition: background 0.2s; }
+
+    .patients-page .actions { display: flex; gap: 12px; justify-content: center; }
+    .patients-page .actions button {
+      background: none; border: none; cursor: pointer; font-size: 18px;
+      color: #ffadad; transition: 0.2s;
+    }
+    .patients-page .actions button:hover { color: #ff7f7f; transform: scale(1.15); }
+
+    /* 🔧 Evitar que las columnas se deformen con textos largos */
+.patients-page #patientsTable td {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,0 +1,407 @@
+/* public/css/layout.css */
+
+/* ====== Header / Nav (App) ====== */
+
+/* Fuerza el fondo global de la app (gana a cualquier page css) */
+body {
+  background: url("../images/body.png") no-repeat center center fixed;
+  background-size: cover;
+  background-color: #fff5f5;
+}
+
+header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(255, 173, 173, 0.4);
+  height: 75px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffadad;
+  text-decoration: none;
+}
+
+.nav-icons {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-icons a {
+  color: #ffadad;
+  font-size: 22px;
+  transition: 0.2s;
+  position: relative;
+}
+.nav-icons a:hover {
+  color: #fff3c2;
+  transform: scale(1.15);
+}
+
+/* ====== Contenedor general de páginas (App) ====== */
+main {
+  max-width: 800px;
+  margin: 60px auto;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 22px;
+  padding: 50px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Título estándar (si tu app lo usa así) */
+h1 {
+  text-align: center;
+  color: var(--color-primary);
+  margin-bottom: 40px;
+  font-size: 30px;
+}
+
+/* =========================================
+   Header público (landing / auth)
+   Links: Inicio / Sobre nosotros / Contacto
+   Botones: .btn-login / .btn-register
+   ========================================= */
+
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Links del menú público */
+header nav a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+header nav a:hover {
+  color: var(--color-primary);
+}
+
+/* Botones del header público (mantiene tu look original) */
+header nav .btn-login,
+header nav .btn-register {
+  background: #ffadad;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: none; /* evita que herede sombras fuertes si existen */
+}
+
+header nav .btn-login:hover,
+header nav .btn-register:hover {
+  background: #fff3c2;
+  color: #333;
+}
+
+/* Header público (landing) más transparente */
+.public-header {
+  background: rgba(255, 255, 255, 0.30);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 173, 173, 0.28);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== Header: slide-up suave (hidden siempre gana) ===== */
+header {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+
+/* Oculto */
+header.hidden {
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Visible (opcional si tu JS la usa) */
+header.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Si por bug quedan ambas clases, que gane hidden */
+header.hidden.visible {
+  transform: translateY(-110%);
+  opacity: 0;
+}
+
+/* Ocultar header en auth (login/register) */
+body.is-login header,
+body.is-register header {
+  display: none !important;
+}
+
+/* Ver entrevista: que las cajas internas ocupen el ancho del contenido */
+body.is-interview-view .section {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* ================================
+   Entrevista 2/2 — estilo garantizado
+================================ */
+body.is-interview-edit-2 section.form-card {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: calc(100% - 40px);
+  max-width: 950px;
+  margin: 90px auto;
+  backdrop-filter: blur(6px);
+}
+
+body.is-interview-edit-2 .form-card h2 {
+  color: #ffadad;
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+body.is-interview-edit-2 .question {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 173, 173, 0.3);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+
+body.is-interview-edit-2 .question:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+body.is-interview-edit-2 .question > label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+}
+
+body.is-interview-edit-2 .options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+body.is-interview-edit-2 textarea,
+body.is-interview-edit-2 input[type="text"],
+body.is-interview-edit-2 input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ffd6d6;
+  background: #fffdf7;
+  font-size: 15px;
+  margin-top: 8px;
+  transition: 0.2s;
+}
+
+body.is-interview-edit-2 textarea:focus,
+body.is-interview-edit-2 input:focus {
+  outline: none;
+  border-color: #ffadad;
+  box-shadow: 0 0 6px rgba(255, 173, 173, 0.25);
+}
+
+    /* =========================
+    Patient Edit: form en columna (uno debajo del otro)
+    ========================= */
+
+body.is-patient-edit .patient-form{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* cada label como bloque */
+body.is-patient-edit .patient-form > label{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* inputs full width y prolijos */
+body.is-patient-edit .patient-form input{
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* botón guardar centrado abajo */
+body.is-patient-edit .patient-form .btn-save-edit{
+  align-self: center !important;
+  margin-top: 10px !important;
+  min-width: 220px;
+}
+
+/* Patient Edit: que el date sea igual de ancho */
+body.is-patient-edit .patient-form input[type="date"]{
+  width: 100% !important;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* =========================
+   Patient Edit: main más angosto (pisando patients.css)
+   ========================= */
+body.is-patient-edit .patients-page main{
+  max-width: 800px !important;  /* bajalo a 850 / 800 si querés */
+  width: 100% !important;
+}
+
+/* =========================
+   Patient Edit: inputs full width (incluye type=date)
+   ========================= */
+body.is-patient-edit .patient-form{
+  align-items: stretch !important; /* por si algún CSS lo centra */
+}
+
+body.is-patient-edit .patient-form > label{
+  width: 100% !important;
+}
+
+body.is-patient-edit .patient-form input,
+body.is-patient-edit .patient-form input[type="date"]{
+  width: 100% !important;
+  max-width: none !important;
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+/* Nuevo Paciente: mismo layout que editar */
+body.is-patient-new .patient-form{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  max-width: 560px;
+  margin: 0 auto;
+  align-items: stretch !important;
+}
+
+body.is-patient-new .patient-form > label{
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+body.is-patient-new .patient-form input{
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+body.is-patient-new .patient-form button[type="submit"]{
+  align-self: center !important;
+  margin-top: 10px !important;
+  min-width: 220px;
+}
+
+/* Contenedor más angosto */
+body.is-patient-new .patients-page main{
+  max-width: 900px !important;
+  width: 100% !important;
+}
+
+/* ===== Nuevo Paciente: inputs con el mismo estilo que Editar ===== */
+body.is-patient-new .patient-form input{
+  width: 100% !important;
+  border: 1.5px solid #ffd6d6 !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  font-size: 15px !important;
+  background: #fffdf9 !important;
+  font-family: "Poppins", sans-serif !important;
+  box-sizing: border-box !important;
+}
+
+body.is-patient-new .patient-form input:focus{
+  outline: none !important;
+  border-color: #ffadad !important;
+  box-shadow: 0 0 6px rgba(255, 173, 173, 0.25) !important;
+}
+
+/* =========================================
+   Interview View: barra de acciones alineada
+   (evita que patients.css la deje absolute)
+   ========================================= */
+body.is-interview-view .patients-page main .main-top-actions{
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+body.is-interview-view .patients-page main .main-top-actions .right-actions{
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+/* mismos tamaños para que no se vean “desparejos” */
+body.is-interview-view .patients-page main .main-top-actions .btn-back,
+body.is-interview-view .patients-page main .main-top-actions .btn-add{
+  height: 40px !important;
+  padding: 0 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+/* (opcional) si también querés que el contenedor no sea tan ancho */
+body.is-interview-view main{
+  max-width: 950px;
+}
+
+.is-dashboard .top-bar,
+.is-patients .top-bar,
+.is-profile .top-bar,
+.is-agenda .top-bar,
+.is-treatments .top-bar{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 3000;
+}
+
+.is-dashboard main,
+.is-patients main,
+.is-profile main,
+.is-agenda main,
+.is-treatments main{
+  padding-top: 70px;
+}

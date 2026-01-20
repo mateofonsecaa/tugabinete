@@ -1,0 +1,1029 @@
+/* ============================================================
+   🌸 MIGABINETE — TREATMENTS (SPA)
+   Scope: SOLO dentro de .treatments-page
+   (No toca body ni estilos globales)
+   ============================================================ */
+
+.treatments-page {
+  font-family: "Poppins", sans-serif;
+}
+
+.treatments-page * {
+  box-sizing: border-box;
+}
+
+/* ================================
+   Layout principal (igual que pacientes/agenda)
+================================ */
+.treatments-page main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 100px auto 60px; /* deja lugar para top-bar */
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  backdrop-filter: blur(5px);
+  animation: treatmentsFadeIn 0.8s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+@keyframes treatmentsFadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.treatments-page h1 {
+  color: #ffadad;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 30px;
+}
+
+/* ================================
+   Secciones: títulos
+================================ */
+.treatments-page #registerSection h2,
+.treatments-page .filter-section h2,
+.treatments-page .modal-box h2,
+.treatments-page .modal-edit-pro h2,
+.treatments-page .modal-detail-pro h2 {
+  color: #444;
+  border-left: 5px solid #ffadad;
+  padding-left: 10px;
+  margin-bottom: 18px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   🌸 REGISTRO DE TRATAMIENTO
+============================================================ */
+.treatments-page #registerSection {
+  margin-bottom: 60px;
+}
+
+.treatments-page #registerOptions {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Botones principales (Paciente existente / Nuevo paciente / Guardar / Cerrar) */
+.treatments-page .btn-patient,
+.treatments-page .btn-save-treatment,
+.treatments-page .btn-cancel-treatment {
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+}
+
+.treatments-page .btn-patient {
+  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+  color: #fff;
+  margin: 0 8px;
+}
+
+.treatments-page .btn-patient:hover,
+.treatments-page .btn-save-treatment:hover {
+  background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
+  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 173, 173, 0.35);
+}
+
+.treatments-page .btn-save-treatment {
+  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+  color: #fff;
+}
+
+.treatments-page .btn-cancel-treatment {
+  background: transparent;
+  border: 2px solid #ffadad;
+  color: #ffadad;
+  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.15);
+}
+
+.treatments-page .btn-cancel-treatment:hover {
+  background: #ffadad;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 173, 173, 0.25);
+}
+
+.treatments-page #treatmentForm {
+  background: #fffdf9;
+  border: 1.5px solid rgba(255, 173, 173, 0.3);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.1);
+}
+
+.treatments-page #treatmentForm label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+.treatments-page #treatmentForm input,
+.treatments-page #treatmentForm select,
+.treatments-page #treatmentForm textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1.5px solid #ffd6d6;
+  background: #fffdf9;
+  padding: 10px 14px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+.treatments-page #treatmentForm input:focus,
+.treatments-page #treatmentForm select:focus,
+.treatments-page #treatmentForm textarea:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 8px rgba(255, 173, 173, 0.3);
+  outline: none;
+}
+
+.treatments-page #treatmentForm textarea {
+  resize: vertical;
+  height: 80px;
+}
+
+.treatments-page .action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+/* ============================================================
+   🔎 FILTROS
+============================================================ */
+.treatments-page .filter-section {
+  margin: 60px 0 40px 0;
+}
+
+.treatments-page .filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: space-between;
+  background: #fffdf9;
+  border: 1.5px solid rgba(255, 173, 173, 0.35);
+  border-radius: 18px;
+  padding: 25px 30px;
+  box-shadow: 0 4px 15px rgba(255, 173, 173, 0.15);
+}
+
+/* inputs y selects */
+.treatments-page .filters input,
+.treatments-page .filters select {
+  flex: 1;
+  min-width: 220px;
+  background: #ffffff;
+  border: 2px solid rgba(255, 173, 173, 0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #444;
+  outline: none;
+  transition: all 0.25s ease;
+  box-shadow: inset 0 2px 5px rgba(255, 173, 173, 0.05);
+}
+
+.treatments-page .filters input::placeholder {
+  color: #aaa;
+  letter-spacing: 0.3px;
+}
+
+.treatments-page .filters input:focus,
+.treatments-page .filters select:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 10px rgba(255, 173, 173, 0.35);
+}
+
+/* select flecha */
+.treatments-page .filters select {
+  appearance: none;
+  background: linear-gradient(180deg, #fffdf9 0%, #fffaf5 100%);
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10'><path fill='%23ffadad' d='M7 10L0 0h14z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 10px;
+  cursor: pointer;
+}
+
+/* Limpiar filtros */
+.treatments-page .clear-all-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.treatments-page #clearAllFilters {
+  background: transparent;
+  border: 2px solid #ffadad;
+  color: #ffadad;
+  padding: 10px 24px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(255, 173, 173, 0.25);
+}
+
+.treatments-page #clearAllFilters:hover {
+  background: #ffadad;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   Searchable select (paciente / tratamientos / filtro)
+============================================================ */
+.treatments-page .searchable-select {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.treatments-page .searchable-select input {
+  width: 100%;
+  background: #ffffff;
+  border: 2px solid rgba(255, 173, 173, 0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #444;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.treatments-page .searchable-select input:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 10px rgba(255, 173, 173, 0.35);
+}
+
+.treatments-page .options {
+  display: none;
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  background: #fffdf9;
+  border: 2px solid rgba(255, 173, 173, 0.3);
+  max-height: 230px;
+  overflow-y: auto;
+  border-radius: 12px;
+  z-index: 999;
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.08);
+}
+
+.treatments-page .options div {
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.treatments-page .options div:hover {
+  background: #fff1f1;
+}
+
+.treatments-page .input-validator-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  display: none;
+}
+
+.treatments-page .input-validator-icon.error {
+  color: #ff6b6b;
+  display: block;
+}
+
+.treatments-page .input-validator-icon.ok {
+  color: #4caf50;
+  display: block;
+}
+
+/* ============================================================
+   📋 TABLA
+============================================================ */
+.treatments-page table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: 20px;
+}
+
+.treatments-page thead th {
+  text-align: left;
+  padding: 12px 14px;
+  background: #fff7d9;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 13px;
+  border-bottom: 2px solid #ffd6d6;
+}
+
+.treatments-page tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(255, 173, 173, 0.1);
+}
+
+.treatments-page tbody td {
+  padding: 12px 14px;
+  font-size: 15px;
+  color: #444;
+}
+
+.treatments-page #treatmentsTable td {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Estados */
+.treatments-page .status-paid {
+  background: #d8ffe0;
+  color: #178a3f;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.treatments-page .status-pending {
+  background: #ffe3e3;
+  color: #d93636;
+  padding: 4px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Acciones */
+.treatments-page .actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #ffadad;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.treatments-page .actions button:hover {
+  color: #f76e6e;
+  transform: scale(1.2);
+}
+
+/* ============================================================
+   📎 Files / previews
+============================================================ */
+.treatments-page .file-field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.treatments-page .file-field label {
+  font-weight: 600;
+  color: #555;
+  font-size: 15px;
+}
+
+.treatments-page .file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.treatments-page .file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+.treatments-page .file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  border: 1.5px solid rgba(255, 173, 173, 0.6);
+  color: #444;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.treatments-page .file-btn:hover {
+  border-color: #ffadad;
+  background-color: #fff7f7;
+  color: #222;
+}
+
+.treatments-page .file-btn i {
+  color: #ffadad;
+  font-size: 15px;
+}
+
+.treatments-page .file-name {
+  font-size: 14px;
+  color: #777;
+  font-style: italic;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.treatments-page .photo-mini-preview {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-top: 8px;
+  display: none;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+/* ============================================================
+   ⏰ Time input (solo dentro treatments)
+============================================================ */
+.treatments-page input[type="time"] {
+  width: 100%;
+  background-color: #fffdf9;
+  border: 1.5px solid rgba(255, 173, 173, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  color: #444;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.treatments-page input[type="time"]:hover {
+  border-color: #ffadad;
+  background-color: #fff7f7;
+}
+
+.treatments-page input[type="time"]:focus {
+  outline: none;
+  border-color: #ffadad;
+  background-color: #fffaf9;
+  box-shadow: 0 0 8px rgba(255, 173, 173, 0.3);
+}
+
+.treatments-page input[type="time"]::-webkit-calendar-picker-indicator {
+  background: url("data:image/svg+xml;utf8,<svg fill='%23ffadad' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm0 2C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm-.5-10.79V7h1v4.5l3.5 2.1-.5.86-3.5-2.1z'/></svg>") no-repeat center;
+  background-size: 18px 18px;
+  opacity: 0.75;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 6px;
+  transition: all 0.2s ease;
+}
+
+.treatments-page input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: rgba(255, 173, 173, 0.1);
+}
+
+/* ============================================================
+   🌸 MODALES (overlay + base)
+============================================================ */
+.treatments-page .modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 245, 245, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  padding: 18px;
+}
+
+.treatments-page .modal-overlay.active {
+  display: flex;
+}
+
+.treatments-page .modal-box {
+  background: #fffdf9;
+  border-radius: 18px;
+  box-shadow: 0 8px 35px rgba(255, 173, 173, 0.25);
+  padding: 35px 45px;
+  width: 90%;
+  max-width: 720px;
+  animation: treatmentsSlideUp 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform-origin: center;
+  position: relative;
+}
+
+@keyframes treatmentsSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.treatments-page .close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
+  color: #ffadad;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* Modal nuevo paciente */
+.treatments-page .modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+
+.treatments-page .form-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.treatments-page .modal-box input,
+.treatments-page .modal-box select,
+.treatments-page .modal-box textarea {
+  border: 1.5px solid #ffd6d6;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  background: #fffdf9;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+.treatments-page .modal-box textarea {
+  resize: none;
+  height: 70px;
+}
+
+.treatments-page .modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.treatments-page .btn-save {
+  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 173, 173, 0.3);
+}
+
+.treatments-page .btn-save:hover {
+  background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
+  color: #333;
+  transform: translateY(-2px);
+}
+
+.treatments-page .btn-cancel {
+  background: transparent;
+  border: 2px solid #ffadad;
+  color: #ffadad;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.treatments-page .btn-cancel:hover {
+  background: #ffadad;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   ✏️ MODAL EDITAR TRATAMIENTO
+============================================================ */
+.treatments-page .modal-edit-pro {
+  background: linear-gradient(180deg, #fffdf9 0%, #fff9f7 100%);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(255, 173, 173, 0.25);
+  width: 95%;
+  max-width: 1100px;
+  height: auto;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 32px 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #444;
+  animation: treatmentsSlideUp 0.3s ease-out;
+}
+
+.treatments-page .edit-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.treatments-page .edit-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.treatments-page .edit-column label {
+  font-weight: 600;
+  color: #555;
+  font-size: 15px;
+}
+
+.treatments-page .edit-column input,
+.treatments-page .edit-column select,
+.treatments-page .edit-column textarea {
+  border: 1.5px solid #ffd6d6;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 15px;
+  background: #fffdf9;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  transition: all 0.25s ease;
+}
+
+.treatments-page .edit-column input:focus,
+.treatments-page .edit-column select:focus,
+.treatments-page .edit-column textarea:focus {
+  border-color: #ffadad;
+  box-shadow: 0 0 8px rgba(255, 173, 173, 0.3);
+  outline: none;
+}
+
+.treatments-page .edit-photo-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.treatments-page .photo-block {
+  flex: 1;
+  text-align: center;
+}
+
+.treatments-page .photo-block label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.treatments-page .photo-preview {
+  width: 100%;
+  height: 140px;
+  border: 2px dashed rgba(255, 173, 173, 0.35);
+  border-radius: 14px;
+  background: #fffdf9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.treatments-page .photo-preview:hover {
+  border-color: #ffadad;
+  box-shadow: 0 0 10px rgba(255, 173, 173, 0.25);
+}
+
+.treatments-page .photo-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.treatments-page .photo-preview img:hover {
+  transform: scale(1.05);
+}
+
+/* Fix buscable en editar */
+.treatments-page .modal-edit-pro .searchable-select {
+  width: 100% !important;
+  min-width: 0;
+}
+
+.treatments-page .modal-edit-pro #editTreatmentInput,
+.treatments-page .modal-edit-pro #editTreatmentOptions {
+  width: 100% !important;
+}
+
+/* ============================================================
+   👁️ MODAL DETALLE TRATAMIENTO
+============================================================ */
+.treatments-page .modal-detail-pro {
+  background: linear-gradient(180deg, #fffdf9 0%, #fff9f7 100%);
+  border-radius: 22px;
+  box-shadow: 0 12px 40px rgba(255, 173, 173, 0.25);
+  width: 92%;
+  max-width: 900px;
+  padding: 28px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #444;
+  position: relative;
+  animation: treatmentsSlideUp 0.3s ease-out;
+  height: 90vh;
+}
+
+.treatments-page .detail-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.treatments-page .detail-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1.5px solid rgba(255, 173, 173, 0.25);
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 3px 10px rgba(255, 173, 173, 0.08);
+}
+
+.treatments-page .detail-card h3 {
+  color: #ff9b9b;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.treatments-page .detail-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 3px 0;
+}
+
+.treatments-page .detail-notes {
+  background: #fff;
+  border: 1.5px solid rgba(255, 173, 173, 0.25);
+  border-radius: 14px;
+  padding: 12px 18px;
+  box-shadow: 0 3px 10px rgba(255, 173, 173, 0.08);
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.treatments-page .detail-photos {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.treatments-page .detail-photos div {
+  text-align: center;
+}
+
+.treatments-page .detail-photos img {
+  width: 140px;
+  height: 140px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 173, 173, 0.3);
+  box-shadow: 0 5px 14px rgba(255, 173, 173, 0.25);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.treatments-page .detail-photos img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 22px rgba(255, 173, 173, 0.35);
+}
+
+/* ✅ Arregla la línea rosa desfasada en los títulos */
+.treatments-page #registerSection h2,
+.treatments-page .filter-section h2 {
+  width: fit-content;        /* se ajusta al texto */
+  margin: 0 auto 18px;       /* centra el bloque */
+  text-align: left;          /* evita que el texto “centre” raro con el borde */
+  display: block;            /* para que margin auto funcione */
+}
+
+/* ============================================================
+   🖼️ MODAL IMAGEN AMPLIADA (tu HTML ya lo trae inline, pero
+   dejamos una base por si querés sacarlo del inline)
+============================================================ */
+.treatments-page #imagePreviewModal.active {
+  display: flex !important;
+}
+
+/* ✅ FORZAR ANCHO DEL CONTENEDOR INTERNO (form de "Paciente existente") */
+.treatments-page #registerSection{
+  width: 100%;
+}
+
+/* el card/form interno */
+.treatments-page #registerSection #treatmentForm{
+  width: min(900px, 100%) !important;   /* probá 900/1000 si querés más */
+  max-width: none !important;          /* 🔥 esto mata el límite angosto */
+  margin: 0 auto !important;
+}
+
+/* por las dudas, que los campos no te achiquen el card */
+.treatments-page #treatmentForm input,
+.treatments-page #treatmentForm select,
+.treatments-page #treatmentForm textarea{
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .treatments-page main {
+    padding: 25px 18px;
+    margin: 90px auto 40px;
+  }
+
+  .treatments-page .filters {
+    padding: 18px;
+    gap: 12px;
+  }
+
+  .treatments-page .modal-detail-pro {
+    padding: 22px;
+    height: 92vh;
+  }
+
+  .treatments-page .detail-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .treatments-page .detail-photos {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .treatments-page .detail-photos img {
+    width: 120px;
+    height: 120px;
+  }
+
+  .treatments-page .edit-grid {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .treatments-page .edit-photo-section {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .treatments-page .photo-preview {
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .treatments-page main {
+    width: 92%;
+    margin: 90px auto 40px;
+    padding: 16px;
+  }
+
+  .treatments-page h1,
+  .treatments-page h2 {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .treatments-page #registerOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .treatments-page .btn-patient,
+  .treatments-page .btn-save-treatment,
+  .treatments-page .btn-cancel-treatment {
+    width: 90%;
+    margin: 0 auto;
+    display: block;
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .treatments-page .filters input,
+  .treatments-page .filters select,
+  .treatments-page .searchable-select input {
+    width: 100%;
+    font-size: 15px;
+    padding: 12px;
+    min-width: 0;
+  }
+
+  .treatments-page #clearAllFilters {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* Tabla: mostrar solo 3 columnas + acciones */
+  .treatments-page #treatmentsTable th:nth-child(n+3):not(:last-child),
+  .treatments-page #treatmentsTable td:nth-child(n+3):not(:last-child) {
+    display: none;
+  }
+
+  .treatments-page .modal-box,
+  .treatments-page .modal-edit-pro,
+  .treatments-page .modal-detail-pro {
+    width: 92%;
+    padding: 16px;
+    border-radius: 16px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .treatments-page .photo-preview,
+  .treatments-page .detail-photos img {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+/* ============================================================
+   ✅ SOLO Treatments: header fijo + drawer por arriba
+   (NO forzar left, para que pueda cerrar)
+============================================================ */
+
+.treatments-page .top-bar{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 3000;
+}
+
+/* Drawer arriba del header, pero sin tocar su left/transform */
+.treatments-page .drawer{
+  position: fixed;
+  top: 0 !important;
+  bottom: 0;
+  height: 100vh;
+  z-index: 4000;
+}
+
+/* Overlay arriba del header, abajo del drawer */
+.treatments-page .drawer-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 3500;
+}
