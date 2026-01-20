@@ -1,3 +1,5 @@
+import { API_URL } from "../core/config.js";
+
 export function Register() {
   return `
     <header>
