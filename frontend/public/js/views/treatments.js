@@ -93,160 +93,215 @@ export function Treatments() {
 
       <div id="drawer-overlay" class="drawer-overlay"></div>
 
-      <main>
-        <h1>Planilla de Tratamientos</h1>
+      <main class="treatments-main">
+        <div class="treatments-container">
 
-        <!-- REGISTRO -->
-        <section id="registerSection">
-          <h2>Registrar nuevo tratamiento</h2>
-          <div id="registerOptions">
-            <button class="btn-patient" id="btnExistingPatient">Paciente existente</button>
-            <button class="btn-patient" id="btnNewPatient">Nuevo paciente</button>
+          <div class="treatments-head">
+            <div>
+              <h1>Planilla de Tratamientos</h1>
+              <p class="treatments-subtitle">Registrá, filtrá y gestioná tratamientos de forma rápida.</p>
+            </div>
           </div>
 
-          <form id="treatmentForm" style="display:none;">
-            <label for="patientInput">Seleccionar paciente</label>
+          <div class="treatments-grid">
 
-            <div class="searchable-select">
-              <div style="position:relative;">
-                <input
-                  type="text"
-                  id="patientInput"
-                  placeholder="Buscá un paciente..."
-                  autocomplete="off"
-                  required
-                />
-                <i id="patientValidator" class="input-validator-icon"></i>
+            <!-- COLUMNA IZQUIERDA (REGISTRO) -->
+            <section id="registerSection" class="tg-card tg-collapsible">
+              <div class="tg-card-head">
+                <h2>Registrar tratamiento</h2>
               </div>
-              <div class="options" id="patientOptions"></div>
-            </div>
 
-            <input type="hidden" id="patientSelect" required />
+              <div class="tg-collapse-body" id="registerBody">
 
-            <label for="treatmentInput">Tratamiento</label>
-            <div class="searchable-select">
-              <div style="position:relative;">
-                <input
-                  type="text"
-                  id="treatmentInput"
-                  placeholder="Seleccioná un tratamiento..."
-                  autocomplete="off"
-                  required
-                />
-                <i id="treatmentValidator" class="input-validator-icon"></i>
+                <div id="registerOptions" class="register-options">
+                  <button class="btn-patient" id="btnExistingPatient" type="button">Paciente existente</button>
+                  <button class="btn-patient" id="btnNewPatient" type="button">Nuevo paciente</button>
+                </div>
+
+                <form id="treatmentForm" class="tg-form-grid" style="display:none;">
+
+                  <!-- Columna 1 -->
+                  <div class="tg-form-col">
+                    <label for="patientInput">Paciente</label>
+                    <div class="searchable-select">
+                      <div style="position:relative;">
+                        <input
+                          type="text"
+                          id="patientInput"
+                          placeholder="Buscá un paciente..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i id="patientValidator" class="input-validator-icon"></i>
+                      </div>
+                      <div class="options" id="patientOptions"></div>
+                    </div>
+                    <input type="hidden" id="patientSelect" required />
+
+                    <label for="treatmentInput">Tratamiento</label>
+                    <div class="searchable-select">
+                      <div style="position:relative;">
+                        <input
+                          type="text"
+                          id="treatmentInput"
+                          placeholder="Seleccioná un tratamiento..."
+                          autocomplete="off"
+                          required
+                        />
+                        <i id="treatmentValidator" class="input-validator-icon"></i>
+                      </div>
+                      <div class="options" id="treatmentOptions">
+                        ${TREATMENTS_OPTIONS_HTML}
+                      </div>
+                    </div>
+
+                    <div class="tg-inline-2">
+                      <div>
+                        <label for="date">Fecha</label>
+                        <input type="date" id="date" required />
+                      </div>
+                      <div>
+                        <label for="time">Hora</label>
+                        <input type="time" id="time" required />
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Columna 2 -->
+                  <div class="tg-form-col">
+                    <label for="amount">Monto ($)</label>
+                    <input type="text" id="amount" placeholder="Ej: 2500" maxlength="10" required />
+
+                    <div class="tg-inline-2">
+                      <div>
+                        <label for="paymentStatus">Estado</label>
+                        <select id="paymentStatus" required>
+                          <option value="" disabled selected hidden>Seleccionar</option>
+                          <option value="Pagado">Pagado</option>
+                          <option value="Pendiente">Pendiente</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label for="paymentMethod">Método</label>
+                        <select id="paymentMethod" required>
+                          <option value="" disabled selected hidden>Seleccionar</option>
+                          <option value="Efectivo">Efectivo</option>
+                          <option value="Mercado Pago">Mercado Pago</option>
+                          <option value="Transferencia">Transferencia</option>
+                          <option value="Tarjeta">Tarjeta</option>
+                          <option value="No Especificado">No especificado</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <label for="notes">Notas u observaciones</label>
+                    <textarea id="notes" placeholder="Detalles del tratamiento..." maxlength="420"></textarea>
+                  </div>
+
+                  <!-- Fotos -->
+                  <div class="tg-photos-row">
+                    <div class="file-field">
+                      <label>Foto ANTES</label>
+                      <div class="file-input-wrapper">
+                        <input type="file" id="beforePhoto" accept="image/*" />
+                        <img id="beforePreview" class="photo-mini-preview">
+                        <label for="beforePhoto" class="file-btn">
+                          <i class="fa-regular fa-image"></i>
+                          <span>Seleccionar</span>
+                        </label>
+                        <span class="file-name" id="beforeFileName">Ningún archivo seleccionado</span>
+                      </div>
+                    </div>
+
+                    <div class="file-field">
+                      <label>Foto DESPUÉS</label>
+                      <div class="file-input-wrapper">
+                        <input type="file" id="afterPhoto" accept="image/*" />
+                        <img id="afterPreview" class="photo-mini-preview">
+                        <label for="afterPhoto" class="file-btn">
+                          <i class="fa-regular fa-image"></i>
+                          <span>Seleccionar</span>
+                        </label>
+                        <span class="file-name" id="afterFileName">Ningún archivo seleccionado</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="action-buttons">
+                    <button type="button" class="btn-cancel-treatment" id="btnCancelTreatmentForm">Cerrar</button>
+                    <button type="submit" class="btn-save-treatment" id="btnSaveTreatment">Guardar</button>
+                  </div>
+                </form>
+
               </div>
-              <div class="options" id="treatmentOptions">
-                ${TREATMENTS_OPTIONS_HTML}
-              </div>
+            </section>
+
+            <!-- COLUMNA DERECHA (FILTROS + TABLA) -->
+            <div class="treatments-right">
+
+              <section class="tg-card tg-collapsible is-collapsed filter-section">
+                <div class="tg-card-head">
+                  <h2>Buscar tratamientos</h2>
+
+                  <button class="tg-icon-btn" id="btnCollapseFilters" type="button" aria-label="Desplegar filtros">
+                    <i class="fa-solid fa-sliders"></i>
+                  </button>
+                </div>
+
+                <div class="active-filters active-filters--sticky" id="activeFilters"></div>
+
+                <div class="tg-collapse-body" id="filtersBody">
+                  <div class="filters">
+                    <input type="text" id="filterPatient" placeholder="Buscar paciente..." />
+                    <input type="date" id="filterDate" placeholder="Seleccionar fecha" />
+
+                    <div class="searchable-select">
+                      <input
+                        type="text"
+                        id="filterTypeInput"
+                        placeholder="Tipo de tratamiento..."
+                        autocomplete="off"
+                      />
+                      <div class="options" id="filterTypeOptions">
+                        ${TREATMENTS_OPTIONS_HTML}
+                      </div>
+                    </div>
+
+                    <select id="filterStatus">
+                      <option value="" disabled selected hidden>Estado de pago</option>
+                      <option>Pagado</option>
+                      <option>Pendiente</option>
+                    </select>
+                  </div>
+
+                  <div class="clear-all-wrapper">
+                    <button id="clearAllFilters" type="button">Limpiar filtros</button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="tg-card table-card">
+                <div class="table-head">
+                  <div class="table-title">
+                    <h2>Resultados</h2>
+                    <span class="muted" id="resultsCount">—</span>
+                  </div>
+                </div>
+
+                <div class="table-scroll">
+                  <div class="table-scroll">
+                    <div id="treatmentsList" class="tg-results-list">
+                      <div class="tg-empty" style="text-align:center;color:#777;">Cargando tratamientos...</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
             </div>
-
-            <label for="date">Fecha</label>
-            <input type="date" id="date" required />
-
-            <label for="time">Hora</label>
-            <input type="time" id="time" required />
-
-            <label for="amount">Monto ($)</label>
-            <input type="text" id="amount" placeholder="Ej: 2500" maxlength="10" required />
-
-            <label for="notes">Notas u observaciones</label>
-            <textarea id="notes" placeholder="Detalles del tratamiento..." maxlength="420"></textarea>
-
-            <label for="paymentStatus">Estado del pago</label>
-            <select id="paymentStatus" required>
-              <option value="" disabled selected hidden>Seleccionar método de pago</option>
-              <option value="Pagado">Pagado</option>
-              <option value="Pendiente">Pendiente</option>
-            </select>
-
-            <label for="paymentMethod">Método de pago</label>
-            <select id="paymentMethod" required>
-              <option value="" disabled selected hidden>Seleccionar</option>
-              <option value="Efectivo">Efectivo</option>
-              <option value="Mercado Pago">Mercado Pago</option>
-              <option value="No Especificado">No especificado</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Tarjeta">Tarjeta</option>
-            </select>
-
-            <div class="file-field">
-              <label>Foto ANTES del tratamiento</label>
-              <div class="file-input-wrapper">
-                <input type="file" id="beforePhoto" accept="image/*" />
-                <img id="beforePreview" class="photo-mini-preview">
-                <label for="beforePhoto" class="file-btn">
-                  <i class="fa-regular fa-image"></i>
-                  <span>Seleccionar archivo</span>
-                </label>
-                <span class="file-name" id="beforeFileName">Ningún archivo seleccionado</span>
-              </div>
-            </div>
-
-            <div class="file-field">
-              <label>Foto DESPUÉS del tratamiento</label>
-              <div class="file-input-wrapper">
-                <input type="file" id="afterPhoto" accept="image/*" />
-                <img id="afterPreview" class="photo-mini-preview">
-                <label for="afterPhoto" class="file-btn">
-                  <i class="fa-solid fa-camera"></i>
-                  <span>Seleccionar archivo</span>
-                </label>
-                <span class="file-name" id="afterFileName">Ningún archivo seleccionado</span>
-              </div>
-            </div>
-
-            <div class="action-buttons">
-              <button type="button" class="btn-cancel-treatment" id="btnCancelTreatmentForm">Cerrar</button>
-              <button type="submit" class="btn-save-treatment" id="btnSaveTreatment">Guardar</button>
-            </div>
-          </form>
-        </section>
-
-        <!-- FILTROS -->
-        <section class="filter-section">
-          <h2>Buscar tratamientos existentes</h2>
-          <div class="filters">
-            <input type="text" id="filterPatient" placeholder="Buscar paciente..." />
-            <input type="date" id="filterDate" placeholder="Seleccionar fecha" />
-            <div class="searchable-select">
-              <input
-                type="text"
-                id="filterTypeInput"
-                placeholder="Tipo de tratamiento..."
-                autocomplete="off"
-              />
-              <div class="options" id="filterTypeOptions">
-                ${TREATMENTS_OPTIONS_HTML}
-              </div>
-            </div>
-
-            <select id="filterStatus">
-              <option value="" disabled selected hidden>Estado de pago</option>
-              <option>Pagado</option>
-              <option>Pendiente</option>
-            </select>
           </div>
-
-          <div class="clear-all-wrapper">
-            <button id="clearAllFilters">Limpiar filtros</button>
-          </div>
-        </section>
-
-        <!-- TABLA -->
-        <section>
-          <table id="treatmentsTable">
-            <thead>
-              <tr>
-                <th>Paciente</th><th>Fecha</th><th>Tratamiento</th>
-                <th>Monto</th><th>Pago</th><th>Método</th><th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="treatmentBody">
-              <tr><td colspan="8" style="text-align:center;color:#777;">Cargando tratamientos...</td></tr>
-            </tbody>
-          </table>
-        </section>
+        </div>
       </main>
+
 
       <!-- MODAL NUEVO PACIENTE -->
       <div id="newPatientModal" class="modal-overlay">
@@ -504,6 +559,88 @@ export async function initTreatments() {
   console.log("Treatments SPA inicializado");
 }
 
+function setCollapsible(sectionSelector, isOpen) {
+  const section = document.querySelector(sectionSelector);
+  if (!section) return;
+  section.classList.toggle("is-collapsed", !isOpen);
+}
+
+function toggleCollapsible(sectionSelector) {
+  const section = document.querySelector(sectionSelector);
+  if (!section) return;
+  section.classList.toggle("is-collapsed");
+}
+
+function openRegisterCard() {
+  setCollapsible("#registerSection", true);
+  // asegurar que se vea el cuerpo y opciones
+  const body = document.getElementById("registerBody");
+  if (body) body.style.display = "block";
+}
+
+function closeRegisterCard() {
+  setCollapsible("#registerSection", false);
+}
+
+function openFiltersCard() {
+  setCollapsible(".filter-section", true);
+}
+
+function closeFiltersCard() {
+  setCollapsible(".filter-section", false);
+}
+
+function updateResultsCount(n) {
+  const el = document.getElementById("resultsCount");
+  if (!el) return;
+  el.textContent = `${n} resultado${n === 1 ? "" : "s"}`;
+}
+
+function renderActiveFilterChips() {
+  const wrap = document.getElementById("activeFilters");
+  if (!wrap) return;
+
+  const patient = (document.getElementById("filterPatient")?.value || "").trim();
+  const date = (document.getElementById("filterDate")?.value || "").trim();
+  const type = (document.getElementById("filterTypeInput")?.value || "").trim();
+  const status = (document.getElementById("filterStatus")?.value || "").trim();
+
+  const chips = [];
+
+  if (patient) chips.push({ key: "patient", label: `Paciente: ${patient}` });
+  if (date) chips.push({ key: "date", label: `Fecha: ${date}` });
+  if (type) chips.push({ key: "type", label: `Tipo: ${type}` });
+  if (status) chips.push({ key: "status", label: `Pago: ${status}` });
+
+  if (!chips.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+
+  wrap.innerHTML = chips
+    .map(
+      (c) => `
+        <button class="tg-chip" type="button" data-chip="${c.key}">
+          ${c.label} <i class="fa-solid fa-xmark"></i>
+        </button>
+      `
+    )
+    .join("");
+
+  // remover chip
+  wrap.querySelectorAll(".tg-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.chip;
+      if (key === "patient") document.getElementById("filterPatient").value = "";
+      if (key === "date") document.getElementById("filterDate").value = "";
+      if (key === "type") document.getElementById("filterTypeInput").value = "";
+      if (key === "status") document.getElementById("filterStatus").selectedIndex = 0;
+
+      applyFilters();
+    });
+  });
+}
+
 /* ======================
    UI bindings
 ====================== */
@@ -513,6 +650,8 @@ function bindUI() {
   bindOnce("#btnExistingPatient", "click", () => showExistingPatientForm());
   bindOnce("#btnNewPatient", "click", () => openNewPatientModal());
   bindOnce("#btnCancelTreatmentForm", "click", () => cancelTreatmentForm());
+
+  bindOnce("#btnCollapseFilters", "click", () => toggleCollapsible(".filter-section"));
 
   // Limitar amount solo números
   bindOnce("#amount", "input", (e) => {
@@ -533,11 +672,19 @@ function bindUI() {
   if (!window.__treatmentsDelegationBound) {
     window.__treatmentsDelegationBound = true;
     document.body.addEventListener("click", (e) => {
-      // Si no estamos en esta vista, no hacemos nada
-      if (!document.querySelector(".treatments-page")) return;
+    if (!document.querySelector(".treatments-page")) return;
 
-      const btn = e.target.closest("button");
-      if (!btn) return;
+    // ✅ Click en fila -> abrir ver (si NO clickeó un botón)
+    const row = e.target.closest(".treat-card[data-id]");
+    if (row && !e.target.closest("button")) {
+      const id = row.dataset.id;
+      const t = allTreatments.find((x) => String(x.id) === String(id));
+      if (t) openViewModal(t);
+      return;
+    }
+
+    const btn = e.target.closest("button");
+    if (!btn) return;
 
       // acciones de tabla
       if (btn.classList.contains("btn-view") || btn.classList.contains("btn-edit") || btn.classList.contains("btn-delete")) {
@@ -729,6 +876,8 @@ async function loadTreatments() {
 
     const data = await res.json();
     allTreatments = Array.isArray(data) ? data : (data.appointments || data.items || []);
+    updateResultsCount(allTreatments.length);
+    renderActiveFilterChips();
     renderTreatments(allTreatments);
   } catch (err) {
     console.error("❌ Error al cargar tratamientos:", err);
@@ -810,38 +959,53 @@ function initSearchableSelect({ input, options, validator = null, allowed = null
 ====================== */
 
 function renderTreatments(treatments) {
-  const tbody = document.getElementById("treatmentBody");
-  if (!tbody) return;
+  const list = document.getElementById("treatmentsList");
+  if (!list) return;
 
   if (!treatments.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No hay tratamientos registrados</td></tr>`;
+    list.innerHTML = `<div class="tg-empty" style="text-align:center;">No hay tratamientos registrados</div>`;
     return;
   }
 
-  tbody.innerHTML = treatments
-    .map((t) => {
-      const date = t.date ? new Date(t.date) : null;
-      const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
-      const amountStr = typeof t.amount === "number" ? t.amount.toFixed(2) : (t.amount ? Number(t.amount).toFixed(2) : null);
+  list.innerHTML = treatments.map((t) => {
+    const date = t.date ? new Date(t.date) : null;
+    const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
+    const timeStr = t.time || "—";
+    const amount = Number(t.amount ?? 0);
+    const amountStr = `$${amount.toFixed(2)}`;
 
-      return `
-        <tr>
-          <td>${t.patient?.fullName || "Sin paciente"}</td>
-          <td>${dateStr}</td>
-          <td>${t.treatment || "-"}</td>
-          <td>${amountStr != null ? `$${amountStr}` : "-"}</td>
-          <td><span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${t.status || "-"}</span></td>
-          <td>${t.method || "-"}</td>
-          <td class="actions">
-            <button class="btn-view" data-id="${t.id}" title="Ver"><i class="fa-solid fa-eye"></i></button>
-            <button class="btn-edit" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button class="btn-delete" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
+    return `
+      <div class="treat-card" data-id="${t.id}">
+        <div class="treat-card-main">
+          <div class="treat-left">
+            <div class="treat-patient-pill">${t.patient?.fullName || "Sin paciente"}</div>
+
+            <div class="treat-sub treat-sub--stack">
+              <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
+              <div class="treat-sub-line"><span class="lbl">Hora:</span> <span class="val">${timeStr}</span></div>
+              <div class="treat-sub-line"><span class="lbl">Tratamiento:</span> <span class="val">${t.treatment || "-"}</span></div>
+            </div>
+          </div>
+
+          <div class="treat-right">
+            <div class="treat-amount">${amountStr}</div>
+            <div class="treat-badges">
+              <span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${t.status || "-"}</span>
+              <span class="treat-method">${t.method || "-"}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="treat-card-actions actions">
+          <button class="btn-view" data-id="${t.id}" title="Ver"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn-edit" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+          <button class="btn-delete" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
+
 
 function applyFilters() {
   const patientFilter = (document.getElementById("filterPatient")?.value || "").toLowerCase();
@@ -852,9 +1016,15 @@ function applyFilters() {
   const filtered = allTreatments.filter((t) => {
     const matchesPatient = !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
-    const matchesDate =
-      !dateFilter ||
-      (t.date && new Date(t.date).toISOString().slice(0, 10) === dateFilter);
+    const matchesDate = !dateFilter || (() => {
+      if (!t.date) return false;
+      const d = new Date(t.date);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const localISO = `${y}-${m}-${day}`;
+      return localISO === dateFilter;
+    })();
 
     const matchesType = !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
 
@@ -863,6 +1033,8 @@ function applyFilters() {
     return matchesPatient && matchesDate && matchesType && matchesStatus;
   });
 
+  updateResultsCount(filtered.length);
+  renderActiveFilterChips();
   renderTreatments(filtered);
 }
 
@@ -1198,7 +1370,8 @@ async function openViewModal(treatment) {
 
   document.getElementById("viewType").textContent = treatment.treatment || "—";
   document.getElementById("viewDate").textContent = dateFormatted;
-  document.getElementById("viewAmount").textContent = `$${(treatment.amount ?? 0).toFixed ? treatment.amount.toFixed(2) : Number(treatment.amount || 0).toFixed(2)}`;
+  const amountView = Number(treatment.amount ?? 0);
+  document.getElementById("viewAmount").textContent = `$${amountView.toFixed(2)}`;
   document.getElementById("viewStatus").textContent = treatment.status || "—";
   document.getElementById("viewMethod").textContent = treatment.method || "—";
   document.getElementById("viewNotes").textContent = treatment.notes || "—";
@@ -1314,6 +1487,7 @@ async function confirmNewPatient() {
     });
 
     closeNewPatientModal();
+    openRegisterCard();
 
     // abrir form y refrescar lista
     document.getElementById("registerOptions").style.display = "none";
@@ -1338,6 +1512,7 @@ async function confirmNewPatient() {
       color: "#333",
     });
   }
+  
 }
 
 /* ======================
@@ -1345,13 +1520,19 @@ async function confirmNewPatient() {
 ====================== */
 
 function cancelTreatmentForm() {
-  document.getElementById("treatmentForm").style.display = "none";
-  document.getElementById("registerOptions").style.display = "block";
+  const form = document.getElementById("treatmentForm");
+  const opts = document.getElementById("registerOptions");
+  if (form) form.style.display = "none";
+  if (opts) opts.style.display = "flex";
+  // no cerramos la card (solo cerramos el form)
 }
 
 function showExistingPatientForm() {
-  document.getElementById("registerOptions").style.display = "none";
-  document.getElementById("treatmentForm").style.display = "block";
+  openRegisterCard();
+  const opts = document.getElementById("registerOptions");
+  const form = document.getElementById("treatmentForm");
+  if (opts) opts.style.display = "none";
+  if (form) form.style.display = "block";
 }
 
 /* ======================
@@ -1465,7 +1646,8 @@ async function downloadTreatmentPDF() {
   doc.text(`Tratamiento: ${t.treatment || "—"}`, 14, tratamientoY);
   doc.text(`Fecha: ${t.date ? new Date(t.date).toLocaleDateString("es-AR") : "—"}`, 14, tratamientoY + 7);
   doc.text(`Hora: ${t.time || "—"}`, 14, tratamientoY + 14);
-  doc.text(`Monto: $${(t.amount ?? 0).toFixed ? t.amount.toFixed(2) : Number(t.amount || 0).toFixed(2)}`, 14, tratamientoY + 21);
+  const amountPdf = Number(t.amount ?? 0);
+  doc.text(`Monto: $${amountPdf.toFixed(2)}`, 14, tratamientoY + 21);
   doc.text(`Estado del pago: ${t.status || "—"}`, 14, tratamientoY + 28);
   doc.text(`Método de pago: ${t.method || "—"}`, 14, tratamientoY + 35);
 

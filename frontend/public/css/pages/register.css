@@ -336,3 +336,33 @@ body.is-register #app > :first-child {
     max-width: 90%;
   }
 }
+
+.terms-check{
+  margin: 14px 0 6px;
+}
+
+.terms-label{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #555;
+  user-select: none;
+}
+
+.terms-label input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+  accent-color: #ffadad; /* rosa de tu paleta */
+  cursor: pointer;
+}
+
+.terms-link{
+  color: #ffadad;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.terms-link:hover{
+  text-decoration: underline;
+}

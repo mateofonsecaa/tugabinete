@@ -30,7 +30,17 @@ export function Register() {
             <label for="confirm-password">Confirmar contraseña</label>
             <input type="password" id="confirm-password" placeholder="••••••••" required />
           </div>
-
+          <div class="terms-check">
+            <label class="terms-label">
+              <input type="checkbox" id="acceptTerms" />
+              <span>
+                Acepto
+                <a href="/terms" target="_blank" rel="noopener" class="terms-link">
+                  términos y condiciones
+                </a>
+              </span>
+            </label>
+          </div>
           <button type="submit">Registrarse</button>
 
           <p class="login-link">
@@ -89,6 +99,12 @@ async function registerUser(event) {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirm-password").value;
+  const acceptTerms = document.getElementById("acceptTerms")?.checked;
+
+  if (!acceptTerms) {
+    showNotification("Debés aceptar los términos y condiciones para registrarte.", "error");
+    return;
+  }
 
   if (!name || !email || !password) {
     showNotification("Por favor completá todos los campos.", "error");

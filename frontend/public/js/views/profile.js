@@ -3,6 +3,8 @@ import { API_URL } from "../core/config.js";
 import { authFetch } from "../core/authFetch.js";
 import { initDrawer } from "../components/drawer.js";
 
+let incomeChartInstance = null;
+
 export function Profile() {
   return `
     <div class="profile-page">
@@ -94,6 +96,41 @@ export function Profile() {
                 </section>
               </div>
 
+              <section class="profile-card income-card">
+                <div class="income-head">
+                  <div>
+                    <h3>Ingresos</h3>
+                    <p class="muted">Resumen de ingresos por tratamientos</p>
+                  </div>
+
+                  <div class="income-controls">
+                    <select id="incomeRange">
+                      <option value="6m" selected>Últimos 6 meses</option>
+                      <option value="12m">Últimos 12 meses</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="income-kpis">
+                  <div class="income-kpi">
+                    <span class="lbl">Total</span>
+                    <span class="val" id="incomeTotal">$—</span>
+                  </div>
+                  <div class="income-kpi">
+                    <span class="lbl">Promedio/mes</span>
+                    <span class="val" id="incomeAvg">$—</span>
+                  </div>
+                </div>
+
+                <div class="income-chart-wrap">
+                  <canvas id="incomeChart" height="140"></canvas>
+                  <div id="incomeChartFallback" class="tg-empty" style="display:none; text-align:center;">
+                    No se pudo cargar el gráfico.
+                  </div>
+                </div>
+              </section>
+
+
             </section>
 
             <!-- DERECHA -->
@@ -127,6 +164,7 @@ export function initProfile() {
   // 3) Cargar datos secundarios
   loadStats();
   loadAppointments();
+  initIncome();
 
   // 4) Bind navegación SPA (evita window.location.href)
   bindNav();
@@ -311,4 +349,208 @@ function loadSweetAlert() {
     s.src = "https://cdn.jsdelivr.net/npm/sweetalert2@11";
     document.head.appendChild(s);
   }
+}
+
+/* =====================================================
+   💰 Ingresos (solo Pagado) por mes
+===================================================== */
+
+function formatARS(n) {
+  const value = Number(n) || 0;
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function monthKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function buildLastNMonths(n) {
+  // genera lista de meses (keys) desde el más viejo al más nuevo
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - (n - 1), 1);
+
+  const months = [];
+  for (let i = 0; i < n; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    months.push({
+      key: monthKey(d),
+      label: d.toLocaleDateString("es-AR", { month: "short", year: "2-digit" }), // ej: "ene 26"
+      start: d,
+    });
+  }
+  return months;
+}
+
+async function fetchAppointmentsForIncome(fromDate, neededMonths) {
+  // Paginado defensivo: trae hasta que ya no haya data o ya cubrimos los meses requeridos
+  const limit = 200;
+  let offset = 0;
+  let all = [];
+
+  while (true) {
+    const res = await authFetch(`${API_URL}/appointments?offset=${offset}&limit=${limit}`);
+    if (!res.ok) break;
+
+    const json = await res.json().catch(() => null);
+    const items = Array.isArray(json) ? json : (json?.appointments || json?.items || []);
+    if (!items.length) break;
+
+    all.push(...items);
+
+    // si el último item es más viejo que fromDate, podemos cortar (para no traer todo)
+    const last = items[items.length - 1];
+    const lastDate = last?.date ? new Date(last.date) : null;
+    if (lastDate && lastDate < fromDate) break;
+
+    if (items.length < limit) break;
+    offset += limit;
+
+    // pequeño guard: no iterar infinito si el backend no pagina bien
+    if (offset > 2000) break;
+  }
+
+  // Filtramos por fecha >= fromDate
+  return all.filter((t) => {
+    if (!t?.date) return false;
+    const d = new Date(t.date);
+    return d >= fromDate;
+  });
+}
+
+function destroyIncomeChart() {
+  if (incomeChartInstance) {
+    incomeChartInstance.destroy();
+    incomeChartInstance = null;
+  }
+}
+
+function renderIncomeChart(labels, values) {
+  const canvas = document.getElementById("incomeChart");
+  const fallback = document.getElementById("incomeChartFallback");
+  if (!canvas) return;
+
+  if (!window.Chart) {
+    // Chart.js no cargó
+    if (fallback) fallback.style.display = "block";
+    canvas.style.display = "none";
+    return;
+  }
+
+  if (fallback) fallback.style.display = "none";
+  canvas.style.display = "block";
+
+  const ctx = canvas.getContext("2d");
+  destroyIncomeChart();
+
+  incomeChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Ingresos",
+          data: values,
+          tension: 0.35,
+          fill: true,
+          borderWidth: 2,
+          borderColor: "#ffadad",
+          backgroundColor: "rgba(255, 173, 173, 0.22)",
+          pointRadius: 3,
+          pointHoverRadius: 5,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      // ✅ clave: que tome el punto por eje X aunque no “toques” el punto
+      interaction: {
+        mode: "index",
+        intersect: false,
+        axis: "x",
+      },
+      hover: {
+        mode: "index",
+        intersect: false,
+      },
+
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          mode: "index",
+          intersect: false,
+          callbacks: {
+            label: (ctx) => ` ${formatARS(ctx.parsed.y)}`,
+          },
+        },
+      },
+
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxRotation: 0, autoSkip: true },
+        },
+        y: {
+          ticks: {
+            callback: (v) => formatARS(v),
+          },
+        },
+      },
+    },
+  });
+}
+
+async function loadIncome(range = "6m") {
+  const monthsCount = range === "12m" ? 12 : 6;
+  const months = buildLastNMonths(monthsCount);
+  const fromDate = months[0].start;
+
+  // Traemos tratamientos/turnos del backend
+  const rows = await fetchAppointmentsForIncome(fromDate, monthsCount);
+
+  // Sumatoria por mes SOLO Pagado
+  const sums = new Map();
+  rows.forEach((t) => {
+    if ((t.status || "").toLowerCase() !== "pagado") return;
+
+    const amount = Number(t.amount);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+
+    const d = new Date(t.date);
+    const key = monthKey(d);
+    sums.set(key, (sums.get(key) || 0) + amount);
+  });
+
+  const labels = months.map((m) => m.label);
+  const values = months.map((m) => Math.round(sums.get(m.key) || 0));
+
+  // KPIs
+  const total = values.reduce((acc, v) => acc + v, 0);
+  const avg = Math.round(total / monthsCount);
+
+  const totalEl = document.getElementById("incomeTotal");
+  const avgEl = document.getElementById("incomeAvg");
+  if (totalEl) totalEl.textContent = formatARS(total);
+  if (avgEl) avgEl.textContent = formatARS(avg);
+
+  renderIncomeChart(labels, values);
+}
+
+function initIncome() {
+  const select = document.getElementById("incomeRange");
+  if (select && !select.dataset.bound) {
+    select.dataset.bound = "1";
+    select.addEventListener("change", () => loadIncome(select.value));
+  }
+
+  // primera carga
+  loadIncome(select?.value || "6m");
 }
