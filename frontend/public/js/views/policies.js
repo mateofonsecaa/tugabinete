@@ -17,7 +17,7 @@ export function Policies() {
         <h2>1. Quiénes somos y contacto</h2>
         <p>
           TuGabinete es una plataforma de gestión para profesionales (agenda, pacientes, tratamientos y registros).
-          Consultas o solicitudes: <span class="highlight">soporte@tugabinete.com</span>.
+          Consultas o solicitudes: <span class="highlight">tugabinete2026@gmail.com</span>.
         </p>
 
         <h2>2. Datos que recopilamos</h2>
@@ -62,7 +62,7 @@ export function Policies() {
         <h2>8. Tus derechos</h2>
         <p>
           Podés solicitar acceso, rectificación o eliminación de tu información de cuenta escribiendo a
-          <span class="highlight">soporte@tugabinete.com</span>. Podremos verificar identidad.
+          <span class="highlight">tugabinete2026@gmail.com</span>. Podremos verificar identidad.
         </p>
 
         <h2>9. Cambios</h2>
@@ -71,8 +71,6 @@ export function Policies() {
         </p>
 
         <p style="margin-top: 22px; color:#666;">
-          Nota: este texto es un modelo práctico. Si vas a operar comercialmente a escala o con datos sensibles,
-          es recomendable revisión legal.
         </p>
       </section>
 
