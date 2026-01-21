@@ -3,12 +3,14 @@
 export function PublicHeader() {
   return `
     <header class="public-header" id="publicHeader">
-      <a class="brand" href="/" data-link>MiGabinete</a>
-
-      <nav class="public-nav">
+      <div class="logo">TuGabinete</div>
+      <nav>
         <a href="/" data-link>Inicio</a>
-        <a href="/login" class="btn" data-link>Iniciar sesión</a>
-        <a href="/register" class="btn" data-link>Registrarme</a>
+        <a href="/about" data-link>Sobre Nosotros</a>
+        <a href="/contact" data-link>Contacto</a>
+        <a href="/plans" data-link class="btn-plans">Planes</a>
+        <a href="/login" data-link class="btn-login">Iniciar sesión</a>
+        <a href="/register" data-link class="btn-register">Registrarme</a>
       </nav>
     </header>
   `;
@@ -23,13 +25,18 @@ export function initPublicHeader() {
     window.removeEventListener("scroll", window.__publicHeaderScrollHandler);
   }
 
-  let lastY = window.scrollY;
+  setTimeout(() => header.classList.add("visible"), 200);
+
+  let lastScrollY = window.scrollY;
+  const hideThreshold = 615;
 
   window.__publicHeaderScrollHandler = () => {
-    const y = window.scrollY;
-    if (y > lastY && y > 200) header.classList.add("hidden");
-    else header.classList.remove("hidden");
-    lastY = y;
+    if (window.scrollY > lastScrollY && window.scrollY > hideThreshold) {
+      header.classList.add("hidden");
+    } else {
+      header.classList.remove("hidden");
+    }
+    lastScrollY = window.scrollY;
   };
 
   window.addEventListener("scroll", window.__publicHeaderScrollHandler);

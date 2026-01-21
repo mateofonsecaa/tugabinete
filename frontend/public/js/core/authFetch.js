@@ -44,7 +44,7 @@ export async function authFetch(endpoint, options = {}) {
 }
 
 function redirectToLogin() {
-  // ✅ SPA route
+  //SPA route
     history.pushState(null, "", "/login");
     window.dispatchEvent(new PopStateEvent("popstate"));
 }

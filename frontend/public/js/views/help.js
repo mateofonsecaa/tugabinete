@@ -10,7 +10,7 @@ export function Help() {
         <p class="updated">Soporte y preguntas frecuentes</p>
 
         <h2>Contacto</h2>
-        <p>Escribinos a <span class="highlight">soporte@tugabinete.com</span> y te respondemos lo antes posible.</p>
+        <p>Escribinos a <span class="highlight">tugabinete2006@gmail.com</span> y te respondemos lo antes posible.</p>
 
         <h2>Cuenta</h2>
         <ul>

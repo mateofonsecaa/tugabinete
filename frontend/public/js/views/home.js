@@ -6,6 +6,7 @@ export function Home() {
         <a href="/" data-link>Inicio</a>
         <a href="/about" data-link>Sobre Nosotros</a>
         <a href="/contact" data-link>Contacto</a>
+        <a href="/plans" data-link class="btn-plans">Planes</a>
         <a href="/login" data-link class="btn-login">Iniciar sesión</a>
         <a href="/register" data-link class="btn-register">Registrarme</a>
       </nav>
@@ -58,17 +59,17 @@ export function Home() {
       <h2>Testimonios de nuestra comunidad</h2>
       <div class="testimonials-grid">
         <div class="testimonial">
-          <img src="./images/personaejemplo.png">
+          <img src="./images/analopez.png">
           <p>“Esta plataforma me ha ayudado a organizar mis tratamientos de manera profesional.”</p>
           <cite>- Ana López</cite>
         </div>
         <div class="testimonial">
-          <img src="./images/personaejemplo.png">
+          <img src="./images/mariagarcia.png">
           <p>“Fácil de usar y perfecta para cuidar cada detalle de mis clientes.”</p>
           <cite>- María García</cite>
         </div>
         <div class="testimonial">
-          <img src="./images/personaejemplo.png">
+          <img src="./images/luzdeluna.png">
           <p>“Los reportes me permiten crecer mi gabinete de belleza.”</p>
           <cite>- Laura Martínez</cite>
         </div>
