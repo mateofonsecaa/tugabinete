@@ -70,7 +70,7 @@ export function Plans() {
             <!-- MEDIO -->
             <article class="plan-card paid">
               <div class="plan-top">
-                <span class="plan-chip discount">-50%</span>
+                <span class="plan-chip discount">-100%</span>
                 <span class="plan-chip plan-name">Medio</span>
                 <span class="plan-chip placeholder" aria-hidden="true">—</span>
             </div>
@@ -78,7 +78,7 @@ export function Plans() {
                 <h2 class="plan-title">Para sostener tu ritmo</h2>
 
                 <div class="price">
-                  <span class="amount">ARS 12.500</span>
+                  <span class="amount">ARS 0</span>
                   <span class="period">/ mes</span>
                 </div>
 
@@ -117,7 +117,7 @@ export function Plans() {
             <!-- FULL (RECOMENDADO) -->
             <article class="plan-card featured paid">
                 <div class="plan-top">
-                    <span class="plan-chip discount">-50%</span>
+                    <span class="plan-chip discount">-100%</span>
                     <span class="plan-chip plan-name">Full</span>
                     <span class="plan-chip recommended"><i class="fa-solid fa-crown"></i> Recomendado</span>
                 </div>
@@ -126,7 +126,7 @@ export function Plans() {
                 <h2 class="plan-title">Para crecer sin límites</h2>
 
                 <div class="price big">
-                  <span class="amount">ARS 15.000</span>
+                  <span class="amount">ARS 0</span>
                   <span class="period">/ mes</span>
                 </div>
 
