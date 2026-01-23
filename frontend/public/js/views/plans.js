@@ -12,7 +12,7 @@ export function Plans() {
           <h1>Planes claros para trabajar con confianza</h1>
 
             <p class="lead">
-                Planes mensuales en ARS. <strong>Promo lanzamiento: 50% OFF los primeros 3 meses</strong> en planes pagos.
+                Planes mensuales en ARS. <strong>Promo lanzamiento: GRATIS los primeros 3 meses</strong> en TODOS los planes pagos.
             </p>
 
           <div class="hero-note">
