@@ -6,7 +6,7 @@ export function InterviewEdit2() {
   <div class="patients-page">
     <div class="top-bar">
       <button id="open-menu" class="menu-btn"><i class="fa-solid fa-bars"></i></button>
-      <span class="app-title">Entrevista (2/2)</span>
+      <span class="app-title">TuGabinete</span>
     </div>
 
     <aside id="drawer" class="drawer">
