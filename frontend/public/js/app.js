@@ -3,13 +3,19 @@ import { router } from "./router.js";
 console.log("SPA iniciada");
 
 document.addEventListener("click", (e) => {
-  if (e.target.matches("[data-link]")) {
+  // 1) Navegación SPA (sirve aunque cliquees hijos dentro del <a>)
+  const link = e.target.closest("[data-link]");
+  if (link) {
     e.preventDefault();
-    history.pushState(null, "", e.target.href);
+    history.pushState(null, "", link.getAttribute("href"));
     router();
+    return;
   }
 
-  if (e.target.id === "logout") {
+  // 2) Logout (sirve aunque cliquees un hijo)
+  const logoutBtn = e.target.closest("#logout");
+  if (logoutBtn) {
+    e.preventDefault();
     localStorage.removeItem("token");
     history.pushState(null, "", "/login");
     router();

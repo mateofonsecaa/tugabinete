@@ -52,6 +52,7 @@ export function Layout(content, { active = "" } = {}) {
           <a href="/profile" data-go="/profile" class="${active === "profile" ? "active" : ""}">
             <i class="fa-solid fa-user"></i><span>Mi perfil</span>
           </a>
+          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
           <a href="#" id="drawerLogout">
             <i class="fa-solid fa-right-from-bracket"></i><span>Cerrar sesión</span>
           </a>

@@ -20,6 +20,7 @@ export function InterviewEdit1() {
           <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
           <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
           <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
+          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
           <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
       </nav>
     </aside>

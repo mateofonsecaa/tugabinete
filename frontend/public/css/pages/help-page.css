@@ -1,0 +1,329 @@
+/* public/css/help-page.css */
+/* Se aplica SOLO cuando el body tenga la clase is-help-page */
+
+body.is-help-page main{
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 28px;
+}
+
+/* Header interno */
+body.is-help-page .help-header{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+body.is-help-page .help-header h2{
+  margin: 0;
+  font-size: 26px;
+  color: #333;
+}
+
+body.is-help-page .help-header p{
+  margin: 6px 0 0;
+  color: #666;
+}
+
+/* Chips */
+body.is-help-page .help-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+body.is-help-page .chip{
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.92);
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: .15s;
+}
+
+body.is-help-page .chip.active{
+  background: #fff3c2;
+  border-color: rgba(255, 173, 173, 0.55);
+}
+
+/* Layout */
+body.is-help-page .help-layout{
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+body.is-help-page .help-list{
+  display: grid;
+  gap: 10px;
+}
+
+body.is-help-page .help-item{
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.95);
+  border-radius: 16px;
+  padding: 12px 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.04);
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+body.is-help-page .help-item:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255, 173, 173, 0.55);
+}
+
+body.is-help-page .help-item.active{
+  border-color: rgba(255, 173, 173, 0.85);
+  box-shadow: 0 14px 26px rgba(0,0,0,0.06);
+}
+
+body.is-help-page .help-item-top{
+  display: grid;
+  gap: 6px;
+}
+
+body.is-help-page .help-item-title{
+  font-weight: 700;
+  color: #333;
+}
+
+body.is-help-page .help-item-meta{
+  font-size: 12px;
+  color: #777;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+body.is-help-page .help-item-meta .dot{ opacity: 0.6; }
+
+body.is-help-page .help-item-summary{
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Viewer */
+body.is-help-page .help-viewer{
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.05);
+}
+
+body.is-help-page .viewer-head{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+body.is-help-page .viewer-kicker{
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+body.is-help-page .viewer-title{
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+body.is-help-page .viewer-summary{
+  margin: 6px 0 0;
+  color: #666;
+}
+
+body.is-help-page .viewer-buttons{
+  display: flex;
+  gap: 8px;
+}
+
+body.is-help-page .btn-ghost{
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #444;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+body.is-help-page .viewer-media{
+  margin-top: 14px;
+}
+
+body.is-help-page .video-player{
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #000;
+}
+
+body.is-help-page .video-embed{
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: #000;
+}
+
+body.is-help-page .video-embed iframe{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body.is-help-page .video-placeholder{
+  border: 1px dashed rgba(0,0,0,0.20);
+  border-radius: 14px;
+  padding: 18px;
+  color: #666;
+  display: grid;
+  gap: 6px;
+  place-items: center;
+  text-align: center;
+}
+
+body.is-help-page .video-placeholder i{ font-size: 20px; color: #ffadad; }
+body.is-help-page .ph-title{ font-weight: 700; color: #333; }
+body.is-help-page .ph-sub code{ background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 8px; }
+
+body.is-help-page .viewer-grid{
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+body.is-help-page .viewer-card{
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.90);
+}
+
+body.is-help-page .viewer-card h4{
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #333;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+body.is-help-page .viewer-card ol{
+  margin: 0;
+  padding-left: 18px;
+  color: #555;
+  display: grid;
+  gap: 6px;
+}
+
+body.is-help-page .quick-links{
+  display: grid;
+  gap: 8px;
+}
+
+body.is-help-page .quick-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-decoration: none;
+  color: #333;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 243, 194, 0.45);
+  border: 1px solid rgba(255, 173, 173, 0.35);
+}
+
+body.is-help-page .support-box{
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 173, 173, 0.12);
+  border: 1px solid rgba(255, 173, 173, 0.25);
+}
+
+body.is-help-page .support-title{ font-weight: 700; color: #333; }
+body.is-help-page .support-sub{ margin-top: 4px; color: #666; font-size: 13px; }
+
+body.is-help-page .support-cta{
+  margin-top: 10px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+}
+
+body.is-help-page .viewer-toast{
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.80);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: .18s ease;
+}
+body.is-help-page .viewer-toast.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Empty */
+body.is-help-page .help-empty{
+  border: 1px dashed rgba(0,0,0,0.20);
+  border-radius: 16px;
+  padding: 14px;
+  color: #666;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+body.is-help-page .help-empty-title{ font-weight: 700; color: #333; }
+body.is-help-page .help-empty-sub{ font-size: 13px; }
+
+/* Responsive */
+@media (max-width: 980px){
+  body.is-help-page .help-layout{
+    grid-template-columns: 1fr;
+  }
+  body.is-help-page .viewer-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px){
+  body.is-help-page .help-header{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  body.is-help-page .help-actions{
+    width: 100%;
+  }
+}

@@ -18,6 +18,7 @@ import { Treatments, initTreatments } from "./views/treatments.js";
 import { Policies, initPolicies } from "./views/policies.js";
 import { Terms, initTerms } from "./views/terms.js";
 import { Help, initHelp } from "./views/help.js";
+import { HelpPage, initHelpPage } from "./views/help.page.js";
 import { About, initAbout } from "./views/about.js";
 import { Contact, initContact } from "./views/contact.js";
 import { Plans, initPlans } from "./views/plans.js";
@@ -39,7 +40,9 @@ export function router() {
         "is-interview-edit-2",
         "is-treatments",
         "is-profile",
-        "is-contact"
+        "is-contact",
+        "is-help",
+        "is-help-page"
       );
 
       if (path === "/login") document.body.classList.add("is-login");
@@ -61,6 +64,8 @@ export function router() {
 
       // /patients/:id/interview/edit/2
       else if (/^\/patients\/\d+\/interview\/edit\/2$/.test(path)) document.body.classList.add("is-interview-edit-2");
+      
+      else if (path === "/ayuda") document.body.classList.add("is-help-page");
 
       else if (path === "/contact") document.body.classList.add("is-contact");
 
@@ -120,6 +125,12 @@ if (path === "/help") {
   return;
 }
 
+if (path === "/ayuda") {
+  app.innerHTML = HelpPage();
+  initHelpPage();
+  return;
+}
+
 if (path === "/about") {
   app.innerHTML = About();
   initAbout();
@@ -169,8 +180,6 @@ if (path === "/plans") {
     return;
   }
 
-  else if (path === "/treatments") document.body.classList.add("is-treatments");
-
   // /patients/:id/interview
   const iv = path.match(/^\/patients\/(\d+)\/interview$/);
   if (iv) {
@@ -201,7 +210,7 @@ if (path === "/plans") {
   const patientEditMatch = path.match(/^\/patients\/(\d+)\/edit$/);
   if (patientEditMatch) {
     if (!requireAuth()) return;
-    document.body.className = "is-patient-edit";
+    document.body.classList.add("is-patient-edit");
     app.innerHTML = PatientEdit();
     initPatientEdit();
     return;

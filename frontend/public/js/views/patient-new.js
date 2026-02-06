@@ -2,7 +2,15 @@
 import { initDrawer } from "../components/drawer.js";
 import { initPatientCreatePage } from "../patients/patientCreate.page.js";
 
+function getTodayYYYYMMDD() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export function PatientNew() {
+  const today = getTodayYYYYMMDD();
+
   return `
     <div class="patients-page">
       <div class="top-bar">
@@ -26,6 +34,7 @@ export function PatientNew() {
           <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
           <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
           <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
+          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
           <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
       </aside>
@@ -47,7 +56,7 @@ export function PatientNew() {
           </label>
 
           <label>Fecha de nacimiento
-            <input id="birthDate" type="date" required />
+            <input id="birthDate" type="date" required max="${today}" />
           </label>
 
           <label>Teléfono
@@ -75,4 +84,23 @@ export function initPatientNew() {
   document.body.className = "is-patient-new";
   initDrawer();
   initPatientCreatePage();
+
+  // Refuerzo: por si el usuario la escribe manualmente, validamos igual
+  const birthInput = document.querySelector("#birthDate");
+  if (birthInput) {
+    const today = getTodayYYYYMMDD();
+    birthInput.max = today;
+
+    const validateBirthDate = () => {
+      if (birthInput.value && birthInput.value > today) {
+        birthInput.setCustomValidity("La fecha de nacimiento no puede ser posterior a hoy.");
+      } else {
+        birthInput.setCustomValidity("");
+      }
+    };
+
+    birthInput.addEventListener("input", validateBirthDate);
+    birthInput.addEventListener("change", validateBirthDate);
+    validateBirthDate();
+  }
 }
