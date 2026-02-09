@@ -20,6 +20,7 @@ const allowedOrigins = [
   "https://gleeful-moxie-181612.netlify.app",
   "https://tugabinete.com",
   "https://www.tugabinete.com",
+  "https://tugabinete.pages.dev"
 ];
 
 app.use((req, res, next) => {
