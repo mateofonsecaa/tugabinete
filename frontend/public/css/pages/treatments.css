@@ -200,6 +200,35 @@
   box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
 }
 
+/* ✅ FIX: que los botones no se estiren a 100% */
+.treatments-page .action-buttons{
+  justify-content: center;
+}
+
+.treatments-page .action-buttons .btn-save-treatment,
+.treatments-page .action-buttons .btn-cancel-treatment{
+  width: auto !important;
+  flex: 0 0 auto !important;
+  min-width: 180px;   /* tamaño “normal” */
+  max-width: 260px;   /* evita que se haga enorme */
+}
+
+/* ✅ FIX: botones del modal EDITAR (ahí tu botón es .btn-save, no .btn-save-treatment) */
+.treatments-page .modal-actions{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.treatments-page .modal-actions .btn-save,
+.treatments-page .modal-actions .btn-cancel{
+  width: auto !important;
+  flex: 0 0 auto !important;
+  min-width: 180px;
+  max-width: 260px;
+}
+
 .treatments-page .btn-patient,
 .treatments-page .btn-save-treatment{
   background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
@@ -601,106 +630,62 @@
   z-index: 3500;
 }
 
-/* Fotos: centrar labels + botón */
-.tg-photos-row{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.file-field{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.file-input-wrapper{
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.file-btn{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.file-name{
-  font-size: 12px;
-  opacity: .75;
-}
-
-/* Chips visibles aunque el filtro esté colapsado */
-.active-filters--sticky{
+.treatments-page .active-filters--sticky{
   padding: 10px 16px 14px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-/* Resultados en cards */
-.tg-results-list{
+.treatments-page .tg-results-list{
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.treat-card{
-  position: relative;          /* clave para el pill */
+.treatments-page .treat-card{
+  position: relative;
   overflow: visible;
   border: 1px solid rgba(255, 173, 173, 0.35);
   border-radius: 14px;
   background: rgba(255,255,255,0.92);
-  padding: 22px 14px 12px;     /* más padding arriba para dejar lugar al pill */
+  padding: 22px 14px 12px;
   cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease;
 }
 
-.treat-card:hover{
+.treatments-page .treat-card:hover{
   transform: translateY(-1px);
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-.treat-card-main{
+.treatments-page .treat-card-main{
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
 }
 
-.treat-left{
-  min-width: 0;
-}
+.treatments-page .treat-left{ min-width: 0; }
 
-/* ✅ NOMBRE COMO PILL ARRIBA IZQUIERDA */
-.treat-title{
+.treatments-page .treat-title{
   position: absolute;
   top: -12px;
   left: 14px;
-
   background: #fffdf9;
   border: 1px solid rgba(255, 173, 173, 0.55);
   border-radius: 999px;
   padding: 6px 10px;
-
   font-weight: 800;
   font-size: 13px;
-
   max-width: calc(100% - 150px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
   box-shadow: 0 6px 14px rgba(0,0,0,0.06);
 }
 
-/* si todavía usás .treat-sub en algún lado, dejalo igual */
-.treat-sub{
+.treatments-page .treat-sub{
   opacity: .75;
   font-size: 13px;
   margin-top: 2px;
@@ -709,96 +694,93 @@
   text-overflow: ellipsis;
 }
 
-.treat-right{
+.treatments-page .treat-right{
   text-align: right;
   flex: 0 0 auto;
 }
 
-.treat-amount{
-  font-weight: 800;
-}
+.treatments-page .treat-amount{ font-weight: 800; }
 
-.treat-badges{
+.treatments-page .treat-badges{
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   margin-top: 4px;
 }
 
-.treat-method{
+.treatments-page .treat-method{
   font-size: 12px;
   opacity: .75;
 }
 
-/* Acciones alineadas */
-.treat-card-actions{
+.treatments-page .treat-card-actions{
   margin-top: 10px;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
 }
 
-.treat-card-actions button{
-  cursor: pointer;
-}
+.treatments-page .treat-card-actions button{ cursor: pointer; }
 
-.treat-sub--stack{
+.treatments-page .treat-sub--stack{
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.treat-sub-line{
+.treatments-page .treat-sub-line{
   display: flex;
   gap: 8px;
   align-items: baseline;
 }
 
-.treat-sub-line .lbl{
+.treatments-page .treat-sub-line .lbl{
   font-size: 12px;
   opacity: .65;
-  min-width: 92px; /* alinea los valores */
+  min-width: 92px;
 }
 
-.treat-sub-line .val{
+.treatments-page .treat-sub-line .val{
   font-weight: 600;
 }
 
-/* ============================================================
-   MODAL DETALLE (VER) — Fotos con tamaño controlado
-   ============================================================ */
-
-.treatments-page .modal-detail-pro .detail-photos{
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  align-items: start;
+.tg-card-head--between{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.treatments-page .modal-detail-pro .detail-photos > div{
-  background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(255, 173, 173, 0.25);
-  border-radius: 14px;
-  padding: 10px;
+.treatments-page .sale-head-actions{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;              /* <-- separación */
+  flex-wrap: wrap;        /* <-- por si en mobile no entra */
+  padding: 12px 0 6px;
 }
 
-.treatments-page .modal-detail-pro .detail-photos p{
-  margin: 0 0 8px;
-  font-weight: 700;
-  color: #444;
+/* ✅ FIX SOLO para el modal "Editar tratamiento" (que no se estire Guardar cambios) */
+.treatments-page #editTreatmentModal .modal-actions{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.treatments-page .modal-detail-pro .detail-photos img{
-  width: 100%;
-  height: 220px;          /* ✅ acá controlás el tamaño */
-  max-height: 220px;
-  object-fit: cover;      /* cover = recorta lindo, contain = no recorta */
-  border-radius: 12px;
-  display: block;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
-  cursor: zoom-in;        /* ya que al click abrís el modal grande */
+.treatments-page #editTreatmentModal .modal-actions .btn-save,
+.treatments-page #editTreatmentModal .modal-actions .btn-cancel{
+  width: auto !important;
+  flex: 0 0 auto !important;
+  min-width: 180px;
+  max-width: 260px;
+}
+
+/* Si el botón viene con display:block de otro CSS */
+.treatments-page #editTreatmentModal .modal-actions .btn-save{
+  display: inline-flex !important;
 }
 
 /* Mobile */
@@ -810,8 +792,229 @@
     height: 200px;
     max-height: 200px;
   }
+
+  .treatments-grid{
+    grid-template-columns: 1fr;
+  }
 }
 
 .treatments-page #imagePreviewModal{
   z-index: 6500 !important;
+}
+
+/* ============================================================
+   MODAL VER (Detalle del Tratamiento) — PRO UI
+   Aplica solo al modal #viewTreatmentModal
+   ============================================================ */
+
+.treatments-page #viewTreatmentModal.modal-overlay{
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+}
+
+.treatments-page #viewTreatmentModal .modal-box.modal-detail-pro{
+  width: min(920px, 96vw);
+  max-height: 86vh;
+  overflow: auto;
+  padding: 22px 22px 18px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255, 173, 173, 0.30);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.12);
+}
+
+/* scrollbar prolijo dentro del modal */
+.treatments-page #viewTreatmentModal .modal-box.modal-detail-pro::-webkit-scrollbar{
+  width: 10px;
+}
+.treatments-page #viewTreatmentModal .modal-box.modal-detail-pro::-webkit-scrollbar-thumb{
+  background: rgba(255, 173, 173, 0.45);
+  border-radius: 999px;
+}
+.treatments-page #viewTreatmentModal .modal-box.modal-detail-pro::-webkit-scrollbar-track{
+  background: rgba(255, 173, 173, 0.10);
+  border-radius: 999px;
+}
+
+/* Header del modal */
+.treatments-page #viewTreatmentModal h2{
+  margin: 4px 0 14px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 44px; /* para que no choque con la X */
+}
+
+.treatments-page #viewTreatmentModal h2 i{
+  color: #ffadad;
+}
+
+/* Botón cerrar (X) bien ubicado y visible */
+.treatments-page #viewTreatmentModal .close-btn{
+  top: 12px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 173, 173, 0.14);
+  border: 1px solid rgba(255, 173, 173, 0.30);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.treatments-page #viewTreatmentModal .close-btn:hover{
+  background: rgba(255, 173, 173, 0.22);
+  transform: translateY(-1px);
+}
+
+/* Grid de tarjetas (Paciente / Tratamiento) */
+.treatments-page #viewTreatmentModal .detail-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.treatments-page #viewTreatmentModal .detail-card{
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(255, 173, 173, 0.25);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+}
+
+.treatments-page #viewTreatmentModal .detail-card h3{
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treatments-page #viewTreatmentModal .detail-card h3 i{
+  color: #ffadad;
+}
+
+.treatments-page #viewTreatmentModal .detail-card p{
+  margin: 6px 0;
+  font-size: 13.5px;
+  color: #444;
+  display: flex;
+  gap: 8px;
+}
+
+.treatments-page #viewTreatmentModal .detail-card p strong{
+  min-width: 78px;
+  opacity: .75;
+  font-weight: 700;
+}
+
+.treatments-page #viewTreatmentModal #viewAmount{
+  font-weight: 900;
+  color: #222;
+}
+
+.treatments-page #viewTreatmentModal #viewStatus{
+  font-weight: 800;
+}
+
+.treatments-page #viewTreatmentModal #viewMethod{
+  font-weight: 700;
+  opacity: .85;
+}
+
+/* Notas como bloque separado */
+.treatments-page #viewTreatmentModal .detail-notes{
+  margin-top: 14px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(255, 173, 173, 0.22);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.treatments-page #viewTreatmentModal .detail-notes h3{
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treatments-page #viewTreatmentModal .detail-notes h3 i{
+  color: #ffadad;
+}
+
+.treatments-page #viewTreatmentModal .detail-notes p{
+  margin: 0;
+  font-size: 13.5px;
+  color: #444;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+/* Fotos: tarjetas + imagen prolija */
+.treatments-page #viewTreatmentModal .detail-photos{
+  margin-top: 14px;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos > div{
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(255, 173, 173, 0.22);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos p{
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #444;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos img{
+  width: 100%;
+  height: 240px;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+  cursor: zoom-in;
+}
+
+/* Botón Descargar PDF centrado y “pro” */
+.treatments-page #viewTreatmentModal .modal-actions{
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.treatments-page #viewTreatmentModal #downloadPdfBtn.btn-save{
+  min-width: 220px;
+  width: auto !important;
+  padding: 12px 18px;
+  border-radius: 14px;
+}
+
+/* Responsive modal */
+@media (max-width: 760px){
+  .treatments-page #viewTreatmentModal .detail-grid{
+    grid-template-columns: 1fr;
+  }
+  .treatments-page #viewTreatmentModal .detail-photos{
+    grid-template-columns: 1fr !important;
+  }
+  .treatments-page #viewTreatmentModal .detail-photos img{
+    height: 210px;
+    max-height: 210px;
+  }
 }
