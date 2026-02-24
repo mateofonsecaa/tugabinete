@@ -107,6 +107,7 @@ export function Treatments() {
           <div class="treatments-grid">
 
             <!-- COLUMNA IZQUIERDA (REGISTRO) -->
+            <div class="treatments-left">
             <section id="registerSection" class="tg-card tg-collapsible">
               <div class="tg-card-head">
                 <h2>Registrar tratamiento</h2>
@@ -237,6 +238,98 @@ export function Treatments() {
               </div>
             </section>
 
+            <!-- REGISTRAR VENTA -->
+            <section id="registerSaleSection" class="tg-card tg-collapsible is-collapsed">
+            <div class="tg-card-head">
+              <h2>Registrar venta de producto</h2>
+            </div>
+
+            <div class="sale-head-actions">
+              <button class="btn-patient" id="btnOpenSaleForm" type="button">Registrar venta</button>
+              <button class="btn-patient" id="btnNewPatientFromSale" type="button">Nuevo paciente</button>
+            </div>
+
+            <div class="tg-collapse-body">
+
+                <form id="saleForm" class="tg-form-grid" style="display:none;">
+
+                  <!-- Columna 1 -->
+                  <div class="tg-form-col">
+                    <label>Paciente</label>
+                    <div class="searchable-select">
+                      <div style="position:relative;">
+                        <input
+                          type="text"
+                          id="salePatientInput"
+                          placeholder="Buscá un paciente..."
+                          autocomplete="off"
+                          required
+                        />
+                      </div>
+                      <div class="options" id="salePatientOptions"></div>
+                    </div>
+                    <input type="hidden" id="salePatientId" required />
+
+                    <label>Producto vendido</label>
+                    <input type="text" id="saleProduct" placeholder="Ej: Serum vitamina C" required />
+
+                    <div class="tg-inline-2">
+                      <div>
+                        <label>Fecha</label>
+                        <input type="date" id="saleDate" required />
+                      </div>
+                      <div>
+                        <label>Cantidad</label>
+                        <input type="number" id="saleQuantity" min="1" step="1" required/>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Columna 2 -->
+                  <div class="tg-form-col">
+                    <label>Monto total ($)</label>
+                    <input type="number" id="saleAmount" min="0" step="1" inputmode="numeric" required/>
+
+                    <div class="tg-inline-2">
+                      <div>
+                        <label>Estado</label>
+                        <select id="saleStatus" required>
+                          <option value="" disabled selected hidden>Seleccionar</option>
+                          <option>Pagado</option>
+                          <option>Pendiente</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label>Método</label>
+                        <select id="saleMethod" required>
+                          <option value="" disabled selected hidden>Seleccionar</option>
+                          <option>Efectivo</option>
+                          <option>Transferencia</option>
+                          <option>Mercado Pago</option>
+                          <option>Tarjeta</option>
+                          <option>No especificado</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <label>Notas</label>
+                    <textarea id="saleNotes" maxlength="300"></textarea>
+                  </div>
+
+                  <div class="action-buttons">
+                    <button type="button" class="btn-cancel-treatment" id="btnCancelSaleForm">Cerrar</button>
+
+                    <button type="submit" class="btn-save-treatment">
+                      Guardar
+                    </button>
+                  </div>
+
+                </form>
+
+              </div>
+            </section>
+            </div>
+
             <!-- COLUMNA DERECHA (FILTROS + TABLA) -->
             <div class="treatments-right">
 
@@ -290,7 +383,6 @@ export function Treatments() {
                 </div>
 
                 <div class="table-scroll">
-                  <div class="table-scroll">
                     <div id="treatmentsList" class="tg-results-list">
                       <div class="tg-empty" style="text-align:center;color:#777;">Cargando tratamientos...</div>
                     </div>
@@ -505,6 +597,7 @@ export function Treatments() {
 
 let currentUser = null;
 let allTreatments = [];
+let allSales = [];
 let allowedPatients = []; // normalizados
 let isSavingTreatment = false;
 let beforePhotoData = "";
@@ -526,8 +619,9 @@ export async function initTreatments() {
   bindUI();
 
   // Inicialización data
-  await loadPatients();    // llena dropdown + allowedPatients
-  await loadTreatments();  // pinta tabla
+await loadPatients();
+await Promise.all([loadTreatments(), loadSales()]);
+applyFilters(); 
 
   // Selects (treatment, edit, filter)
   initSearchableSelect({
@@ -651,12 +745,33 @@ function bindUI() {
   bindOnce("#btnExistingPatient", "click", () => showExistingPatientForm());
   bindOnce("#btnNewPatient", "click", () => openNewPatientModal());
   bindOnce("#btnCancelTreatmentForm", "click", () => cancelTreatmentForm());
+  bindOnce("#btnOpenSaleForm", "click", () => openSaleForm());
+
+  bindOnce("#btnNewPatientFromSale", "click", () => {
+    openNewPatientModal();
+    // marca para saber que el modal se abrió desde "venta"
+    window.__newPatientContext = "sale";
+  });
+
+  bindOnce("#btnCancelSaleForm", "click", () => closeSaleForm());
 
   bindOnce("#btnCollapseFilters", "click", () => toggleCollapsible(".filter-section"));
 
   // Limitar amount solo números
   bindOnce("#amount", "input", (e) => {
     e.target.value = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
+  });
+
+  // ✅ Fecha (Registrar tratamiento): abrir calendario al click
+  bindOnce("#date", "click", () => {
+    const el = document.getElementById("date");
+    el?.showPicker?.();
+  });
+
+  // (opcional) también al focus
+  bindOnce("#date", "focus", () => {
+    const el = document.getElementById("date");
+    el?.showPicker?.();
   });
 
   // Filtros
@@ -679,6 +794,12 @@ function bindUI() {
     const row = e.target.closest(".treat-card[data-id]");
     if (row && !e.target.closest("button")) {
       const id = row.dataset.id;
+      const kind = row.dataset.kind || "treatment";
+
+      if (kind === "sale") {
+        // opcional: abrir un modal de venta (si no tenés, no hagas nada)
+        return;
+      }
       const t = allTreatments.find((x) => String(x.id) === String(id));
       if (t) openViewModal(t);
       return;
@@ -784,6 +905,67 @@ function bindUI() {
       if (modal.style.display === "flex" && e.target === modal) closeImagePreview();
     });
   }
+
+  /* ======================
+  Sale bindings
+====================== */
+
+/* ======================
+  Sale bindings
+====================== */
+
+bindOnce("#saleForm", "submit", (e) => onCreateSale(e));
+
+/* ✅ Fecha: no permitir futuro (max = hoy) + abrir calendario */
+bindOnce("#saleDate", "focus", () => {
+  const el = document.getElementById("saleDate");
+  if (!el) return;
+
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth() + 1).padStart(2, "0");
+  const d = String(today.getDate()).padStart(2, "0");
+
+  el.max = `${y}-${m}-${d}`; // bloquea fechas futuras
+  el.showPicker?.();         // abre el calendario
+});
+
+// ✅ también al click
+bindOnce("#saleDate", "click", () => {
+  const el = document.getElementById("saleDate");
+  el?.showPicker?.();
+});
+
+/* ✅ Cantidad: entero y mínimo 1 */
+bindOnce("#saleQuantity", "input", (e) => {
+  let v = String(e.target.value || "").replace(/[^0-9]/g, "");
+  if (v === "") return;
+
+  let n = parseInt(v, 10);
+  if (Number.isNaN(n) || n < 1) n = 1;
+
+  e.target.value = String(n);
+});
+
+/* ✅ Monto: numérico y >= 0 (solo números) */
+bindOnce("#saleAmount", "input", (e) => {
+  let v = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
+  if (v === "") { e.target.value = ""; return; }
+
+  let n = parseInt(v, 10);
+  if (Number.isNaN(n) || n < 0) n = 0;
+
+  e.target.value = String(n);
+});
+
+/* ✅ Notas: máximo 300 (refuerzo del maxlength) */
+bindOnce("#saleNotes", "input", (e) => {
+  const max = 300;
+  if (e.target.value.length > max) {
+    e.target.value = e.target.value.slice(0, max);
+  }
+});
+
 }
 
 function bindOnce(selector, event, handler) {
@@ -813,12 +995,13 @@ async function loadCurrentUser() {
 }
 
 async function loadPatients() {
+  let data = []; 
   try {
     const res = await authFetch(`${API_URL}/patients`);
     if (!res.ok) throw new Error("Error al obtener pacientes");
 
     const result = await res.json();
-    const data = Array.isArray(result) ? result : (result.patients || []);
+    data = Array.isArray(result) ? result : (result.patients || []);
 
     data.sort((a, b) => String(a.fullName || "").localeCompare(String(b.fullName || "")));
 
@@ -857,7 +1040,8 @@ async function loadPatients() {
       validator: "#patientValidator",
       allowed: allowedPatients,
       onSelect: (value) => {
-        const opt = [...document.querySelectorAll("#patientOptions div")].find((d) => d.textContent === value);
+        const valueNorm = normalizeText(value);
+        const opt = [...document.querySelectorAll("#patientOptions div")].find((d) => normalizeText(d.textContent) === valueNorm);
         if (opt) document.getElementById("patientSelect").value = opt.dataset.id;
       },
     });
@@ -868,6 +1052,36 @@ async function loadPatients() {
     if (list) list.innerHTML = `<div>Error al cargar</div>`;
     allowedPatients = [];
   }
+
+  /* ======================
+   Pacientes para ventas
+====================== */
+
+const saleList = document.getElementById("salePatientOptions");
+
+if (saleList) {
+  saleList.innerHTML = "";
+
+  data.forEach((p) => {
+    const div = document.createElement("div");
+    div.textContent = p.fullName;
+    div.dataset.id = p.id;
+
+    div.addEventListener("click", () => {
+      document.getElementById("salePatientInput").value = p.fullName;
+      document.getElementById("salePatientId").value = p.id;
+      saleList.style.display = "none";
+    });
+
+    saleList.appendChild(div);
+  });
+
+  initSearchableSelect({
+    input: "#salePatientInput",
+    options: "#salePatientOptions",
+  });
+}
+
 }
 
 async function loadTreatments() {
@@ -877,13 +1091,29 @@ async function loadTreatments() {
 
     const data = await res.json();
     allTreatments = Array.isArray(data) ? data : (data.appointments || data.items || []);
-    updateResultsCount(allTreatments.length);
-    renderActiveFilterChips();
-    renderTreatments(allTreatments);
   } catch (err) {
     console.error("❌ Error al cargar tratamientos:", err);
-    const tbody = document.getElementById("treatmentBody");
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#777;">Error al cargar tratamientos</td></tr>`;
+    allTreatments = [];
+    const list = document.getElementById("treatmentsList");
+    if (list) {
+      list.innerHTML = `<div class="tg-empty" style="text-align:center;color:#777;">
+        Error al cargar tratamientos
+      </div>`;
+    }
+  }
+}
+
+async function loadSales() {
+  try {
+    const res = await authFetch(`${API_URL}/sales?offset=0&limit=50`);
+    if (!res.ok) throw new Error("Error al obtener ventas");
+
+    const data = await res.json();
+    allSales = Array.isArray(data) ? data : (data.sales || data.items || []);
+    console.log("✅ SALES:", allSales.length, allSales[0]); // <-- ESTE
+  } catch (err) {
+    console.error("❌ Error al cargar ventas:", err);
+    allSales = [];
   }
 }
 
@@ -936,8 +1166,6 @@ function initSearchableSelect({ input, options, validator = null, allowed = null
       $options.style.display = "none";
       if (onSelect) onSelect($input.value);
       $input.dispatchEvent(new Event("input"));
-      // si es un filtro, disparar apply
-      if ($input.id === "filterTypeInput") applyFilters();
     }
   });
 
@@ -959,54 +1187,112 @@ function initSearchableSelect({ input, options, validator = null, allowed = null
    Rendering + filters
 ====================== */
 
-function renderTreatments(treatments) {
+function renderTreatmentCard(t) {
+  const date = t.date ? new Date(t.date) : null;
+  const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
+  const timeStr = t.time || "—";
+  const amount = Number(t.amount ?? 0);
+  const amountStr = `$${amount.toFixed(2)}`;
+
+  return `
+    <div class="treat-card" data-id="${t.id}" data-kind="treatment">
+      <div class="treat-card-main">
+        <div class="treat-left">
+          <div class="treat-patient-pill">${t.patient?.fullName || "Sin paciente"}</div>
+
+          <div class="treat-sub treat-sub--stack">
+            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Hora:</span> <span class="val">${timeStr}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Tratamiento:</span> <span class="val">${t.treatment || "-"}</span></div>
+          </div>
+        </div>
+
+        <div class="treat-right">
+          <div class="treat-amount">${amountStr}</div>
+          <div class="treat-badges">
+            <span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${t.status || "-"}</span>
+            <span class="treat-method">${t.method || "-"}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="treat-card-actions actions">
+        <button class="btn-view" data-id="${t.id}" title="Ver"><i class="fa-solid fa-eye"></i></button>
+        <button class="btn-edit" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+        <button class="btn-delete" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSaleCard(s) {
+  const date = s.date ? new Date(s.date) : null;
+  const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
+  const amount = Number(s.amount ?? 0);
+  const amountStr = `$${amount.toFixed(2)}`;
+  const qty = Number(s.quantity ?? 0);
+
+  // badge tipo "Venta"
+  return `
+    <div class="treat-card" data-id="${s.id}" data-kind="sale">
+      <div class="treat-card-main">
+        <div class="treat-left">
+          <div class="treat-patient-pill">${s.patient?.fullName || "Sin paciente"}</div>
+
+          <div class="treat-sub treat-sub--stack">
+            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Venta:</span> <span class="val">${s.product || "-"}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Cantidad:</span> <span class="val">${qty || "-"}</span></div>
+          </div>
+        </div>
+
+        <div class="treat-right">
+          <div class="treat-amount">${amountStr}</div>
+          <div class="treat-badges">
+            <span class="${s.status === "Pagado" ? "status-paid" : "status-pending"}">${s.status || "-"}</span>
+            <span class="treat-method">${s.method || "-"}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getAllResultsCombined() {
+  const t = (allTreatments || []).map((x) => ({ ...x, __type: "treatment" }));
+  const s = (allSales || []).map((x) => ({ ...x, __type: "sale" }));
+
+  // ordenar por fecha (y hora en tratamientos) DESC
+  const toTime = (item) => {
+    if (item.__type === "treatment") {
+      const d = item.date ? String(item.date).split("T")[0] : "";
+      const time = item.time || "00:00";
+      return new Date(`${d}T${time}:00`).getTime() || 0;
+    }
+    // sale
+    const d = item.date ? String(item.date).split("T")[0] : "";
+    return new Date(`${d}T00:00:00`).getTime() || 0;
+  };
+
+  return [...t, ...s].sort((a, b) => toTime(b) - toTime(a));
+}
+
+function renderResults(items) {
   const list = document.getElementById("treatmentsList");
   if (!list) return;
 
-  if (!treatments.length) {
-    list.innerHTML = `<div class="tg-empty" style="text-align:center;">No hay tratamientos registrados</div>`;
+  if (!items.length) {
+    list.innerHTML = `<div class="tg-empty" style="text-align:center;">No hay resultados</div>`;
     return;
   }
 
-  list.innerHTML = treatments.map((t) => {
-    const date = t.date ? new Date(t.date) : null;
-    const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
-    const timeStr = t.time || "—";
-    const amount = Number(t.amount ?? 0);
-    const amountStr = `$${amount.toFixed(2)}`;
-
-    return `
-      <div class="treat-card" data-id="${t.id}">
-        <div class="treat-card-main">
-          <div class="treat-left">
-            <div class="treat-patient-pill">${t.patient?.fullName || "Sin paciente"}</div>
-
-            <div class="treat-sub treat-sub--stack">
-              <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
-              <div class="treat-sub-line"><span class="lbl">Hora:</span> <span class="val">${timeStr}</span></div>
-              <div class="treat-sub-line"><span class="lbl">Tratamiento:</span> <span class="val">${t.treatment || "-"}</span></div>
-            </div>
-          </div>
-
-          <div class="treat-right">
-            <div class="treat-amount">${amountStr}</div>
-            <div class="treat-badges">
-              <span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${t.status || "-"}</span>
-              <span class="treat-method">${t.method || "-"}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="treat-card-actions actions">
-          <button class="btn-view" data-id="${t.id}" title="Ver"><i class="fa-solid fa-eye"></i></button>
-          <button class="btn-edit" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-          <button class="btn-delete" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </div>
-    `;
-  }).join("");
+  list.innerHTML = items
+    .map((item) => {
+      if (item.__type === "sale") return renderSaleCard(item);
+      return renderTreatmentCard(item);
+    })
+    .join("");
 }
-
 
 function applyFilters() {
   const patientFilter = (document.getElementById("filterPatient")?.value || "").toLowerCase();
@@ -1014,7 +1300,8 @@ function applyFilters() {
   const typeFilter = (document.getElementById("filterTypeInput")?.value || "").toLowerCase();
   const statusFilter = document.getElementById("filterStatus")?.value || "";
 
-  const filtered = allTreatments.filter((t) => {
+  // 1) Filtrar tratamientos
+  const filteredTreatments = (allTreatments || []).filter((t) => {
     const matchesPatient = !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
     const matchesDate = !dateFilter || (() => {
@@ -1028,15 +1315,51 @@ function applyFilters() {
     })();
 
     const matchesType = !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
-
     const matchesStatus = !statusFilter || (t.status === statusFilter);
 
     return matchesPatient && matchesDate && matchesType && matchesStatus;
   });
 
-  updateResultsCount(filtered.length);
+  // 2) Filtrar ventas (typeFilter lo aplico al "product")
+  const filteredSales = (allSales || []).filter((s) => {
+    const matchesPatient = !patientFilter || (s.patient?.fullName || "").toLowerCase().includes(patientFilter);
+
+    const matchesDate = !dateFilter || (() => {
+      if (!s.date) return false;
+      const d = new Date(s.date);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const localISO = `${y}-${m}-${day}`;
+      return localISO === dateFilter;
+    })();
+
+    const matchesType = !typeFilter || (s.product || "").toLowerCase().includes(typeFilter);
+    const matchesStatus = !statusFilter || (s.status === statusFilter);
+
+    return matchesPatient && matchesDate && matchesType && matchesStatus;
+  });
+
+  // 3) Combinar + ordenar por fecha
+  const t = filteredTreatments.map((x) => ({ ...x, __type: "treatment" }));
+  const s = filteredSales.map((x) => ({ ...x, __type: "sale" }));
+
+  const toTime = (item) => {
+    if (item.__type === "treatment") {
+      const d = item.date ? String(item.date).split("T")[0] : "";
+      const time = item.time || "00:00";
+      return new Date(`${d}T${time}:00`).getTime() || 0;
+    }
+    const d = item.date ? String(item.date).split("T")[0] : "";
+    return new Date(`${d}T00:00:00`).getTime() || 0;
+  };
+
+  const combined = [...t, ...s].sort((a, b) => toTime(b) - toTime(a));
+
+  // 4) Pintar todo
+  updateResultsCount(combined.length);
   renderActiveFilterChips();
-  renderTreatments(filtered);
+  renderResults(combined);
 }
 
 function clearAllFilters() {
@@ -1122,7 +1445,6 @@ async function onCreateTreatment(e) {
     if (!res.ok) throw new Error(saved?.error || "Error al registrar");
 
     allTreatments.unshift(saved);
-    renderTreatments(allTreatments);
     applyFilters(); // respeta filtros si están activos
 
     await Swal.fire({
@@ -1186,6 +1508,99 @@ function resetTreatmentForm() {
 }
 
 /* ======================
+   Create Sale
+====================== */
+
+async function onCreateSale(e) {
+  e.preventDefault();
+
+  const patientId = document.getElementById("salePatientId").value;
+
+  if (!patientId) {
+    Swal.fire("Error", "Debés seleccionar un paciente válido.", "error");
+    return;
+  }
+
+    const dateStr = document.getElementById("saleDate").value;
+    const qty = parseInt(document.getElementById("saleQuantity").value, 10);
+
+    const amountStr = document.getElementById("saleAmount").value;
+    const amount = parseFloat(amountStr);
+
+    const notes = document.getElementById("saleNotes").value || "";
+
+    // ✅ Fecha obligatoria y no futura
+    if (!dateStr) {
+      Swal.fire("Error", "La fecha es obligatoria.", "error");
+      return;
+    }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const chosen = new Date(dateStr + "T00:00:00");
+    if (chosen > today) {
+      Swal.fire("Error", "La fecha no puede ser futura.", "error");
+      return;
+    }
+
+    // ✅ Cantidad >= 1
+    if (Number.isNaN(qty) || qty < 1) {
+      Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
+      return;
+    }
+
+    // ✅ Monto numérico y >= 0
+    if (Number.isNaN(amount) || amount < 0) {
+      Swal.fire("Error", "El monto total debe ser un número mayor o igual a 0.", "error");
+      return;
+    }
+
+    // ✅ Notas <= 300
+    if (notes.length > 300) {
+      Swal.fire("Error", "Las notas no pueden superar los 300 caracteres.", "error");
+      return;
+    }
+
+  const newSale = {
+    patientId: parseInt(patientId, 10),
+    product: document.getElementById("saleProduct").value,
+    date: dateStr,
+    quantity: qty,
+    amount: amount,
+    status: document.getElementById("saleStatus").value,
+    method: document.getElementById("saleMethod").value,
+    notes: notes,
+  };
+
+  try {
+    const res = await authFetch(`${API_URL}/sales`, {
+      method: "POST",
+      body: JSON.stringify(newSale),
+    });
+
+    const saved = await res.json();
+    if (!res.ok) throw new Error(saved?.error || "Error al registrar venta");
+
+    allSales.unshift(saved);
+    applyFilters();
+
+    await Swal.fire({
+      icon: "success",
+      title: "Venta registrada",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    document.getElementById("saleForm").reset();
+    document.getElementById("salePatientId").value = "";
+
+  } catch (err) {
+    Swal.fire("Error", err.message, "error");
+  }
+
+  closeSaleForm();
+}
+
+/* ======================
    Delete
 ====================== */
 
@@ -1211,7 +1626,6 @@ async function deleteTreatment(id) {
     }
 
     allTreatments = allTreatments.filter((t) => String(t.id) !== String(id));
-    renderTreatments(allTreatments);
     applyFilters();
 
     await Swal.fire({
@@ -1236,6 +1650,27 @@ function openEditModal(treatment) {
   const modal = document.getElementById("editTreatmentModal");
   modal.classList.add("active");
   modal.style.display = "flex";
+
+    // ✅ FIX FORZADO: evitar botón largo en modal editar (aunque haya CSS global con !important)
+    const actions = modal.querySelector(".modal-actions");
+    const btnSave = modal.querySelector(".btn-save");
+    const btnCancel = modal.querySelector(".btn-cancel");
+
+    if (actions) {
+      actions.style.display = "flex";
+      actions.style.justifyContent = "center";
+      actions.style.gap = "12px";
+      actions.style.flexWrap = "wrap";
+    }
+
+    [btnSave, btnCancel].forEach((b) => {
+      if (!b) return;
+      b.style.width = "auto";
+      b.style.flex = "0 0 auto";
+      b.style.minWidth = "180px";
+      b.style.maxWidth = "260px";
+      b.style.display = "inline-flex";
+    });
 
   document.getElementById("editTreatmentInput").value = treatment.treatment || "";
 
@@ -1336,7 +1771,6 @@ async function onSaveEditTreatment(e) {
     const i = allTreatments.findIndex((t) => String(t.id) === String(updated.id));
     if (i !== -1) allTreatments[i] = saved;
 
-    renderTreatments(allTreatments);
     applyFilters();
     closeEditModal();
 
@@ -1487,20 +1921,32 @@ async function confirmNewPatient() {
       color: "#333",
     });
 
-    closeNewPatientModal();
-    openRegisterCard();
-
-    // abrir form y refrescar lista
-    document.getElementById("registerOptions").style.display = "none";
-    document.getElementById("treatmentForm").style.display = "block";
-
     await loadPatients();
 
     // seleccionar nuevo paciente
-    const select = document.getElementById("patientSelect");
-    const input = document.getElementById("patientInput");
-    if (select && patient?.id) select.value = patient.id;
-    if (input && patient?.fullName) input.value = patient.fullName;
+    const ctx = window.__newPatientContext || "treatment";
+
+    if (ctx === "sale") {
+      const saleId = document.getElementById("salePatientId");
+      const saleInput = document.getElementById("salePatientInput");
+      if (saleId && patient?.id) saleId.value = patient.id;
+      if (saleInput && patient?.fullName) saleInput.value = patient.fullName;
+
+      // abrir form de venta si querés
+      openSaleForm();
+    } else {
+      const select = document.getElementById("patientSelect");
+      const input = document.getElementById("patientInput");
+      if (select && patient?.id) select.value = patient.id;
+      if (input && patient?.fullName) input.value = patient.fullName;
+
+      // abrir form de tratamiento
+      openRegisterCard();
+      document.getElementById("registerOptions").style.display = "none";
+      document.getElementById("treatmentForm").style.display = "block";
+    }
+
+    window.__newPatientContext = null;
 
   } catch (err) {
     console.error("❌ Error al crear paciente:", err);
@@ -1534,6 +1980,20 @@ function showExistingPatientForm() {
   const form = document.getElementById("treatmentForm");
   if (opts) opts.style.display = "none";
   if (form) form.style.display = "block";
+}
+
+function openSaleForm() {
+  setCollapsible("#registerSaleSection", true);
+
+  const form = document.getElementById("saleForm");
+  if (form) form.style.display = "block";
+}
+
+function closeSaleForm() {
+  const form = document.getElementById("saleForm");
+  if (form) form.style.display = "none";
+
+  setCollapsible("#registerSaleSection", false);
 }
 
 /* ======================
