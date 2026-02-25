@@ -23,6 +23,7 @@ model User {
   simpleAppointments  SimpleAppointment[]
   verificationTokens  VerificationToken[]
   reminders           Reminder[]
+  sales Sale[]
 }
 
 model Patient {
@@ -40,6 +41,7 @@ model Patient {
   interview    Interview?
   observation  Observation?
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sales Sale[]
 }
 
 model Appointment {
@@ -164,4 +166,26 @@ model Reminder {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Sale {
+  id        Int      @id @default(autoincrement())
+  product   String
+  date      DateTime
+  quantity  Int
+  amount    Float
+  status    String
+  method    String
+  notes     String?
+
+  patientId Int
+  userId    Int
+
+  createdAt DateTime @default(now())
+
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([patientId])
 }

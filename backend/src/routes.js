@@ -8,6 +8,8 @@ import observationRoutes from "./modules/observations/observations.routes.js";
 import simpleRoutes from "./modules/simple/simple.routes.js";
 import statsRoutes from "./modules/stats/stats.routes.js";
 import remindersRoutes from "./modules/reminders/reminders.routes.js";
+import mpPaymentsRoutes from "./routes/payments.mp.routes.js";
+import salesRoutes from "./modules/sales/sales.routes.js";
 
 const router = Router();
 
@@ -19,5 +21,11 @@ router.use("/observations", observationRoutes);
 router.use("/simple", simpleRoutes);
 router.use("/stats", statsRoutes);
 router.use("/reminders", remindersRoutes);
+
+// ✅ Sales
+router.use("/sales", salesRoutes);
+
+// ✅ Mercado Pago
+router.use("/payments/mp", mpPaymentsRoutes);
 
 export default router;
