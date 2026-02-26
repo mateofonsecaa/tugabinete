@@ -235,3 +235,211 @@
     max-width: 180px;
   }
 }
+
+/* ============================================================
+   TuGabinete — Detalle (Observar) Tratamiento / Venta
+   Solo afecta a #viewTreatmentModal y #viewSaleModal
+   ============================================================ */
+
+/* Overlay: padding + z-index alto para que no quede debajo del top-bar/drawer */
+#viewTreatmentModal.modal-overlay.active,
+#viewSaleModal.modal-overlay.active{
+  padding: 22px !important;
+  z-index: 6500 !important;
+}
+
+/* Caja: tamaño, padding, scroll “pro” */
+#viewTreatmentModal .modal-box.modal-detail-pro,
+#viewSaleModal .modal-box.modal-detail-pro{
+  width: min(920px, 96vw) !important;
+  max-height: 86vh !important;
+  overflow: auto !important;
+  padding: 22px 22px 18px !important;
+  border-radius: 20px !important;
+  border: 1.5px solid rgba(255, 173, 173, 0.30) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.12) !important;
+  position: relative !important;
+}
+
+/* Header (título) */
+#viewTreatmentModal h2,
+#viewSaleModal h2{
+  margin: 4px 0 14px !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #333 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding-right: 56px !important; /* espacio para la X */
+  line-height: 1.2 !important;
+}
+
+#viewTreatmentModal h2 i,
+#viewSaleModal h2 i{
+  color: #ffadad !important;
+}
+
+/* X cerrar: arriba derecha, visible */
+#viewTreatmentModal .modal-box > .close-btn,
+#viewSaleModal .modal-box > .close-btn{
+  position: absolute !important;
+  top: 12px !important;
+  right: 14px !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 173, 173, 0.14) !important;
+  border: 1px solid rgba(255, 173, 173, 0.30) !important;
+  color: #ffadad !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
+#viewTreatmentModal .modal-box > .close-btn:hover,
+#viewSaleModal .modal-box > .close-btn:hover{
+  background: rgba(255, 173, 173, 0.22) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Grid Paciente / Tratamiento-Venta */
+#viewTreatmentModal .detail-grid,
+#viewSaleModal .detail-grid{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+  margin-top: 8px !important;
+}
+
+/* Tarjetas */
+#viewTreatmentModal .detail-card,
+#viewSaleModal .detail-card{
+  background: rgba(255,255,255,0.82) !important;
+  border: 1px solid rgba(255, 173, 173, 0.25) !important;
+  border-radius: 16px !important;
+  padding: 14px 14px 12px !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06) !important;
+}
+
+#viewTreatmentModal .detail-card h3,
+#viewSaleModal .detail-card h3{
+  margin: 0 0 10px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #444 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#viewTreatmentModal .detail-card h3 i,
+#viewSaleModal .detail-card h3 i{
+  color: #ffadad !important;
+}
+
+/* Líneas label/valor: deja de verse todo “pegado” */
+#viewTreatmentModal .detail-card p,
+#viewSaleModal .detail-card p{
+  margin: 8px 0 !important;
+  font-size: 13.5px !important;
+  color: #444 !important;
+  line-height: 1.5 !important;
+  display: grid !important;
+  grid-template-columns: 90px 1fr !important;
+  column-gap: 10px !important;
+  align-items: baseline !important;
+}
+
+#viewTreatmentModal .detail-card p strong,
+#viewSaleModal .detail-card p strong{
+  opacity: .75 !important;
+  font-weight: 700 !important;
+}
+
+#viewTreatmentModal .detail-card span,
+#viewSaleModal .detail-card span{
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* Notas */
+#viewTreatmentModal .detail-notes,
+#viewSaleModal .detail-notes{
+  margin-top: 14px !important;
+  background: rgba(255,255,255,0.78) !important;
+  border: 1px solid rgba(255, 173, 173, 0.22) !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
+}
+
+#viewTreatmentModal .detail-notes h3,
+#viewSaleModal .detail-notes h3{
+  margin: 0 0 8px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #444 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#viewTreatmentModal .detail-notes h3 i,
+#viewSaleModal .detail-notes h3 i{
+  color: #ffadad !important;
+}
+
+#viewTreatmentModal .detail-notes p,
+#viewSaleModal .detail-notes p{
+  margin: 0 !important;
+  font-size: 13.5px !important;
+  color: #444 !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  max-height: 220px !important;
+  overflow: auto !important;
+}
+
+/* Fotos (solo tratamiento; no rompe venta) */
+#viewTreatmentModal .detail-photos{
+  margin-top: 14px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+}
+
+#viewTreatmentModal .detail-photos > div{
+  background: rgba(255,255,255,0.78) !important;
+  border: 1px solid rgba(255, 173, 173, 0.22) !important;
+  border-radius: 16px !important;
+  padding: 12px !important;
+}
+
+#viewTreatmentModal .detail-photos img{
+  width: 100% !important;
+  height: 240px !important;
+  max-height: 240px !important;
+  object-fit: cover !important;
+  border-radius: 14px !important;
+  display: block !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
+  cursor: zoom-in !important;
+}
+
+/* Responsive */
+@media (max-width: 760px){
+  #viewTreatmentModal .detail-grid,
+  #viewSaleModal .detail-grid{
+    grid-template-columns: 1fr !important;
+  }
+  #viewTreatmentModal .detail-photos{
+    grid-template-columns: 1fr !important;
+  }
+  #viewTreatmentModal .detail-photos img{
+    height: 210px !important;
+    max-height: 210px !important;
+  }
+}
