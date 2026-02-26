@@ -2398,7 +2398,11 @@ async function downloadTreatmentPDF() {
     return;
   }
 
-  const { jsPDF } = window.jspdf;
+  const jsPDF = window?.jspdf?.jsPDF;
+  if (!jsPDF) {
+    Swal.fire("Falta librería", "No está cargado jsPDF en tu SPA.", "error");
+    return;
+  }
   const doc = new jsPDF("p", "mm", "a4");
 
   const colorHeader = [204, 173, 173];
