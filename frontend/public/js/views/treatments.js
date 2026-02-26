@@ -1335,8 +1335,8 @@ function initSearchableSelect({ input, options, validator = null, allowed = null
 ====================== */
 
 function renderTreatmentCard(t) {
-  const date = t.date ? new Date(t.date) : null;
-  const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
+  const iso = (t.date ? String(t.date).slice(0, 10) : "");
+  const dateStr = iso ? iso.split("-").reverse().join("/") : "—";
   const timeStr = t.time || "—";
   const amount = Number(t.amount ?? 0);
   const amountStr = `$${amount.toFixed(2)}`;
@@ -1373,8 +1373,8 @@ function renderTreatmentCard(t) {
 }
 
 function renderSaleCard(s) {
-  const date = s.date ? new Date(s.date) : null;
-  const dateStr = date ? date.toLocaleDateString("es-AR") : "—";
+  const iso = s.date ? String(s.date).slice(0, 10) : "";
+  const dateStr = iso ? iso.split("-").reverse().join("/") : "—";
   const amount = Number(s.amount ?? 0);
   const amountStr = `$${amount.toFixed(2)}`;
   const qty = Number(s.quantity ?? 0);
@@ -1464,15 +1464,7 @@ function applyFilters() {
   const filteredTreatments = (allTreatments || []).filter((t) => {
     const matchesPatient = !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
-    const matchesDate = !dateFilter || (() => {
-      if (!t.date) return false;
-      const d = new Date(t.date);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const localISO = `${y}-${m}-${day}`;
-      return localISO === dateFilter;
-    })();
+    const matchesDate = !dateFilter || (t.date && String(t.date).slice(0, 10) === dateFilter);
 
     const matchesType = !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
     const matchesStatus = !statusFilter || (t.status === statusFilter);
@@ -1484,15 +1476,7 @@ function applyFilters() {
   const filteredSales = (allSales || []).filter((s) => {
     const matchesPatient = !patientFilter || (s.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
-    const matchesDate = !dateFilter || (() => {
-      if (!s.date) return false;
-      const d = new Date(s.date);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const localISO = `${y}-${m}-${day}`;
-      return localISO === dateFilter;
-    })();
+    const matchesDate = !dateFilter || (s.date && String(s.date).slice(0, 10) === dateFilter);
 
     const matchesType = !typeFilter || (s.product || "").toLowerCase().includes(typeFilter);
     const matchesStatus = !statusFilter || (s.status === statusFilter);
@@ -2125,7 +2109,8 @@ async function openViewModal(treatment) {
   const modal = document.getElementById("viewTreatmentModal");
   if (!treatment) return;
 
-  const dateFormatted = treatment.date ? new Date(treatment.date).toLocaleDateString("es-AR") : "—";
+  const iso = treatment.date ? String(treatment.date).slice(0, 10) : "";
+  const dateFormatted = iso ? iso.split("-").reverse().join("/") : "—";
 
   document.getElementById("viewName").textContent = treatment.patient?.fullName || "Sin paciente";
   document.getElementById("viewPhone").textContent = treatment.patient?.phone || "—";
@@ -2469,7 +2454,9 @@ async function downloadTreatmentPDF() {
 
   const tratamientoY = startY + 37;
   doc.text(`Tratamiento: ${t.treatment || "—"}`, 14, tratamientoY);
-  doc.text(`Fecha: ${t.date ? new Date(t.date).toLocaleDateString("es-AR") : "—"}`, 14, tratamientoY + 7);
+  const isoDate = t.date ? String(t.date).slice(0, 10) : "";
+  const pdfDate = isoDate ? isoDate.split("-").reverse().join("/") : "—";
+  doc.text(`Fecha: ${pdfDate}`, 14, tratamientoY + 7);
   doc.text(`Hora: ${t.time || "—"}`, 14, tratamientoY + 14);
   const amountPdf = Number(t.amount ?? 0);
   doc.text(`Monto: $${amountPdf.toFixed(2)}`, 14, tratamientoY + 21);
@@ -2519,6 +2506,7 @@ async function downloadTreatmentPDF() {
   doc.setTextColor(...colorTexto);
   doc.text(`Firma profesional:`, 85, 287);
 
-  const filename = `Informe_${(t.patient?.fullName || "Paciente").replace(/\s+/g, "_")}_${(t.date ? new Date(t.date).toLocaleDateString("es-AR") : "Fecha")}.pdf`;
+  const fileDate = t.date ? String(t.date).slice(0, 10) : "Fecha";
+  const filename = `Informe_${(t.patient?.fullName || "Paciente").replace(/\s+/g, "_")}_${fileDate}.pdf`;
   doc.save(filename);
 }
