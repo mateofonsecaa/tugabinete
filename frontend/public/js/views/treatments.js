@@ -280,8 +280,8 @@ export function Treatments() {
                       </div>
                       <div>
                         <label>Cantidad</label>
-                        <input type="number" id="saleQuantity" min="1" step="1" required/>
-                      </div>
+                        <input type="number" id="saleQuantity" min="1" max="2147483647" step="1" inputmode="numeric" required/>
+                      </div>º
                     </div>
                   </div>
 
@@ -518,6 +518,63 @@ export function Treatments() {
         </div>
       </div>
 
+      <!-- MODAL EDITAR VENTA -->
+      <div id="editSaleModal" class="modal-overlay">
+        <div class="modal-box modal-edit-pro">
+          <button class="close-btn" id="closeEditSaleBtn">&times;</button>
+          <h2><i class="fa-solid fa-pen-to-square"></i> Editar Venta</h2>
+
+          <form id="editSaleForm" class="edit-grid">
+            <div class="edit-column">
+              <label>Producto vendido</label>
+              <input
+                type="text"
+                id="editSaleProduct"
+                placeholder="Ej: Serum vitamina C"
+                maxlength="40"
+                required
+              />
+
+              <label>Cantidad</label>
+              <input
+                type="number"
+                id="editSaleQuantity"
+                min="1"
+                step="1"
+                inputmode="numeric"
+                required
+              />
+
+              <label>Monto total ($)</label>
+              <input
+                type="number"
+                id="editSaleAmount"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                required
+              />
+
+              <label>Notas</label>
+              <textarea
+                id="editSaleNotes"
+                maxlength="300"
+                placeholder="Notas de la venta..."
+              ></textarea>
+            </div>
+          </form>
+
+          <div class="modal-actions">
+            <button type="submit" form="editSaleForm" class="btn-save">
+              <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+            </button>
+            <button type="button" class="btn-cancel" id="cancelEditSaleBtn">
+              <i class="fa-solid fa-xmark"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- MODAL VER -->
       <div id="viewTreatmentModal" class="modal-overlay">
         <div class="modal-box modal-detail-pro">
@@ -566,10 +623,39 @@ export function Treatments() {
         </div>
       </div>
 
+      <!-- MODAL VER VENTA -->
+      <div id="viewSaleModal" class="modal-overlay">
+        <div class="modal-box modal-detail-pro">
+          <button class="close-btn" id="closeViewSaleBtn">&times;</button>
+          <h2><i class="fa-solid fa-receipt"></i> Detalle de la Venta</h2>
+
+          <div class="detail-grid">
+            <div class="detail-card">
+              <h3><i class="fa-solid fa-user"></i> Paciente</h3>
+              <p><strong>Nombre:</strong> <span id="viewSaleName">—</span></p>
+              <p><strong>Teléfono:</strong> <span id="viewSalePhone">—</span></p>
+              <p><strong>Dirección:</strong> <span id="viewSaleAddress">—</span></p>
+            </div>
+
+            <div class="detail-card">
+              <h3><i class="fa-solid fa-bag-shopping"></i> Venta</h3>
+              <p><strong>Producto:</strong> <span id="viewSaleProduct">—</span></p>
+              <p><strong>Cantidad:</strong> <span id="viewSaleQuantity">—</span></p>
+              <p><strong>Precio:</strong> <span id="viewSaleAmount">—</span></p>
+            </div>
+          </div>
+
+          <div class="detail-notes">
+            <h3><i class="fa-solid fa-pen"></i> Nota</h3>
+            <p id="viewSaleNotes">—</p>
+          </div>
+        </div>
+      </div>
+
       <!-- MODAL IMAGEN AMPLIADA -->
       <div id="imagePreviewModal"
         style="display:none; position:fixed; inset:0; background:rgba(255,245,245,0.85);
-              backdrop-filter:blur(10px); z-index:3000; justify-content:center; align-items:center; overflow:hidden;">
+              backdrop-filter:blur(10px); z-index:7000; justify-content:center; align-items:center; overflow:hidden;">
         <div id="imagePreviewContainer"
           style="position:relative; display:flex; justify-content:center; align-items:center; max-width:95vw; max-height:95vh;">
           <button id="closeImageBtn"
@@ -603,7 +689,9 @@ let isSavingTreatment = false;
 let beforePhotoData = "";
 let afterPhotoData = "";
 let editingTreatment = null;
+let editingSale = null;
 let treatmentViewCache = null;
+let patientsCache = [];
 
 export async function initTreatments() {
   initDrawer();
@@ -797,7 +885,8 @@ function bindUI() {
       const kind = row.dataset.kind || "treatment";
 
       if (kind === "sale") {
-        // opcional: abrir un modal de venta (si no tenés, no hagas nada)
+        const s = allSales.find((x) => String(x.id) === String(id));
+        if (s) openSaleViewModal(s);
         return;
       }
       const t = allTreatments.find((x) => String(x.id) === String(id));
@@ -812,6 +901,24 @@ function bindUI() {
       if (btn.classList.contains("btn-view") || btn.classList.contains("btn-edit") || btn.classList.contains("btn-delete")) {
         const id = btn.dataset.id;
         if (!id) return;
+
+        const card = btn.closest(".treat-card");
+        const kind = card?.dataset.kind || "treatment";
+
+        // ✅ Acciones para ventas
+        if (kind === "sale") {
+          const s = allSales.find((x) => String(x.id) === String(id));
+          if (btn.classList.contains("btn-view")) {
+            if (s) openSaleViewModal(s);
+          }
+          if (btn.classList.contains("btn-edit")) {
+            if (s) openEditSaleModal(s);
+          }
+          if (btn.classList.contains("btn-delete")) deleteSale(id);
+          return;
+        }
+
+        // ✅ Acciones para tratamientos
         const t = allTreatments.find((x) => String(x.id) === String(id));
         if (!t) return;
 
@@ -826,7 +933,9 @@ function bindUI() {
       if (btn.id === "confirmNewPatientBtn") confirmNewPatient();
 
       if (btn.id === "closeEditTreatmentBtn" || btn.id === "cancelEditTreatmentBtn") closeEditModal();
+      if (btn.id === "closeEditSaleBtn" || btn.id === "cancelEditSaleBtn") closeEditSaleModal();
       if (btn.id === "closeViewTreatmentBtn") closeViewModal();
+      if (btn.id === "closeViewSaleBtn") closeSaleViewModal();
       if (btn.id === "downloadPdfBtn") downloadTreatmentPDF();
 
       if (btn.id === "closeImageBtn") closeImagePreview();
@@ -905,12 +1014,7 @@ function bindUI() {
       if (modal.style.display === "flex" && e.target === modal) closeImagePreview();
     });
   }
-
   /* ======================
-  Sale bindings
-====================== */
-
-/* ======================
   Sale bindings
 ====================== */
 
@@ -938,8 +1042,12 @@ bindOnce("#saleDate", "click", () => {
 
 /* ✅ Cantidad: entero y mínimo 1 */
 bindOnce("#saleQuantity", "input", (e) => {
-  let v = String(e.target.value || "").replace(/[^0-9]/g, "");
-  if (v === "") return;
+  let v = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
+
+  if (v === "") {
+    e.target.value = "";
+    return;
+  }
 
   let n = parseInt(v, 10);
   if (Number.isNaN(n) || n < 1) n = 1;
@@ -964,6 +1072,42 @@ bindOnce("#saleNotes", "input", (e) => {
   if (e.target.value.length > max) {
     e.target.value = e.target.value.slice(0, max);
   }
+});
+
+bindOnce("#editSaleForm", "submit", (e) => onSaveEditSale(e));
+
+/* ✅ Producto: máximo 40 chars (refuerzo por si pega texto largo) */
+bindOnce("#editSaleProduct", "input", (e) => {
+  const max = 40;
+  if (e.target.value.length > max) e.target.value = e.target.value.slice(0, max);
+});
+
+/* ✅ Cantidad: solo dígitos, máximo 10 dígitos, entero y mínimo 1 */
+bindOnce("#editSaleQuantity", "input", (e) => {
+  let v = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
+  if (v === "") { e.target.value = ""; return; }
+
+  let n = parseInt(v, 10);
+  if (Number.isNaN(n) || n < 1) n = 1;
+
+  e.target.value = String(n);
+});
+
+/* ✅ Monto: numérico y >= 0 (solo números) */
+bindOnce("#editSaleAmount", "input", (e) => {
+  let v = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
+  if (v === "") { e.target.value = ""; return; }
+
+  let n = parseInt(v, 10);
+  if (Number.isNaN(n) || n < 0) n = 0;
+
+  e.target.value = String(n);
+});
+
+/* ✅ Notas: máximo 300 */
+bindOnce("#editSaleNotes", "input", (e) => {
+  const max = 300;
+  if (e.target.value.length > max) e.target.value = e.target.value.slice(0, max);
 });
 
 }
@@ -1002,6 +1146,8 @@ async function loadPatients() {
 
     const result = await res.json();
     data = Array.isArray(result) ? result : (result.patients || []);
+
+    patientsCache = data;
 
     data.sort((a, b) => String(a.fullName || "").localeCompare(String(b.fullName || "")));
 
@@ -1051,6 +1197,7 @@ async function loadPatients() {
     const list = document.getElementById("patientOptions");
     if (list) list.innerHTML = `<div>Error al cargar</div>`;
     allowedPatients = [];
+    patientsCache = [];
   }
 
   /* ======================
@@ -1232,7 +1379,6 @@ function renderSaleCard(s) {
   const amountStr = `$${amount.toFixed(2)}`;
   const qty = Number(s.quantity ?? 0);
 
-  // badge tipo "Venta"
   return `
     <div class="treat-card" data-id="${s.id}" data-kind="sale">
       <div class="treat-card-main">
@@ -1253,6 +1399,20 @@ function renderSaleCard(s) {
             <span class="treat-method">${s.method || "-"}</span>
           </div>
         </div>
+      </div>
+
+      <div class="treat-card-actions actions">
+        <button class="btn-view" data-id="${s.id}" title="Ver">
+          <i class="fa-solid fa-eye"></i>
+        </button>
+
+        <button class="btn-edit" data-id="${s.id}" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+
+        <button class="btn-delete" data-id="${s.id}" title="Eliminar">
+          <i class="fa-solid fa-trash"></i>
+        </button>
       </div>
     </div>
   `;
@@ -1640,6 +1800,42 @@ async function deleteTreatment(id) {
   }
 }
 
+async function deleteSale(id) {
+  const confirm = await Swal.fire({
+    title: "¿Eliminar venta?",
+    text: "Esta acción no se puede deshacer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#ffadad",
+    cancelButtonColor: "#d1d1d1",
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const res = await authFetch(`${API_URL}/sales/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(t || "No se pudo eliminar");
+    }
+
+    allSales = allSales.filter((s) => String(s.id) !== String(id));
+    applyFilters();
+
+    await Swal.fire({
+      icon: "success",
+      title: "Eliminado",
+      text: "Venta eliminada correctamente",
+      timer: 1600,
+      showConfirmButton: false,
+    });
+  } catch {
+    Swal.fire("Error", "No se pudo eliminar la venta", "error");
+  }
+}
+
 /* ======================
    Edit modal
 ====================== */
@@ -1787,6 +1983,138 @@ async function onSaveEditTreatment(e) {
   }
 }
 
+function openEditSaleModal(sale) {
+  editingSale = { ...sale };
+
+  const modal = document.getElementById("editSaleModal");
+  if (!modal) return;
+
+  modal.classList.add("active");
+  modal.style.display = "flex";
+
+  const product = document.getElementById("editSaleProduct");
+  const qty = document.getElementById("editSaleQuantity");
+  const amount = document.getElementById("editSaleAmount");
+  const notes = document.getElementById("editSaleNotes");
+
+  if (product) product.value = sale.product || "";
+  if (qty) qty.value = String(sale.quantity ?? 1);
+  if (amount) amount.value = String(sale.amount ?? 0);
+  if (notes) notes.value = sale.notes || "";
+
+  // mismo fix que aplicaste en editar tratamiento (por si tu CSS global rompe el layout)
+  const actions = modal.querySelector(".modal-actions");
+  const btnSave = modal.querySelector(".btn-save");
+  const btnCancel = modal.querySelector(".btn-cancel");
+  if (actions) {
+    actions.style.display = "flex";
+    actions.style.justifyContent = "center";
+    actions.style.gap = "12px";
+    actions.style.flexWrap = "wrap";
+  }
+  [btnSave, btnCancel].forEach((b) => {
+    if (!b) return;
+    b.style.width = "auto";
+    b.style.flex = "0 0 auto";
+    b.style.minWidth = "180px";
+    b.style.maxWidth = "260px";
+    b.style.display = "inline-flex";
+  });
+}
+
+function closeEditSaleModal() {
+  const modal = document.getElementById("editSaleModal");
+  if (!modal) return;
+
+  modal.classList.remove("active");
+  modal.style.display = "none";
+  editingSale = null;
+}
+
+async function onSaveEditSale(e) {
+  e.preventDefault();
+  if (!editingSale) return;
+
+  const product = (document.getElementById("editSaleProduct")?.value || "").trim();
+  const qtyRaw = String(document.getElementById("editSaleQuantity")?.value || "");
+  const qtyStr = qtyRaw.replace(/[^0-9]/g, "").slice(0, 10); // ✅ 10 dígitos hard
+  const qty = parseInt(qtyStr, 10);
+
+  const amount = parseFloat(document.getElementById("editSaleAmount")?.value || "");
+  const notes = (document.getElementById("editSaleNotes")?.value || "");
+
+  if (!product) {
+    Swal.fire("Error", "El nombre del producto es obligatorio.", "error");
+    return;
+  }
+  if (product.length > 40) {
+    Swal.fire("Error", "El nombre del producto no puede superar 40 caracteres.", "error");
+    return;
+  }
+
+  if (Number.isNaN(qty) || qty < 1) {
+    Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
+    return;
+  }
+
+  if (Number.isNaN(amount) || amount < 0) {
+    Swal.fire("Error", "El monto total debe ser un número >= 0.", "error");
+    return;
+  }
+
+  if (notes.length > 300) {
+    Swal.fire("Error", "Las notas no pueden superar 300 caracteres.", "error");
+    return;
+  }
+
+  const patientId = editingSale.patientId ?? editingSale.patient?.id;
+  let date = editingSale.date || null;
+  if (date && String(date).includes("T")) date = String(date).split("T")[0];
+
+  const payload = {
+    patientId: patientId ? parseInt(patientId, 10) : undefined,
+    product,
+    date,
+    quantity: qty,
+    amount,
+    status: editingSale.status || "Pagado",
+    method: editingSale.method || "No especificado",
+    notes: notes.trim() ? notes : null, // ✅ manda la nota EDITADA
+  };
+
+  Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
+
+  try {
+    const res = await authFetch(`${API_URL}/sales/${editingSale.id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+
+    const saved = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(saved?.error || "No se pudo actualizar la venta");
+
+    const merged = { ...editingSale, ...(saved || {}) };
+    if (!merged.patient && editingSale.patient) merged.patient = editingSale.patient;
+
+    const i = allSales.findIndex((x) => String(x.id) === String(editingSale.id));
+    if (i !== -1) allSales[i] = merged;
+
+    applyFilters();
+    closeEditSaleModal();
+
+    await Swal.fire({
+      icon: "success",
+      title: "Guardado",
+      text: "Venta actualizada correctamente",
+      timer: 1600,
+      showConfirmButton: false,
+    });
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", err.message || "No se pudo actualizar la venta", "error");
+  }
+}
+
 /* ======================
    View modal + image
 ====================== */
@@ -1841,6 +2169,42 @@ async function openViewModal(treatment) {
 
 function closeViewModal() {
   const modal = document.getElementById("viewTreatmentModal");
+  modal.classList.remove("active");
+  modal.style.display = "none";
+}
+
+function openSaleViewModal(sale) {
+  if (!sale) return;
+
+  const pid = sale.patientId ?? sale.patient?.id;
+  const cached = (patientsCache || []).find((x) => String(x.id) === String(pid));
+
+  // ✅ cached primero (trae phone/address), sale.patient encima por si trae algo actualizado
+  const p = { ...(cached || {}), ...(sale.patient || {}) };
+
+  document.getElementById("viewSaleName").textContent = p.fullName || "Sin paciente";
+  document.getElementById("viewSalePhone").textContent = p.phone || "—";
+  document.getElementById("viewSaleAddress").textContent = p.address || "—";
+
+  document.getElementById("viewSaleProduct").textContent = sale.product || "—";
+
+  const qty = Number(sale.quantity ?? 0);
+  document.getElementById("viewSaleQuantity").textContent = qty ? String(qty) : "—";
+
+  const amount = Number(sale.amount ?? 0);
+  document.getElementById("viewSaleAmount").textContent = `$${amount.toFixed(2)}`;
+
+  document.getElementById("viewSaleNotes").textContent = sale.notes || "—";
+
+  const modal = document.getElementById("viewSaleModal");
+  if (!modal) return;
+  modal.classList.add("active");
+  modal.style.display = "flex";
+}
+
+function closeSaleViewModal() {
+  const modal = document.getElementById("viewSaleModal");
+  if (!modal) return;
   modal.classList.remove("active");
   modal.style.display = "none";
 }
