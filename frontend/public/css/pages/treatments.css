@@ -591,26 +591,6 @@
   }
 }
 
-@media (max-width: 520px){
-  .treatments-page main.treatments-main{
-    padding: 16px;
-  }
-  .treatments-page .treatments-head{
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  /* Mobile: mostrar Paciente / Fecha / Pago / Acciones */
-  .treatments-page .treatments-table th:nth-child(3),
-  .treatments-page .treatments-table td:nth-child(3),
-  .treatments-page .treatments-table th:nth-child(4),
-  .treatments-page .treatments-table td:nth-child(4),
-  .treatments-page .treatments-table th:nth-child(6),
-  .treatments-page .treatments-table td:nth-child(6){
-    display: none;
-  }
-}
-
 /* Header fijo + drawer arriba (como ya tenías) */
 .treatments-page .top-bar{
   position: fixed;
@@ -788,14 +768,12 @@
   .treatments-page .modal-detail-pro .detail-photos{
     grid-template-columns: 1fr;
   }
-  .treatments-page .modal-detail-pro .detail-photos img{
+  .treatments-page .modal-detail-pro .detail-photos .photo-frame{
     height: 200px;
     max-height: 200px;
   }
 
-  .treatments-grid{
-    grid-template-columns: 1fr;
-  }
+  .treatments-page .treatments-grid{ grid-template-columns: 1fr; }
 }
 
 .treatments-page #imagePreviewModal{
@@ -977,15 +955,47 @@
   color: #444;
 }
 
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos img{
+/* Frame fijo para que no colapse cuando no hay imagen */
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
   width: 100%;
   height: 240px;
   max-height: 240px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Imagen ocupa todo el frame */
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame img{
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 14px;
-  display: block;
   box-shadow: 0 10px 24px rgba(0,0,0,0.10);
   cursor: zoom-in;
+}
+
+/* Placeholder cuando no hay foto */
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+
+  background: rgba(255,255,255,0.70);
+  border: 2px dashed rgba(255, 173, 173, 0.55);
+  border-radius: 14px;
+
+  color: #777;
+  font-weight: 700;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty i{
+  color: #ffadad;
+  font-size: 22px;
 }
 
 /* Botón acciones (PDF) */
@@ -1010,8 +1020,28 @@
   .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
     grid-template-columns: 1fr;
   }
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos img{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
     height: 210px;
     max-height: 210px;
+  }
+}
+
+@media (max-width: 520px){
+  .treatments-page main.treatments-main{
+    padding: 16px;
+  }
+  .treatments-page .treatments-head{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Mobile: mostrar Paciente / Fecha / Pago / Acciones */
+  .treatments-page .treatments-table th:nth-child(3),
+  .treatments-page .treatments-table td:nth-child(3),
+  .treatments-page .treatments-table th:nth-child(4),
+  .treatments-page .treatments-table td:nth-child(4),
+  .treatments-page .treatments-table th:nth-child(6),
+  .treatments-page .treatments-table td:nth-child(6){
+    display: none;
   }
 }

@@ -281,7 +281,7 @@ export function Treatments() {
                       <div>
                         <label>Cantidad</label>
                         <input type="number" id="saleQuantity" min="1" max="2147483647" step="1" inputmode="numeric" required/>
-                      </div>º
+                      </div>
                     </div>
                   </div>
 
@@ -319,7 +319,7 @@ export function Treatments() {
                   <div class="action-buttons">
                     <button type="button" class="btn-cancel-treatment" id="btnCancelSaleForm">Cerrar</button>
 
-                    <button type="submit" class="btn-save-treatment">
+                    <button type="submit" class="btn-save-treatment" id="btnSaveSale">
                       Guardar
                     </button>
                   </div>
@@ -335,7 +335,7 @@ export function Treatments() {
 
               <section class="tg-card tg-collapsible is-collapsed filter-section">
                 <div class="tg-card-head">
-                  <h2>Buscar tratamientos</h2>
+                  <h2>Filtros de búsqueda</h2>
 
                   <button class="tg-icon-btn" id="btnCollapseFilters" type="button" aria-label="Desplegar filtros">
                     <i class="fa-solid fa-sliders"></i>
@@ -607,11 +607,24 @@ export function Treatments() {
           <div class="detail-photos">
             <div>
               <p><strong>Antes</strong></p>
-              <img id="viewBeforePhoto" src="" alt="Foto antes">
+
+              <div class="photo-frame">
+                <img id="viewBeforePhoto" src="" alt="Foto antes" style="display:none;">
+                <div id="viewBeforeEmpty" class="photo-empty">
+                  <span>Sin foto cargada</span>
+                </div>
+              </div>
             </div>
+
             <div>
               <p><strong>Después</strong></p>
-              <img id="viewAfterPhoto" src="" alt="Foto después">
+
+              <div class="photo-frame">
+                <img id="viewAfterPhoto" src="" alt="Foto después" style="display:none;">
+                <div id="viewAfterEmpty" class="photo-empty">
+                  <span>Sin foto cargada</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -686,8 +699,7 @@ let allTreatments = [];
 let allSales = [];
 let allowedPatients = []; // normalizados
 let isSavingTreatment = false;
-let beforePhotoData = "";
-let afterPhotoData = "";
+let isSavingSale = false;
 let editingTreatment = null;
 let editingSale = null;
 let treatmentViewCache = null;
@@ -960,8 +972,8 @@ function bindUI() {
     const name = document.getElementById("beforeFileName");
     if (name) name.textContent = input?.files?.length ? input.files[0].name : "Ningún archivo seleccionado";
 
-    loadImageFile(input, "beforePreview", (img) => {
-      beforePhotoData = img;
+    // preview solamente
+    loadImageFile(input, "beforePreview", () => {
       const preview = document.getElementById("beforePreview");
       if (preview) preview.style.display = "block";
     });
@@ -972,8 +984,8 @@ function bindUI() {
     const name = document.getElementById("afterFileName");
     if (name) name.textContent = input?.files?.length ? input.files[0].name : "Ningún archivo seleccionado";
 
-    loadImageFile(input, "afterPreview", (img) => {
-      afterPhotoData = img;
+    // preview solamente
+    loadImageFile(input, "afterPreview", () => {
       const preview = document.getElementById("afterPreview");
       if (preview) preview.style.display = "block";
     });
@@ -1297,6 +1309,13 @@ function initSearchableSelect({ input, options, validator = null, allowed = null
 
   $input.addEventListener("focus", () => {
     $options.style.display = "block";
+
+    const v = normalizeText($input.value);
+    if (!v) {
+      [...$options.children].forEach((opt) => {
+        opt.style.display = "block";
+      });
+    }
   });
 
   $input.addEventListener("input", () => {
@@ -1567,6 +1586,8 @@ async function onCreateTreatment(e) {
       return;
     }
 
+    const beforePhoto = await inputFileToDataURL(document.getElementById("beforePhoto"));
+    const afterPhoto  = await inputFileToDataURL(document.getElementById("afterPhoto"));
     const newTreatment = {
       patientId: parseInt(document.getElementById("patientSelect").value, 10),
       treatment: document.getElementById("treatmentInput").value,
@@ -1576,8 +1597,8 @@ async function onCreateTreatment(e) {
       notes: document.getElementById("notes").value,
       status: document.getElementById("paymentStatus").value,
       method: document.getElementById("paymentMethod").value,
-      beforePhoto: beforePhotoData || null,
-      afterPhoto: afterPhotoData || null,
+      beforePhoto,
+      afterPhoto,
     };
 
     const res = await authFetch(`${API_URL}/appointments`, {
@@ -1626,9 +1647,6 @@ function resetTreatmentForm() {
   document.getElementById("amount").value = "";
   document.getElementById("notes").value = "";
 
-  beforePhotoData = "";
-  afterPhotoData = "";
-
   const beforeName = document.getElementById("beforeFileName");
   const afterName = document.getElementById("afterFileName");
   if (beforeName) beforeName.textContent = "Ningún archivo seleccionado";
@@ -1649,6 +1667,18 @@ function resetTreatmentForm() {
   const afterInput = document.getElementById("afterPhoto");
   if (beforeInput) beforeInput.value = "";
   if (afterInput) afterInput.value = "";
+
+  const pi = document.getElementById("patientInput");
+  const ti = document.getElementById("treatmentInput");
+
+  if (pi) pi.dispatchEvent(new Event("input", { bubbles: true }));
+  if (ti) ti.dispatchEvent(new Event("input", { bubbles: true }));
+
+  // opcional: esconder los dropdowns al reset
+  const po = document.getElementById("patientOptions");
+  const to = document.getElementById("treatmentOptions");
+  if (po) po.style.display = "none";
+  if (to) to.style.display = "none";
 }
 
 /* ======================
@@ -1658,70 +1688,79 @@ function resetTreatmentForm() {
 async function onCreateSale(e) {
   e.preventDefault();
 
-  const patientId = document.getElementById("salePatientId").value;
+  const btnSave = document.getElementById("btnSaveSale") ||
+                  document.querySelector('#saleForm button[type="submit"]');
 
-  if (!patientId) {
-    Swal.fire("Error", "Debés seleccionar un paciente válido.", "error");
-    return;
+  if (isSavingSale) return;
+  isSavingSale = true;
+
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Cargando...`;
+    btnSave.style.opacity = "0.6";
   }
 
-    const dateStr = document.getElementById("saleDate").value;
-    const qty = parseInt(document.getElementById("saleQuantity").value, 10);
+  try {
+    const patientId = document.getElementById("salePatientId")?.value;
 
-    const amountStr = document.getElementById("saleAmount").value;
+    if (!patientId) {
+      await Swal.fire("Error", "Debés seleccionar un paciente válido.", "error");
+      throw new Error("__VALIDATION__");
+    }
+
+    const dateStr = document.getElementById("saleDate")?.value || "";
+    const qty = parseInt(document.getElementById("saleQuantity")?.value || "", 10);
+
+    const amountStr = document.getElementById("saleAmount")?.value || "";
     const amount = parseFloat(amountStr);
 
-    const notes = document.getElementById("saleNotes").value || "";
+    const notes = document.getElementById("saleNotes")?.value || "";
 
-    // ✅ Fecha obligatoria y no futura
     if (!dateStr) {
-      Swal.fire("Error", "La fecha es obligatoria.", "error");
-      return;
+      await Swal.fire("Error", "La fecha es obligatoria.", "error");
+      throw new Error("__VALIDATION__");
     }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const chosen = new Date(dateStr + "T00:00:00");
     if (chosen > today) {
-      Swal.fire("Error", "La fecha no puede ser futura.", "error");
-      return;
+      await Swal.fire("Error", "La fecha no puede ser futura.", "error");
+      throw new Error("__VALIDATION__");
     }
 
-    // ✅ Cantidad >= 1
     if (Number.isNaN(qty) || qty < 1) {
-      Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
-      return;
+      await Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
+      throw new Error("__VALIDATION__");
     }
 
-    // ✅ Monto numérico y >= 0
     if (Number.isNaN(amount) || amount < 0) {
-      Swal.fire("Error", "El monto total debe ser un número mayor o igual a 0.", "error");
-      return;
+      await Swal.fire("Error", "El monto total debe ser un número mayor o igual a 0.", "error");
+      throw new Error("__VALIDATION__");
     }
 
-    // ✅ Notas <= 300
     if (notes.length > 300) {
-      Swal.fire("Error", "Las notas no pueden superar los 300 caracteres.", "error");
-      return;
+      await Swal.fire("Error", "Las notas no pueden superar los 300 caracteres.", "error");
+      throw new Error("__VALIDATION__");
     }
 
-  const newSale = {
-    patientId: parseInt(patientId, 10),
-    product: document.getElementById("saleProduct").value,
-    date: dateStr,
-    quantity: qty,
-    amount: amount,
-    status: document.getElementById("saleStatus").value,
-    method: document.getElementById("saleMethod").value,
-    notes: notes,
-  };
+    const newSale = {
+      patientId: parseInt(patientId, 10),
+      product: document.getElementById("saleProduct")?.value || "",
+      date: dateStr,
+      quantity: qty,
+      amount: amount,
+      status: document.getElementById("saleStatus")?.value || "",
+      method: document.getElementById("saleMethod")?.value || "",
+      notes: notes,
+    };
 
-  try {
     const res = await authFetch(`${API_URL}/sales`, {
       method: "POST",
       body: JSON.stringify(newSale),
     });
 
-    const saved = await res.json();
+    const saved = await res.json().catch(() => null);
     if (!res.ok) throw new Error(saved?.error || "Error al registrar venta");
 
     allSales.unshift(saved);
@@ -1734,14 +1773,31 @@ async function onCreateSale(e) {
       showConfirmButton: false,
     });
 
-    document.getElementById("saleForm").reset();
-    document.getElementById("salePatientId").value = "";
+    document.getElementById("saleForm")?.reset();
+    const salePatientId = document.getElementById("salePatientId");
+    if (salePatientId) salePatientId.value = "";
+
+    const spi = document.getElementById("salePatientInput");
+    const spo = document.getElementById("salePatientOptions");
+    if (spi) {
+      spi.value = "";
+      spi.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    if (spo) spo.style.display = "none";
+
+    closeSaleForm(); // ✅ SOLO si guardó bien
 
   } catch (err) {
-    Swal.fire("Error", err.message, "error");
+    if (err?.message === "__VALIDATION__") return;
+    Swal.fire("Error", err?.message || "No se pudo guardar la venta", "error");
+  } finally {
+    isSavingSale = false;
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = "Guardar";
+      btnSave.style.opacity = "1";
+    }
   }
-
-  closeSaleForm();
 }
 
 /* ======================
@@ -2103,49 +2159,91 @@ async function onSaveEditSale(e) {
    View modal + image
 ====================== */
 
+function isValidPhotoSrc(v) {
+  if (!v) return false;
+  const s = String(v);
+  if (s === "null" || s === "undefined") return false;
+
+  // soporta dataURL o url normal
+  if (s.startsWith("data:image/")) return true;
+  if (s.startsWith("http://") || s.startsWith("https://")) return true;
+
+  // fallback por si viene raro pero largo
+  return s.length > 50;
+}
+
+function setPhotoSlot(imgEl, emptyEl, src) {
+  if (!imgEl || !emptyEl) return;
+
+  if (isValidPhotoSrc(src)) {
+    imgEl.src = src;
+    imgEl.style.display = "block";
+    emptyEl.style.display = "none";
+  } else {
+    imgEl.src = "";
+    imgEl.style.display = "none";
+    emptyEl.style.display = "grid";
+  }
+}
+
 async function openViewModal(treatment) {
-  treatmentViewCache = { ...treatment };
+  if (!treatment) return;
 
   const modal = document.getElementById("viewTreatmentModal");
-  if (!treatment) return;
+  if (!modal) return;
+
+  treatmentViewCache = { ...treatment };
 
   const iso = treatment.date ? String(treatment.date).slice(0, 10) : "";
   const dateFormatted = iso ? iso.split("-").reverse().join("/") : "—";
 
-  document.getElementById("viewName").textContent = treatment.patient?.fullName || "Sin paciente";
-  document.getElementById("viewPhone").textContent = treatment.patient?.phone || "—";
-  document.getElementById("viewAddress").textContent = treatment.patient?.address || "—";
+  const pid = treatment.patientId ?? treatment.patient?.id;
+  const cached = (patientsCache || []).find((x) => String(x.id) === String(pid));
+  const p = { ...(cached || {}), ...(treatment.patient || {}) };
+
+  document.getElementById("viewName").textContent = p.fullName || "Sin paciente";
+  document.getElementById("viewPhone").textContent = p.phone || "—";
+  document.getElementById("viewAddress").textContent = p.address || "—";
+
+  // para PDF también
+  treatmentViewCache.patient = p;
 
   document.getElementById("viewType").textContent = treatment.treatment || "—";
   document.getElementById("viewDate").textContent = dateFormatted;
+
   const amountView = Number(treatment.amount ?? 0);
   document.getElementById("viewAmount").textContent = `$${amountView.toFixed(2)}`;
+
   document.getElementById("viewStatus").textContent = treatment.status || "—";
   document.getElementById("viewMethod").textContent = treatment.method || "—";
   document.getElementById("viewNotes").textContent = treatment.notes || "—";
 
   const beforeImg = document.getElementById("viewBeforePhoto");
   const afterImg = document.getElementById("viewAfterPhoto");
-  if (beforeImg) beforeImg.style.display = "none";
-  if (afterImg) afterImg.style.display = "none";
+  const beforeEmpty = document.getElementById("viewBeforeEmpty");
+  const afterEmpty = document.getElementById("viewAfterEmpty");
+
+  // ✅ reset limpio: muestra placeholder y oculta img (sin ícono roto)
+  setPhotoSlot(beforeImg, beforeEmpty, null);
+  setPhotoSlot(afterImg, afterEmpty, null);
+
+  // limpiar cache de fotos
+  treatmentViewCache.beforePhoto = null;
+  treatmentViewCache.afterPhoto = null;
 
   try {
     const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
     if (resp.ok) {
       const photos = await resp.json();
-      if (photos.beforePhoto && beforeImg) {
-        beforeImg.src = photos.beforePhoto;
-        beforeImg.style.display = "block";
-        treatmentViewCache.beforePhoto = photos.beforePhoto;
-      }
-      if (photos.afterPhoto && afterImg) {
-        afterImg.src = photos.afterPhoto;
-        afterImg.style.display = "block";
-        treatmentViewCache.afterPhoto = photos.afterPhoto;
-      }
+
+      setPhotoSlot(beforeImg, beforeEmpty, photos?.beforePhoto);
+      setPhotoSlot(afterImg, afterEmpty, photos?.afterPhoto);
+
+      treatmentViewCache.beforePhoto = isValidPhotoSrc(photos?.beforePhoto) ? photos.beforePhoto : null;
+      treatmentViewCache.afterPhoto  = isValidPhotoSrc(photos?.afterPhoto)  ? photos.afterPhoto  : null;
     }
   } catch {
-    // no-op
+    // si falla, queda el placeholder visible
   }
 
   modal.classList.add("active");
@@ -2154,8 +2252,21 @@ async function openViewModal(treatment) {
 
 function closeViewModal() {
   const modal = document.getElementById("viewTreatmentModal");
+  if (!modal) return;
+
   modal.classList.remove("active");
   modal.style.display = "none";
+
+  const beforeImg = document.getElementById("viewBeforePhoto");
+  const afterImg = document.getElementById("viewAfterPhoto");
+  const beforeEmpty = document.getElementById("viewBeforeEmpty");
+  const afterEmpty = document.getElementById("viewAfterEmpty");
+
+  // ✅ al cerrar, deja placeholders listos para el próximo modal
+  setPhotoSlot(beforeImg, beforeEmpty, null);
+  setPhotoSlot(afterImg, afterEmpty, null);
+
+  treatmentViewCache = null;
 }
 
 function openSaleViewModal(sale) {
@@ -2320,7 +2431,22 @@ function cancelTreatmentForm() {
   const opts = document.getElementById("registerOptions");
   if (form) form.style.display = "none";
   if (opts) opts.style.display = "flex";
-  // no cerramos la card (solo cerramos el form)
+
+  // ✅ limpieza dura de fotos al cerrar
+  const beforeInput = document.getElementById("beforePhoto");
+  const afterInput = document.getElementById("afterPhoto");
+  if (beforeInput) beforeInput.value = "";
+  if (afterInput) afterInput.value = "";
+
+  const bp = document.getElementById("beforePreview");
+  const ap = document.getElementById("afterPreview");
+  if (bp) { bp.src = ""; bp.style.display = "none"; }
+  if (ap) { ap.src = ""; ap.style.display = "none"; }
+
+  const beforeName = document.getElementById("beforeFileName");
+  const afterName = document.getElementById("afterFileName");
+  if (beforeName) beforeName.textContent = "Ningún archivo seleccionado";
+  if (afterName) afterName.textContent = "Ningún archivo seleccionado";
 }
 
 function showExistingPatientForm() {
@@ -2364,6 +2490,18 @@ function loadImageFile(input, previewId, callback = null) {
     if (callback) callback(dataUrl);
   };
   reader.readAsDataURL(file);
+}
+
+function inputFileToDataURL(inputEl) {
+  const file = inputEl?.files?.[0];
+  if (!file) return Promise.resolve(null);
+
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(file);
+  });
 }
 
 /* ======================
@@ -2419,7 +2557,7 @@ async function downloadTreatmentPDF() {
   doc.setFontSize(20);
 
   const usuario = currentUser?.name || "TuGabinete";
-  doc.text(`${usuario} — Informe de Tratamiento`, 14, 20);
+  doc.text(`${usuario} — Informe de Sesión`, 14, 20);
 
   // Foto perfil (si existe)
   if (currentUser?.profileImage) {

@@ -424,7 +424,6 @@
   max-height: 240px !important;
   object-fit: cover !important;
   border-radius: 14px !important;
-  display: block !important;
   box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
   cursor: zoom-in !important;
 }
