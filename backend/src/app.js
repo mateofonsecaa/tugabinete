@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* ===============================================
-   CORS COMPLETO + PREVENTIVO
+    CORS COMPLETO + PREVENTIVO
    =============================================== */
 const allowedOrigins = [
   "http://localhost:3000",
