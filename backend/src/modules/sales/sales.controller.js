@@ -86,7 +86,7 @@ export const createSale = async (req, res) => {
         notes: notes ? String(notes) : null,
       },
       include: {
-        patient: { select: { id: true, fullName: true } },
+        patient: { select: { id: true, fullName: true, phone: true, address: true } },
       },
     });
 
@@ -111,7 +111,7 @@ export const listSales = async (req, res) => {
       take: Number.isNaN(limit) ? 50 : limit,
       orderBy: { date: "desc" },
       include: {
-        patient: { select: { id: true, fullName: true } },
+        patient: { select: { id: true, fullName: true, phone: true, address: true } },
       },
     });
 
@@ -262,7 +262,7 @@ export const updateSale = async (req, res) => {
         notes: nextNotes,
       },
       include: {
-        patient: { select: { id: true, fullName: true } },
+        patient: { select: { id: true, fullName: true, phone: true, address: true } },
       },
     });
 

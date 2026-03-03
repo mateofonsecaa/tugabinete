@@ -1,13 +1,12 @@
 import prisma from "../../core/prismaClient.js";
 
 /* ====================================================
-   🚀 GET ALL (PAGINADO + LIVIANO + MUY RÁPIDO)
+   🚀 GET ALL (PAGINADO + COMPLETO PARA MODAL)
    ==================================================== */
 export const getAll = async (userId, offset = 0, limit = 50) => {
 
-    // Convertir params a número seguro
     offset = Number(offset) || 0;
-    limit = Number(limit) || 50;
+    limit  = Number(limit)  || 50;
 
     return await prisma.appointment.findMany({
         where: { userId },
@@ -17,14 +16,16 @@ export const getAll = async (userId, offset = 0, limit = 50) => {
             time: true,
             treatment: true,
             amount: true,
+            notes: true,              // 🔥 necesario para modal
             status: true,
             method: true,
 
-            // Datos livianos del paciente (NO cargar todo)
             patient: {
                 select: {
                     id: true,
                     fullName: true,
+                    phone: true,       // 🔥 necesario para modal
+                    address: true,     // 🔥 necesario para modal
                 },
             },
         },
@@ -36,12 +37,12 @@ export const getAll = async (userId, offset = 0, limit = 50) => {
 
 
 /* ====================================================
-   🚀 GET BY PATIENT (SIN FOTOS)
+   🚀 GET BY PATIENT (COMPLETO PARA MODAL)
    ==================================================== */
 export const getByPatient = async (userId, patientId, offset = 0, limit = 50) => {
 
     offset = Number(offset) || 0;
-    limit  = Number(limit) || 50;
+    limit  = Number(limit)  || 50;
 
     return await prisma.appointment.findMany({
         where: { userId, patientId },
@@ -51,8 +52,17 @@ export const getByPatient = async (userId, patientId, offset = 0, limit = 50) =>
             time: true,
             treatment: true,
             amount: true,
+            notes: true,
             status: true,
             method: true,
+            patient: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    phone: true,
+                    address: true,
+                },
+            },
         },
         orderBy: { date: "desc" },
         skip: offset,
@@ -62,7 +72,7 @@ export const getByPatient = async (userId, patientId, offset = 0, limit = 50) =>
 
 
 /* ====================================================
-   🚀 GET PHOTOS (Solo fotos, liviano)
+   🚀 GET PHOTOS (Ultra liviano)
    ==================================================== */
 export const getPhotos = async (id, userId) => {
     const result = await prisma.appointment.findFirst({
@@ -97,23 +107,20 @@ export const create = async (userId, data) => {
     const treatmentDate = new Date(`${date}T${time}:00-03:00`);
 
     return await prisma.appointment.create({
-    data: {
-        userId,
-        patientId: Number(patientId),
-        date: treatmentDate,
-        time,
-        treatment,
-        amount: amount ? parseFloat(amount) : null,
-        notes,
-        status,
-        method,
-        beforePhoto,
-        afterPhoto,
-
-        // 🌸 NUEVO: marcar como completado si está pagado
-        completed: status?.toLowerCase() === "pagado"
-    },
-
+        data: {
+            userId,
+            patientId: Number(patientId),
+            date: treatmentDate,
+            time,
+            treatment,
+            amount: amount ? parseFloat(amount) : null,
+            notes,
+            status,
+            method,
+            beforePhoto,
+            afterPhoto,
+            completed: status?.toLowerCase() === "pagado"
+        },
         select: {
             id: true,
             date: true,
@@ -127,6 +134,8 @@ export const create = async (userId, data) => {
                 select: {
                     id: true,
                     fullName: true,
+                    phone: true,
+                    address: true,
                 },
             },
         },
@@ -135,7 +144,7 @@ export const create = async (userId, data) => {
 
 
 /* ====================================================
-   🚀 UPDATE (sin recargar fotos pesadas)
+   🚀 UPDATE
    ==================================================== */
 export const update = async (id, data) => {
     const {
@@ -155,20 +164,17 @@ export const update = async (id, data) => {
     return await prisma.appointment.update({
         where: { id: Number(id) },
         data: {
-        treatment,
-        date: treatmentDate,
-        time,
-        amount: amount ? parseFloat(amount) : null,
-        notes,
-        status,
-        method,
-        beforePhoto: beforePhoto || null,
-        afterPhoto: afterPhoto || null,
-
-        // 🌸 NUEVO: marcar completed si el estado pasa a pagado
-        completed: status?.toLowerCase() === "pagado"
-    },
-
+            treatment,
+            date: treatmentDate,
+            time,
+            amount: amount ? parseFloat(amount) : null,
+            notes,
+            status,
+            method,
+            beforePhoto: beforePhoto || null,
+            afterPhoto: afterPhoto || null,
+            completed: status?.toLowerCase() === "pagado"
+        },
         select: {
             id: true,
             date: true,
@@ -182,6 +188,8 @@ export const update = async (id, data) => {
                 select: {
                     id: true,
                     fullName: true,
+                    phone: true,
+                    address: true,
                 },
             },
         },
@@ -190,7 +198,7 @@ export const update = async (id, data) => {
 
 
 /* ====================================================
-    DELETE
+   🚀 DELETE
    ==================================================== */
 export const remove = async (userId, id) => {
     return await prisma.appointment.deleteMany({
@@ -198,8 +206,9 @@ export const remove = async (userId, id) => {
     });
 };
 
+
 /* ====================================================
-   🚀 COUNT COMPLETED (ultra rápido y optimizado)
+   🚀 COUNT COMPLETED
    ==================================================== */
 export const getCompletedCount = async (userId) => {
     return await prisma.appointment.count({

@@ -2307,35 +2307,34 @@ function closeViewModal() {
 function openSaleViewModal(sale) {
   if (!sale) return;
 
-  showModalLoading("viewSaleModal");
-
   const modal = document.getElementById("viewSaleModal");
-  const box = modal.querySelector(".modal-box");
+  if (!modal) return;
 
-  setTimeout(() => {
-    box.innerHTML = `
-      <button class="close-btn" id="closeViewSaleBtn">&times;</button>
-      <h2><i class="fa-solid fa-receipt"></i> Detalle de la Venta</h2>
+  modal.classList.add("active");
+  modal.style.display = "flex";
 
-      <div class="detail-grid">
-        <div class="detail-card">
-          <h3><i class="fa-solid fa-user"></i> Paciente</h3>
-          <p><strong>Nombre:</strong> ${sale.patient?.fullName || "Sin paciente"}</p>
-        </div>
+  // Paciente
+  document.getElementById("viewSaleName").textContent =
+    sale.patient?.fullName || "Sin paciente";
 
-        <div class="detail-card">
-          <h3><i class="fa-solid fa-bag-shopping"></i> Venta</h3>
-          <p><strong>Producto:</strong> ${sale.product || "—"}</p>
-          <p><strong>Cantidad:</strong> ${sale.quantity || "—"}</p>
-          <p><strong>Monto:</strong> $${Number(sale.amount ?? 0).toFixed(2)}</p>
-        </div>
-      </div>
-    `;
+  document.getElementById("viewSalePhone").textContent =
+    sale.patient?.phone || "—";
 
-    const closeBtn = document.getElementById("closeViewSaleBtn");
-    if (closeBtn) closeBtn.addEventListener("click", closeSaleViewModal);
+  document.getElementById("viewSaleAddress").textContent =
+    sale.patient?.address || "—";
 
-  }, 200);
+  // Venta
+  document.getElementById("viewSaleProduct").textContent =
+    sale.product || "—";
+
+  document.getElementById("viewSaleQuantity").textContent =
+    sale.quantity || "—";
+
+  document.getElementById("viewSaleAmount").textContent =
+    `$${Number(sale.amount ?? 0).toFixed(2)}`;
+
+  document.getElementById("viewSaleNotes").textContent =
+    sale.notes || "—";
 }
 
 function closeSaleViewModal() {

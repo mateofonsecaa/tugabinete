@@ -95,7 +95,7 @@ export function Home() {
     </div>
 
     <div class="copyright">
-      © 2025 TuGabinete — Todos los derechos reservados.
+      © 2026 TuGabinete — Todos los derechos reservados.
     </div>
   `;
 }

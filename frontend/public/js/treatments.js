@@ -835,39 +835,55 @@ if (!updated.afterPhoto || updated.afterPhoto === "null") updated.afterPhoto = n
 // 👁️ VER DETALLES — optimizado con carga diferida de fotos
 // =========================
 async function openViewModal(treatment) {
+  if (!treatment) return;
+
   treatmentViewCache = treatment;
   const modal = document.getElementById("viewTreatmentModal");
 
-  if (!treatment) return;
+  // 🔥 ABRIR INMEDIATAMENTE
+  modal.classList.add("active");
+  modal.style.display = "flex";
 
-  // Datos básicos
-  const dateFormatted = treatment.date
-    ? new Date(treatment.date).toLocaleDateString("es-AR")
-    : "—";
+  // Mostrar loading visual temporal en notas
+  document.getElementById("viewNotes").innerHTML =
+    `<i class="fa-solid fa-spinner fa-spin"></i> Cargando...`;
 
-  document.getElementById("viewName").textContent = treatment.patient?.fullName || "Sin paciente";
-  document.getElementById("viewPhone").textContent = treatment.patient?.phone || "—";
-  document.getElementById("viewAddress").textContent = treatment.patient?.address || "—";
-
-  document.getElementById("viewType").textContent = treatment.treatment || "—";
-  document.getElementById("viewDate").textContent = dateFormatted;
-  document.getElementById("viewAmount").textContent = `$${treatment.amount?.toFixed(2) || "—"}`;
-  document.getElementById("viewStatus").textContent = treatment.status || "—";
-  document.getElementById("viewMethod").textContent = treatment.method || "—";
-  document.getElementById("viewNotes").textContent = treatment.notes || "—";
-
-  // ============================
-  // 🔥 CARGAR FOTOS DESDE BACKEND
-  // ============================
+  // Limpiar imágenes mientras carga
   const beforeImg = document.getElementById("viewBeforePhoto");
   const afterImg = document.getElementById("viewAfterPhoto");
 
   beforeImg.style.display = "none";
   afterImg.style.display = "none";
 
-  try {
+  // Datos básicos inmediatos
+  const dateFormatted = treatment.date
+    ? new Date(treatment.date).toLocaleDateString("es-AR")
+    : "—";
 
-    const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
+  document.getElementById("viewName").textContent =
+    treatment.patient?.fullName || "Sin paciente";
+  document.getElementById("viewPhone").textContent =
+    treatment.patient?.phone || "—";
+  document.getElementById("viewAddress").textContent =
+    treatment.patient?.address || "—";
+
+  document.getElementById("viewType").textContent =
+    treatment.treatment || "—";
+  document.getElementById("viewDate").textContent = dateFormatted;
+  document.getElementById("viewAmount").textContent =
+    `$${treatment.amount?.toFixed(2) || "—"}`;
+  document.getElementById("viewStatus").textContent =
+    treatment.status || "—";
+  document.getElementById("viewMethod").textContent =
+    treatment.method || "—";
+  document.getElementById("viewNotes").textContent =
+    treatment.notes || "—";
+
+  // 🔥 CARGA ASÍNCRONA DE FOTOS (no bloquea apertura)
+  try {
+    const resp = await authFetch(
+      `${API_URL}/appointments/${treatment.id}/photos`
+    );
 
     if (resp.ok) {
       const photos = await resp.json();
@@ -875,28 +891,24 @@ async function openViewModal(treatment) {
       if (photos.beforePhoto) {
         beforeImg.src = photos.beforePhoto;
         beforeImg.style.display = "block";
-        beforeImg.onclick = () => openImagePreview(photos.beforePhoto);
+        beforeImg.onclick = () =>
+          openImagePreview(photos.beforePhoto);
 
-        // Guardar para PDF
         treatmentViewCache.beforePhoto = photos.beforePhoto;
       }
-
 
       if (photos.afterPhoto) {
         afterImg.src = photos.afterPhoto;
         afterImg.style.display = "block";
-        afterImg.onclick = () => openImagePreview(photos.afterPhoto);
+        afterImg.onclick = () =>
+          openImagePreview(photos.afterPhoto);
 
-        // Guardar para PDF
         treatmentViewCache.afterPhoto = photos.afterPhoto;
       }
     }
   } catch (error) {
     console.warn("No se pudieron cargar las fotos:", error);
   }
-
-  modal.classList.add("active");
-  modal.style.display = "flex";
 }
 
 function closeViewModal() {
