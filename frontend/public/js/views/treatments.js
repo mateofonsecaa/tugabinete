@@ -2159,6 +2159,24 @@ async function onSaveEditSale(e) {
    View modal + image
 ====================== */
 
+function showModalLoading(modalId, message = "Cargando detalle...") {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+  const box = modal.querySelector(".modal-box");
+  if (!box) return;
+
+  box.innerHTML = `
+    <div class="modal-loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <p>${message}</p>
+    </div>
+  `;
+
+  modal.classList.add("active");
+  modal.style.display = "flex";
+}
+
 function isValidPhotoSrc(v) {
   if (!v) return false;
   const s = String(v);
@@ -2192,62 +2210,79 @@ async function openViewModal(treatment) {
   const modal = document.getElementById("viewTreatmentModal");
   if (!modal) return;
 
-  treatmentViewCache = { ...treatment };
+  treatmentViewCache = treatment;
 
-  const iso = treatment.date ? String(treatment.date).slice(0, 10) : "";
-  const dateFormatted = iso ? iso.split("-").reverse().join("/") : "—";
+  // mostrar modal inmediatamente
+  modal.classList.add("active");
+  modal.style.display = "flex";
 
-  const pid = treatment.patientId ?? treatment.patient?.id;
-  const cached = (patientsCache || []).find((x) => String(x.id) === String(pid));
-  const p = { ...(cached || {}), ...(treatment.patient || {}) };
+  // limpiar fotos mientras carga
+  setPhotoSlot(
+    document.getElementById("viewBeforePhoto"),
+    document.getElementById("viewBeforeEmpty"),
+    null
+  );
+  setPhotoSlot(
+    document.getElementById("viewAfterPhoto"),
+    document.getElementById("viewAfterEmpty"),
+    null
+  );
 
-  document.getElementById("viewName").textContent = p.fullName || "Sin paciente";
-  document.getElementById("viewPhone").textContent = p.phone || "—";
-  document.getElementById("viewAddress").textContent = p.address || "—";
-
-  // para PDF también
-  treatmentViewCache.patient = p;
-
-  document.getElementById("viewType").textContent = treatment.treatment || "—";
-  document.getElementById("viewDate").textContent = dateFormatted;
-
-  const amountView = Number(treatment.amount ?? 0);
-  document.getElementById("viewAmount").textContent = `$${amountView.toFixed(2)}`;
-
-  document.getElementById("viewStatus").textContent = treatment.status || "—";
-  document.getElementById("viewMethod").textContent = treatment.method || "—";
-  document.getElementById("viewNotes").textContent = treatment.notes || "—";
-
-  const beforeImg = document.getElementById("viewBeforePhoto");
-  const afterImg = document.getElementById("viewAfterPhoto");
-  const beforeEmpty = document.getElementById("viewBeforeEmpty");
-  const afterEmpty = document.getElementById("viewAfterEmpty");
-
-  // ✅ reset limpio: muestra placeholder y oculta img (sin ícono roto)
-  setPhotoSlot(beforeImg, beforeEmpty, null);
-  setPhotoSlot(afterImg, afterEmpty, null);
-
-  // limpiar cache de fotos
-  treatmentViewCache.beforePhoto = null;
-  treatmentViewCache.afterPhoto = null;
+  // mostrar loading visual simple en notas
+  const notesEl = document.getElementById("viewNotes");
+  if (notesEl) {
+    notesEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Cargando...`;
+  }
 
   try {
+    const pid = treatment.patientId ?? treatment.patient?.id;
+    const cached = (patientsCache || []).find((x) => String(x.id) === String(pid));
+    const p = { ...(cached || {}), ...(treatment.patient || {}) };
+
+    document.getElementById("viewName").textContent = p.fullName || "Sin paciente";
+    document.getElementById("viewPhone").textContent = p.phone || "—";
+    document.getElementById("viewAddress").textContent = p.address || "—";
+
+    document.getElementById("viewType").textContent = treatment.treatment || "—";
+
+    const iso = treatment.date ? String(treatment.date).slice(0, 10) : "";
+    const dateFormatted = iso ? iso.split("-").reverse().join("/") : "—";
+    document.getElementById("viewDate").textContent = dateFormatted;
+
+    const amountView = Number(treatment.amount ?? 0);
+    document.getElementById("viewAmount").textContent = `$${amountView.toFixed(2)}`;
+
+    document.getElementById("viewStatus").textContent = treatment.status || "—";
+    document.getElementById("viewMethod").textContent = treatment.method || "—";
+    document.getElementById("viewNotes").textContent = treatment.notes || "—";
+
+    // 🔥 ahora sí cargar fotos (como antes)
     const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
     if (resp.ok) {
       const photos = await resp.json();
 
-      setPhotoSlot(beforeImg, beforeEmpty, photos?.beforePhoto);
-      setPhotoSlot(afterImg, afterEmpty, photos?.afterPhoto);
+      setPhotoSlot(
+        document.getElementById("viewBeforePhoto"),
+        document.getElementById("viewBeforeEmpty"),
+        photos.beforePhoto
+      );
 
-      treatmentViewCache.beforePhoto = isValidPhotoSrc(photos?.beforePhoto) ? photos.beforePhoto : null;
-      treatmentViewCache.afterPhoto  = isValidPhotoSrc(photos?.afterPhoto)  ? photos.afterPhoto  : null;
+      setPhotoSlot(
+        document.getElementById("viewAfterPhoto"),
+        document.getElementById("viewAfterEmpty"),
+        photos.afterPhoto
+      );
+
+      treatmentViewCache = {
+        ...treatment,
+        beforePhoto: photos.beforePhoto,
+        afterPhoto: photos.afterPhoto,
+      };
     }
-  } catch {
-    // si falla, queda el placeholder visible
-  }
 
-  modal.classList.add("active");
-  modal.style.display = "flex";
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function closeViewModal() {
@@ -2272,30 +2307,35 @@ function closeViewModal() {
 function openSaleViewModal(sale) {
   if (!sale) return;
 
-  const pid = sale.patientId ?? sale.patient?.id;
-  const cached = (patientsCache || []).find((x) => String(x.id) === String(pid));
-
-  // ✅ cached primero (trae phone/address), sale.patient encima por si trae algo actualizado
-  const p = { ...(cached || {}), ...(sale.patient || {}) };
-
-  document.getElementById("viewSaleName").textContent = p.fullName || "Sin paciente";
-  document.getElementById("viewSalePhone").textContent = p.phone || "—";
-  document.getElementById("viewSaleAddress").textContent = p.address || "—";
-
-  document.getElementById("viewSaleProduct").textContent = sale.product || "—";
-
-  const qty = Number(sale.quantity ?? 0);
-  document.getElementById("viewSaleQuantity").textContent = qty ? String(qty) : "—";
-
-  const amount = Number(sale.amount ?? 0);
-  document.getElementById("viewSaleAmount").textContent = `$${amount.toFixed(2)}`;
-
-  document.getElementById("viewSaleNotes").textContent = sale.notes || "—";
+  showModalLoading("viewSaleModal");
 
   const modal = document.getElementById("viewSaleModal");
-  if (!modal) return;
-  modal.classList.add("active");
-  modal.style.display = "flex";
+  const box = modal.querySelector(".modal-box");
+
+  setTimeout(() => {
+    box.innerHTML = `
+      <button class="close-btn" id="closeViewSaleBtn">&times;</button>
+      <h2><i class="fa-solid fa-receipt"></i> Detalle de la Venta</h2>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3><i class="fa-solid fa-user"></i> Paciente</h3>
+          <p><strong>Nombre:</strong> ${sale.patient?.fullName || "Sin paciente"}</p>
+        </div>
+
+        <div class="detail-card">
+          <h3><i class="fa-solid fa-bag-shopping"></i> Venta</h3>
+          <p><strong>Producto:</strong> ${sale.product || "—"}</p>
+          <p><strong>Cantidad:</strong> ${sale.quantity || "—"}</p>
+          <p><strong>Monto:</strong> $${Number(sale.amount ?? 0).toFixed(2)}</p>
+        </div>
+      </div>
+    `;
+
+    const closeBtn = document.getElementById("closeViewSaleBtn");
+    if (closeBtn) closeBtn.addEventListener("click", closeSaleViewModal);
+
+  }, 200);
 }
 
 function closeSaleViewModal() {
