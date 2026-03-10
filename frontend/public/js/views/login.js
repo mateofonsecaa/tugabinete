@@ -120,7 +120,7 @@ function showNotification(message, type = "success") {
   notification.classList.add("notification-toast");
   if (type === "error") notification.classList.add("error");
   notification.innerHTML = `
-    <i class="fa-solid ${type === "success" ? "fa-circle-check" : "fa-triangle-exclamation"}"></i>
+    <i class="fa-solid fa-circle-check""></i>
     <span>${message}</span>
   `;
   document.body.appendChild(notification);

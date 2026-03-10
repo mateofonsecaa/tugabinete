@@ -408,7 +408,7 @@ export function Treatments() {
               <input type="text" id="newFullName" placeholder="Ej: Ana López" required>
 
               <label>Fecha de nacimiento</label>
-              <input type="date" id="newBirthDate" required>
+              <input type="date" id="newBirthDate" required onclick="this.showPicker()">
 
               <label>Profesión</label>
               <input type="text" id="newProfession" placeholder="Ej: Diseñadora">
@@ -1561,8 +1561,8 @@ async function onCreateTreatment(e) {
   }
 
   try {
-    const patientNameNorm = normalizeText(document.getElementById("patientInput")?.value || "");
-    if (!allowedPatients.includes(patientNameNorm)) {
+    const patientId = document.getElementById("patientSelect")?.value;
+    if (!patientId) {
       await Swal.fire({
         icon: "error",
         title: "Paciente no encontrado",
@@ -1589,7 +1589,7 @@ async function onCreateTreatment(e) {
     const beforePhoto = await inputFileToDataURL(document.getElementById("beforePhoto"));
     const afterPhoto  = await inputFileToDataURL(document.getElementById("afterPhoto"));
     const newTreatment = {
-      patientId: parseInt(document.getElementById("patientSelect").value, 10),
+      patientId: parseInt(patientId, 10),
       treatment: document.getElementById("treatmentInput").value,
       date: document.getElementById("date").value,
       time: document.getElementById("time").value,

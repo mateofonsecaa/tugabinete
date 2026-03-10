@@ -71,7 +71,7 @@ export function Profile() {
               <div class="profile-card profile-stats-card">
                 <!-- IMPORTANTE: mantener .stat + span (orden) para loadStats() -->
                 <section class="stats">
-                  <div class="stat">
+                  <div class="stat" data-go="/treatments">
                     <div class="stat-top">
                       <i class="fa-solid fa-spa"></i>
                       <span>0</span>
