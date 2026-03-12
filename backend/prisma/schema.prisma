@@ -23,7 +23,7 @@ model User {
   simpleAppointments  SimpleAppointment[]
   verificationTokens  VerificationToken[]
   reminders           Reminder[]
-  sales Sale[]
+  sales               Sale[]
 }
 
 model Patient {
@@ -40,8 +40,9 @@ model Patient {
   appointments Appointment[]
   interview    Interview?
   observation  Observation?
+  homeCarePlan HomeCarePlan?
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sales Sale[]
+  sales        Sale[]
 }
 
 model Appointment {
@@ -169,23 +170,58 @@ model Reminder {
 }
 
 model Sale {
-  id        Int      @id @default(autoincrement())
-  product   String
-  date      DateTime
-  quantity  Int
-  amount    Float
-  status    String
-  method    String
-  notes     String?
+  id       Int      @id @default(autoincrement())
+  product  String
+  date     DateTime
+  quantity Int
+  amount   Float
+  status   String
+  method   String
+  notes    String?
 
   patientId Int
   userId    Int
 
   createdAt DateTime @default(now())
 
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([patientId])
+}
+
+model HomeCarePlan {
+  id           Int       @id @default(autoincrement())
+  title        String
+  objective    String?
+  startDate    DateTime?
+  endDate      DateTime?
+  status       String    @default("Activa")
+  generalNotes String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  patientId Int                @unique
+  patient   Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  items     HomeCarePlanItem[]
+}
+
+model HomeCarePlanItem {
+  id           Int      @id @default(autoincrement())
+  stepOrder    Int
+  moment       String?
+  action       String
+  product      String?
+  frequency    String?
+  instructions String?
+  duration     String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  planId Int
+  plan   HomeCarePlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
 }

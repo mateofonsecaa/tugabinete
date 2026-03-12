@@ -287,7 +287,7 @@ export function Treatments() {
 
                   <!-- Columna 2 -->
                   <div class="tg-form-col">
-                    <label>Monto total ($)</label>
+                    <label>Monto ($)</label>
                     <input type="number" id="saleAmount" min="0" step="1" inputmode="numeric" required/>
 
                     <div class="tg-inline-2">
@@ -383,9 +383,8 @@ export function Treatments() {
                 </div>
 
                 <div class="table-scroll">
-                    <div id="treatmentsList" class="tg-results-list">
-                      <div class="tg-empty" style="text-align:center;color:#777;">Cargando tratamientos...</div>
-                    </div>
+                  <div id="treatmentsList" class="tg-results-list">
+                    <div class="tg-empty" style="text-align:center;color:#777;">Cargando tratamientos...</div>
                   </div>
                 </div>
               </section>
@@ -399,7 +398,6 @@ export function Treatments() {
       <!-- MODAL NUEVO PACIENTE -->
       <div id="newPatientModal" class="modal-overlay">
         <div class="modal-box">
-          <button class="close-btn" id="closeNewPatientModalBtn">&times;</button>
           <h2>Registrar nuevo paciente</h2>
 
           <form id="newPatientForm" class="modal-grid">
@@ -463,7 +461,15 @@ export function Treatments() {
               <input type="time" id="editTreatmentTime" required />
 
               <label>Monto ($)</label>
-              <input type="text" id="editTreatmentAmount" maxlength="10" required />
+              <input
+                type="number"
+                id="editTreatmentAmount"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                max="9999999999"
+                required
+              />
             </div>
 
             <div class="edit-column">
@@ -492,7 +498,7 @@ export function Treatments() {
           <div class="edit-photo-section">
             <div class="photo-block">
               <label>Foto ANTES</label>
-              <div class="photo-preview">
+              <div class="photo-preview is-loading" id="editBeforePreviewWrap">
                 <img id="editBeforePreview" src="" alt="Foto antes" />
               </div>
               <input type="file" id="editBeforePhoto" accept="image/*" />
@@ -500,18 +506,18 @@ export function Treatments() {
 
             <div class="photo-block">
               <label>Foto DESPUÉS</label>
-              <div class="photo-preview">
+              <div class="photo-preview is-loading" id="editAfterPreviewWrap">
                 <img id="editAfterPreview" src="" alt="Foto después" />
               </div>
               <input type="file" id="editAfterPhoto" accept="image/*" />
             </div>
           </div>
 
-          <div class="modal-actions">
-            <button type="submit" form="editTreatmentForm" class="btn-save">
+          <div class="modal-actions edit-treatment-actions">
+            <button type="submit" form="editTreatmentForm" class="btn-edit-treatment-save">
               <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
             </button>
-            <button type="button" class="btn-cancel" id="cancelEditTreatmentBtn">
+            <button type="button" class="btn-edit-treatment-cancel" id="cancelEditTreatmentBtn">
               <i class="fa-solid fa-xmark"></i> Cancelar
             </button>
           </div>
@@ -564,11 +570,11 @@ export function Treatments() {
             </div>
           </form>
 
-          <div class="modal-actions">
-            <button type="submit" form="editSaleForm" class="btn-save">
+          <div class="modal-actions edit-sale-actions">
+            <button type="submit" form="editSaleForm" class="btn-edit-sale-save">
               <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
             </button>
-            <button type="button" class="btn-cancel" id="cancelEditSaleBtn">
+            <button type="button" class="btn-edit-sale-cancel" id="cancelEditSaleBtn">
               <i class="fa-solid fa-xmark"></i> Cancelar
             </button>
           </div>
@@ -874,6 +880,17 @@ function bindUI() {
     el?.showPicker?.();
   });
 
+  // ✅ Fecha filtro: abrir calendario al click
+  bindOnce("#filterDate", "click", () => {
+    const el = document.getElementById("filterDate");
+    el?.showPicker?.();
+  });
+
+  // ✅ también al focus
+  bindOnce("#filterDate", "focus", () => {
+    const el = document.getElementById("filterDate");
+    el?.showPicker?.();
+  });
   // Filtros
   bindOnce("#filterPatient", "input", () => applyFilters());
   bindOnce("#filterDate", "change", () => applyFilters());
@@ -994,14 +1011,26 @@ function bindUI() {
   // Edit modal file inputs (una vez)
   bindOnce("#editBeforePhoto", "change", () => {
     if (!editingTreatment) return;
-    loadImageFile(document.getElementById("editBeforePhoto"), "editBeforePreview", (img) => {
+
+    const input = document.getElementById("editBeforePhoto");
+    const preview = document.getElementById("editBeforePreview");
+    const wrap = document.getElementById("editBeforePreviewWrap");
+
+    loadImageFile(input, "editBeforePreview", (img) => {
+      setEditPhotoPreview(preview, wrap, img);
       editingTreatment.beforePhoto = img;
     });
   });
 
   bindOnce("#editAfterPhoto", "change", () => {
     if (!editingTreatment) return;
-    loadImageFile(document.getElementById("editAfterPhoto"), "editAfterPreview", (img) => {
+
+    const input = document.getElementById("editAfterPhoto");
+    const preview = document.getElementById("editAfterPreview");
+    const wrap = document.getElementById("editAfterPreviewWrap");
+
+    loadImageFile(input, "editAfterPreview", (img) => {
+      setEditPhotoPreview(preview, wrap, img);
       editingTreatment.afterPhoto = img;
     });
   });
@@ -1014,6 +1043,16 @@ function bindUI() {
   bindOnce("#viewAfterPhoto", "click", () => {
     const src = document.getElementById("viewAfterPhoto")?.src;
     if (src) openImagePreview(src);
+  });
+
+    bindOnce("#editBeforePreview", "click", () => {
+    const src = document.getElementById("editBeforePreview")?.src;
+    if (isValidPhotoSrc(src)) openImagePreview(src);
+  });
+
+  bindOnce("#editAfterPreview", "click", () => {
+    const src = document.getElementById("editAfterPreview")?.src;
+    if (isValidPhotoSrc(src)) openImagePreview(src);
   });
 
   // Cerrar modal ampliada clickeando fondo
@@ -1785,7 +1824,7 @@ async function onCreateSale(e) {
     }
     if (spo) spo.style.display = "none";
 
-    closeSaleForm(); // ✅ SOLO si guardó bien
+    closeSaleForm(); // SOLO si guardó bien
 
   } catch (err) {
     if (err?.message === "__VALIDATION__") return;
@@ -1884,79 +1923,107 @@ function openEditModal(treatment) {
   editingTreatment = { ...treatment };
 
   const modal = document.getElementById("editTreatmentModal");
+  if (!modal) return;
+
   modal.classList.add("active");
   modal.style.display = "flex";
 
-    // ✅ FIX FORZADO: evitar botón largo en modal editar (aunque haya CSS global con !important)
-    const actions = modal.querySelector(".modal-actions");
-    const btnSave = modal.querySelector(".btn-save");
-    const btnCancel = modal.querySelector(".btn-cancel");
+  const editTreatmentInput = document.getElementById("editTreatmentInput");
+  const editTreatmentDate = document.getElementById("editTreatmentDate");
+  const editTreatmentTime = document.getElementById("editTreatmentTime");
+  const editTreatmentAmount = document.getElementById("editTreatmentAmount");
+  const editTreatmentStatus = document.getElementById("editTreatmentStatus");
+  const editTreatmentMethod = document.getElementById("editTreatmentMethod");
+  const editTreatmentNotes = document.getElementById("editTreatmentNotes");
 
-    if (actions) {
-      actions.style.display = "flex";
-      actions.style.justifyContent = "center";
-      actions.style.gap = "12px";
-      actions.style.flexWrap = "wrap";
-    }
+  const beforeImg = document.getElementById("editBeforePreview");
+  const afterImg = document.getElementById("editAfterPreview");
+  const beforeWrap = document.getElementById("editBeforePreviewWrap");
+  const afterWrap = document.getElementById("editAfterPreviewWrap");
+  const beforeFile = document.getElementById("editBeforePhoto");
+  const afterFile = document.getElementById("editAfterPhoto");
 
-    [btnSave, btnCancel].forEach((b) => {
-      if (!b) return;
-      b.style.width = "auto";
-      b.style.flex = "0 0 auto";
-      b.style.minWidth = "180px";
-      b.style.maxWidth = "260px";
-      b.style.display = "inline-flex";
-    });
+  setEditPhotoLoading(beforeImg, beforeWrap);
+  setEditPhotoLoading(afterImg, afterWrap);
 
-  document.getElementById("editTreatmentInput").value = treatment.treatment || "";
+  if (editTreatmentInput) editTreatmentInput.value = treatment.treatment || "";
 
   let rawDate = treatment.date || "";
   if (String(rawDate).includes("T")) rawDate = rawDate.split("T")[0];
-  document.getElementById("editTreatmentDate").value = rawDate || "";
+  if (editTreatmentDate) editTreatmentDate.value = rawDate || "";
 
-  document.getElementById("editTreatmentTime").value = treatment.time || "";
-  document.getElementById("editTreatmentAmount").value = (treatment.amount ?? "").toString().replace(/[^0-9.]/g, "");
-  document.getElementById("editTreatmentStatus").value = treatment.status || "";
-  document.getElementById("editTreatmentMethod").value = treatment.method || "";
-  document.getElementById("editTreatmentNotes").value = treatment.notes || "";
+  if (editTreatmentTime) editTreatmentTime.value = treatment.time || "";
+  if (editTreatmentAmount) editTreatmentAmount.value = String(treatment.amount ?? "").replace(/[^0-9.]/g, "");
+  if (editTreatmentStatus) editTreatmentStatus.value = treatment.status || "";
+  if (editTreatmentMethod) editTreatmentMethod.value = treatment.method || "";
+  if (editTreatmentNotes) editTreatmentNotes.value = treatment.notes || "";
 
-  // reset previews
-  const beforeImg = document.getElementById("editBeforePreview");
-  const afterImg = document.getElementById("editAfterPreview");
-  if (beforeImg) beforeImg.src = "";
-  if (afterImg) afterImg.src = "";
+  if (beforeFile) beforeFile.value = "";
+  if (afterFile) afterFile.value = "";
 
-  // cargar fotos diferidas
   (async () => {
     try {
-      const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
-      if (!resp.ok) return;
+      const currentId = treatment.id;
+      const resp = await authFetch(`${API_URL}/appointments/${currentId}/photos`);
+      if (!resp.ok) {
+        setEditPhotoEmpty(beforeImg, beforeWrap);
+        setEditPhotoEmpty(afterImg, afterWrap);
+        return;
+      }
+
       const photos = await resp.json();
 
-      if (photos.beforePhoto && beforeImg) {
-        beforeImg.src = photos.beforePhoto;
+      if (!editingTreatment || String(editingTreatment.id) !== String(currentId)) return;
+
+      if (photos.beforePhoto) {
+        setEditPhotoPreview(beforeImg, beforeWrap, photos.beforePhoto);
         editingTreatment.beforePhoto = photos.beforePhoto;
+      } else {
+        setEditPhotoEmpty(beforeImg, beforeWrap);
+        editingTreatment.beforePhoto = null;
       }
-      if (photos.afterPhoto && afterImg) {
-        afterImg.src = photos.afterPhoto;
+
+      if (photos.afterPhoto) {
+        setEditPhotoPreview(afterImg, afterWrap, photos.afterPhoto);
         editingTreatment.afterPhoto = photos.afterPhoto;
+      } else {
+        setEditPhotoEmpty(afterImg, afterWrap);
+        editingTreatment.afterPhoto = null;
       }
-    } catch {
-      // no-op
+    } catch (err) {
+      console.error("Error cargando fotos del tratamiento:", err);
+      setEditPhotoEmpty(beforeImg, beforeWrap);
+      setEditPhotoEmpty(afterImg, afterWrap);
+      editingTreatment.beforePhoto = null;
+      editingTreatment.afterPhoto = null;
     }
   })();
 }
 
 function closeEditModal() {
   const modal = document.getElementById("editTreatmentModal");
+  if (!modal) return;
+
   modal.classList.remove("active");
   modal.style.display = "none";
-  editingTreatment = null;
 
-  const bf = document.getElementById("editBeforePhoto");
-  const af = document.getElementById("editAfterPhoto");
-  if (bf) bf.value = "";
-  if (af) af.value = "";
+  const form = document.getElementById("editTreatmentForm");
+  if (form) form.reset();
+
+  const beforeImg = document.getElementById("editBeforePreview");
+  const afterImg = document.getElementById("editAfterPreview");
+  const beforeWrap = document.getElementById("editBeforePreviewWrap");
+  const afterWrap = document.getElementById("editAfterPreviewWrap");
+  const beforeFile = document.getElementById("editBeforePhoto");
+  const afterFile = document.getElementById("editAfterPhoto");
+
+  setEditPhotoEmpty(beforeImg, beforeWrap);
+  setEditPhotoEmpty(afterImg, afterWrap);
+
+  if (beforeFile) beforeFile.value = "";
+  if (afterFile) afterFile.value = "";
+
+  editingTreatment = null;
 }
 
 async function onSaveEditTreatment(e) {
@@ -1964,38 +2031,59 @@ async function onSaveEditTreatment(e) {
 
   if (!editingTreatment) return;
 
-  const editValue = normalizeText(document.getElementById("editTreatmentInput").value);
-  if (!allowedTreatments.includes(editValue)) {
-    await Swal.fire({
-      icon: "error",
-      title: "Tratamiento inválido",
-      text: "Debés seleccionar un tratamiento de la lista.",
-      confirmButtonColor: "#ffadad",
-    });
-    document.getElementById("editTreatmentInput").value = "";
-    return;
-  }
+  const btnSave = document.querySelector('button[type="submit"][form="editTreatmentForm"]');
 
-  const updated = {
-    ...editingTreatment,
-    treatment: document.getElementById("editTreatmentInput").value,
-    date: document.getElementById("editTreatmentDate").value,
-    time: document.getElementById("editTreatmentTime").value,
-    amount: parseFloat(document.getElementById("editTreatmentAmount").value) || 0,
-    status: document.getElementById("editTreatmentStatus").value,
-    method: document.getElementById("editTreatmentMethod").value,
-    notes: document.getElementById("editTreatmentNotes").value,
-  };
-
-  // normalizar imágenes inválidas
-  if (!updated.beforePhoto || updated.beforePhoto === "null" || updated.beforePhoto === "undefined" || (String(updated.beforePhoto).length < 100)) {
-    updated.beforePhoto = null;
-  }
-  if (!updated.afterPhoto || updated.afterPhoto === "null" || updated.afterPhoto === "undefined" || (String(updated.afterPhoto).length < 100)) {
-    updated.afterPhoto = null;
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+    btnSave.style.opacity = "0.6";
   }
 
   try {
+    const editValue = normalizeText(document.getElementById("editTreatmentInput")?.value || "");
+
+    if (!allowedTreatments.includes(editValue)) {
+      await Swal.fire({
+        icon: "error",
+        title: "Tratamiento inválido",
+        text: "Debés seleccionar un tratamiento de la lista.",
+        confirmButtonColor: "#ffadad",
+      });
+
+      document.getElementById("editTreatmentInput").value = "";
+      return;
+    }
+
+    const updated = {
+      ...editingTreatment,
+      treatment: document.getElementById("editTreatmentInput").value,
+      date: document.getElementById("editTreatmentDate").value,
+      time: document.getElementById("editTreatmentTime").value,
+      amount: parseFloat(document.getElementById("editTreatmentAmount").value) || 0,
+      status: document.getElementById("editTreatmentStatus").value,
+      method: document.getElementById("editTreatmentMethod").value,
+      notes: document.getElementById("editTreatmentNotes").value,
+    };
+
+    // normalizar imágenes inválidas
+    if (
+      !updated.beforePhoto ||
+      updated.beforePhoto === "null" ||
+      updated.beforePhoto === "undefined" ||
+      String(updated.beforePhoto).length < 100
+    ) {
+      updated.beforePhoto = null;
+    }
+
+    if (
+      !updated.afterPhoto ||
+      updated.afterPhoto === "null" ||
+      updated.afterPhoto === "undefined" ||
+      String(updated.afterPhoto).length < 100
+    ) {
+      updated.afterPhoto = null;
+    }
+
     const res = await authFetch(`${API_URL}/appointments/${updated.id}`, {
       method: "PUT",
       body: JSON.stringify(updated),
@@ -2019,7 +2107,13 @@ async function onSaveEditTreatment(e) {
     });
   } catch (err) {
     console.error(err);
-    Swal.fire("Error", "No se pudo actualizar el tratamiento", "error");
+    await Swal.fire("Error", err.message || "No se pudo actualizar el tratamiento", "error");
+  } finally {
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar cambios`;
+      btnSave.style.opacity = "1";
+    }
   }
 }
 
@@ -2041,25 +2135,6 @@ function openEditSaleModal(sale) {
   if (qty) qty.value = String(sale.quantity ?? 1);
   if (amount) amount.value = String(sale.amount ?? 0);
   if (notes) notes.value = sale.notes || "";
-
-  // mismo fix que aplicaste en editar tratamiento (por si tu CSS global rompe el layout)
-  const actions = modal.querySelector(".modal-actions");
-  const btnSave = modal.querySelector(".btn-save");
-  const btnCancel = modal.querySelector(".btn-cancel");
-  if (actions) {
-    actions.style.display = "flex";
-    actions.style.justifyContent = "center";
-    actions.style.gap = "12px";
-    actions.style.flexWrap = "wrap";
-  }
-  [btnSave, btnCancel].forEach((b) => {
-    if (!b) return;
-    b.style.width = "auto";
-    b.style.flex = "0 0 auto";
-    b.style.minWidth = "180px";
-    b.style.maxWidth = "260px";
-    b.style.display = "inline-flex";
-  });
 }
 
 function closeEditSaleModal() {
@@ -2073,58 +2148,68 @@ function closeEditSaleModal() {
 
 async function onSaveEditSale(e) {
   e.preventDefault();
+
   if (!editingSale) return;
 
-  const product = (document.getElementById("editSaleProduct")?.value || "").trim();
-  const qtyRaw = String(document.getElementById("editSaleQuantity")?.value || "");
-  const qtyStr = qtyRaw.replace(/[^0-9]/g, "").slice(0, 10); // ✅ 10 dígitos hard
-  const qty = parseInt(qtyStr, 10);
+  const btnSave = document.querySelector('button[type="submit"][form="editSaleForm"]');
 
-  const amount = parseFloat(document.getElementById("editSaleAmount")?.value || "");
-  const notes = (document.getElementById("editSaleNotes")?.value || "");
-
-  if (!product) {
-    Swal.fire("Error", "El nombre del producto es obligatorio.", "error");
-    return;
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+    btnSave.style.opacity = "0.6";
   }
-  if (product.length > 40) {
-    Swal.fire("Error", "El nombre del producto no puede superar 40 caracteres.", "error");
-    return;
-  }
-
-  if (Number.isNaN(qty) || qty < 1) {
-    Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
-    return;
-  }
-
-  if (Number.isNaN(amount) || amount < 0) {
-    Swal.fire("Error", "El monto total debe ser un número >= 0.", "error");
-    return;
-  }
-
-  if (notes.length > 300) {
-    Swal.fire("Error", "Las notas no pueden superar 300 caracteres.", "error");
-    return;
-  }
-
-  const patientId = editingSale.patientId ?? editingSale.patient?.id;
-  let date = editingSale.date || null;
-  if (date && String(date).includes("T")) date = String(date).split("T")[0];
-
-  const payload = {
-    patientId: patientId ? parseInt(patientId, 10) : undefined,
-    product,
-    date,
-    quantity: qty,
-    amount,
-    status: editingSale.status || "Pagado",
-    method: editingSale.method || "No especificado",
-    notes: notes.trim() ? notes : null, // ✅ manda la nota EDITADA
-  };
-
-  Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
 
   try {
+    const product = (document.getElementById("editSaleProduct")?.value || "").trim();
+    const qtyRaw = String(document.getElementById("editSaleQuantity")?.value || "");
+    const qtyStr = qtyRaw.replace(/[^0-9]/g, "").slice(0, 10);
+    const qty = parseInt(qtyStr, 10);
+
+    const amount = parseFloat(document.getElementById("editSaleAmount")?.value || "");
+    const notes = document.getElementById("editSaleNotes")?.value || "";
+
+    if (!product) {
+      await Swal.fire("Error", "El nombre del producto es obligatorio.", "error");
+      return;
+    }
+
+    if (product.length > 40) {
+      await Swal.fire("Error", "El nombre del producto no puede superar 40 caracteres.", "error");
+      return;
+    }
+
+    if (Number.isNaN(qty) || qty < 1) {
+      await Swal.fire("Error", "La cantidad debe ser 1 o más.", "error");
+      return;
+    }
+
+    if (Number.isNaN(amount) || amount < 0) {
+      await Swal.fire("Error", "El monto total debe ser un número >= 0.", "error");
+      return;
+    }
+
+    if (notes.length > 300) {
+      await Swal.fire("Error", "Las notas no pueden superar 300 caracteres.", "error");
+      return;
+    }
+
+    const patientId = editingSale.patientId ?? editingSale.patient?.id;
+    let date = editingSale.date || null;
+    if (date && String(date).includes("T")) date = String(date).split("T")[0];
+
+    const payload = {
+      patientId: patientId ? parseInt(patientId, 10) : undefined,
+      product,
+      date,
+      quantity: qty,
+      amount,
+      status: editingSale.status || "Pagado",
+      method: editingSale.method || "No especificado",
+      notes: notes.trim() ? notes : null,
+    };
+
+    Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
+
     const res = await authFetch(`${API_URL}/sales/${editingSale.id}`, {
       method: "PUT",
       body: JSON.stringify(payload),
@@ -2151,7 +2236,13 @@ async function onSaveEditSale(e) {
     });
   } catch (err) {
     console.error(err);
-    Swal.fire("Error", err.message || "No se pudo actualizar la venta", "error");
+    await Swal.fire("Error", err.message || "No se pudo actualizar la venta", "error");
+  } finally {
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar cambios`;
+      btnSave.style.opacity = "1";
+    }
   }
 }
 
@@ -2201,6 +2292,36 @@ function setPhotoSlot(imgEl, emptyEl, src) {
     imgEl.src = "";
     imgEl.style.display = "none";
     emptyEl.style.display = "grid";
+  }
+}
+
+function setEditPhotoLoading(imgEl, wrapEl) {
+  if (!imgEl || !wrapEl) return;
+
+  imgEl.src = "";
+  imgEl.style.display = "none";
+  wrapEl.classList.remove("is-empty");
+  wrapEl.classList.add("is-loading");
+}
+
+function setEditPhotoEmpty(imgEl, wrapEl) {
+  if (!imgEl || !wrapEl) return;
+
+  imgEl.src = "";
+  imgEl.style.display = "none";
+  wrapEl.classList.remove("is-loading");
+  wrapEl.classList.add("is-empty");
+}
+
+function setEditPhotoPreview(imgEl, wrapEl, src) {
+  if (!imgEl || !wrapEl) return;
+
+  if (isValidPhotoSrc(src)) {
+    imgEl.src = src;
+    imgEl.style.display = "block";
+    wrapEl.classList.remove("is-loading", "is-empty");
+  } else {
+    setEditPhotoEmpty(imgEl, wrapEl);
   }
 }
 

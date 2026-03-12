@@ -42,6 +42,17 @@ export const update = async (req, res, next) => {
     }
 };
 
+export const saveHomeCare = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const id = Number(req.params.id);
+    const saved = await service.saveHomeCare(userId, id, req.body);
+    res.json(saved);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const remove = async (req, res, next) => {
     try {
         const userId = req.user.id;

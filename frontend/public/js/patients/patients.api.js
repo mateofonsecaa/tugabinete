@@ -20,3 +20,9 @@ export const deletePatient = (id) =>
   authFetch(`/patients/${id}`, {
     method: "DELETE",
   });
+
+export const savePatientHomeCare = (id, data) =>
+  authFetch(`/patients/${id}/homecare`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });

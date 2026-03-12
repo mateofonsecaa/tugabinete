@@ -139,7 +139,10 @@ function filterPatients() {
 function setupEvents() {
   document.getElementById("search")?.addEventListener("input", filterPatients);
 
-  document.body.addEventListener("click", async (e) => {
+  const table = document.getElementById("patientsTable");
+  if (!table) return;
+
+  table.addEventListener("click", async (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
 
@@ -147,6 +150,8 @@ function setupEvents() {
     if (!row) return;
 
     const id = row.dataset.id;
+    if (!id) return;
+
     const patient = allPatients.find(p => p.id == id);
 
     if (btn.classList.contains("btn-view")) return go(`/patients/${id}`);

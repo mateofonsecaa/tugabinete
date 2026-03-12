@@ -16,6 +16,10 @@ export const update = async (userId, id, data) => {
     return repo.update(userId, id, data);
 };
 
+export const saveHomeCare = async (userId, id, data) => {
+  return repo.saveHomeCare(userId, id, data);
+};
+
 export const remove = async (userId, id) => {
     return repo.remove(userId, id);
 };

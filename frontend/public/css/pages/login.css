@@ -106,25 +106,25 @@
       font-size: 14px;
     }
 
-    button[type="submit"] {
-      width: 100%;
-      background: #ffadad;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
-    }
+    .login-card button[type="submit"] {
+    width: 100%;
+    background: #ffadad;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+  }
 
-    button[type="submit"]:hover {
-      background: #fff3c2;
-      color: #333;
-      transform: translateY(-2px);
-    }
+  .login-card button[type="submit"]:hover {
+    background: #fff3c2;
+    color: #333;
+    transform: translateY(-2px);
+  }
 
     .extra-links {
       text-align: center;
@@ -274,7 +274,7 @@ body.is-login #app > :first-child {
     font-size: 13px;
   }
 
-  button[type="submit"] {
+  .login-card button[type="submit"] {
     padding: 12px;
     font-size: 15px;
   }

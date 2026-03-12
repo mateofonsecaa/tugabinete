@@ -1,1064 +1,1267 @@
-/* ============================================================
-   TuGabinete — Treatments (Pro UI)
-   Scope: SOLO dentro de .treatments-page
-   ============================================================ */
-
-.treatments-page { font-family: "Poppins", sans-serif; }
-.treatments-page * { box-sizing: border-box; }
-
-/* MAIN container (mantiene tu estética actual) */
-.treatments-page main.treatments-main{
-  flex: 1;
-  max-width: 1200px;
-  width: 100%;
-  margin: 100px auto 60px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  padding: 26px;
-  backdrop-filter: blur(5px);
-  animation: treatmentsFadeIn 0.8s ease-in-out;
-  position: relative;
-}
-
-@keyframes treatmentsFadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.treatments-page .treatments-container{
-  width: 100%;
-}
-
-/* Header */
-.treatments-page .treatments-head{
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.treatments-page h1{
-  color: #ffadad;
-  margin: 0 0 6px;
-  font-size: 28px;
-}
-
-.treatments-page .treatments-subtitle{
-  margin: 0;
-  color: #666;
-  font-size: 14px;
-}
-
-/* GRID (opción B) */
-.treatments-page .treatments-grid{
-  display: grid;
-  grid-template-columns: 1fr 420px; /* izquierda ancha, derecha más angosta */
-  gap: 14px;
-  align-items: start;
-}
-
-.treatments-page .treatments-right{
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-
-/* Cards */
-.treatments-page .tg-card{
-  background: #fffdf9;
-  border: 1.5px solid rgba(255, 173, 173, 0.30);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.10);
-}
-
-/* Card head */
-.treatments-page .tg-card-head{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.treatments-page .tg-card h2{
-  margin: 0;
-  color: #444;
-  font-size: 18px;
-  font-weight: 800;
-  border-left: 5px solid #ffadad;
-  padding-left: 10px;
-}
-
-.treatments-page .tg-icon-btn{
-  border: none;
-  background: transparent;
-  color: #ffadad;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 8px 10px;
-  transition: transform .15s ease, background .15s ease;
-}
-
-.treatments-page .tg-icon-btn:hover{
-  background: rgba(255, 173, 173, 0.10);
-  transform: translateY(-1px);
-}
-
-/* Collapsible behavior */
-.treatments-page .tg-collapse-body{ display: block; }
-.treatments-page .tg-collapsible.is-collapsed .tg-collapse-body{ display: none; }
-.treatments-page .tg-collapsible.is-collapsed .tg-icon-btn i{ transform: rotate(-90deg); }
-.treatments-page .tg-icon-btn i{ transition: transform .15s ease; }
-
-/* Register options */
-.treatments-page .register-options{
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-/* Form grid (2 columnas + fotos abajo) */
-.treatments-page .tg-form-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 16px;
-}
-
-.treatments-page .tg-form-col{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.treatments-page .tg-inline-2{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.treatments-page .tg-photos-row{
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 16px;
-  margin-top: 4px;
-}
-
-/* Inputs base */
-.treatments-page label{
-  font-weight: 600;
-  color: #555;
-  font-size: 14px;
-}
-
-.treatments-page input,
-.treatments-page select,
-.treatments-page textarea{
-  width: 100%;
-  border-radius: 10px;
-  border: 1.5px solid #ffd6d6;
-  background: #fff;
-  padding: 10px 12px;
-  font-size: 14.5px;
-  transition: all 0.2s ease;
-  font-family: "Poppins", sans-serif;
-  color: #333;
-}
-
-.treatments-page input:focus,
-.treatments-page select:focus,
-.treatments-page textarea:focus{
-  border-color: #ffadad;
-  box-shadow: 0 0 8px rgba(255, 173, 173, 0.25);
-  outline: none;
-}
-
-.treatments-page textarea{ resize: vertical; min-height: 80px; }
-
-/* Buttons (mantengo tu gradiente rosa) */
-.treatments-page .btn-patient,
-.treatments-page .btn-save-treatment,
-.treatments-page .btn-cancel-treatment{
-  border: none;
-  border-radius: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.25s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 18px;
-  font-family: "Poppins", sans-serif;
-  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
-}
-
-/* ✅ FIX: que los botones no se estiren a 100% */
-.treatments-page .action-buttons{
-  justify-content: center;
-}
-
-.treatments-page .action-buttons .btn-save-treatment,
-.treatments-page .action-buttons .btn-cancel-treatment{
-  width: auto !important;
-  flex: 0 0 auto !important;
-  min-width: 180px;   /* tamaño “normal” */
-  max-width: 260px;   /* evita que se haga enorme */
-}
-
-/* ✅ FIX: botones del modal EDITAR (ahí tu botón es .btn-save, no .btn-save-treatment) */
-.treatments-page .modal-actions{
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.treatments-page .modal-actions .btn-save,
-.treatments-page .modal-actions .btn-cancel{
-  width: auto !important;
-  flex: 0 0 auto !important;
-  min-width: 180px;
-  max-width: 260px;
-}
-
-.treatments-page .btn-patient,
-.treatments-page .btn-save-treatment{
-  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
-  color: #fff;
-}
-
-.treatments-page .btn-patient:hover,
-.treatments-page .btn-save-treatment:hover{
-  background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
-  color: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(255, 173, 173, 0.35);
-}
-
-.treatments-page .btn-cancel-treatment{
-  background: transparent;
-  border: 2px solid #ffadad;
-  color: #ffadad;
-  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.15);
-}
-
-.treatments-page .btn-cancel-treatment:hover{
-  background: #ffadad;
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255, 173, 173, 0.25);
-}
-
-.treatments-page .action-buttons{
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-/* Searchable select */
-.treatments-page .searchable-select{ position: relative; width: 100%; }
-.treatments-page .searchable-select input{ padding-right: 34px; }
-
-.treatments-page .options{
-  display: none;
-  position: absolute;
-  top: 46px;
-  left: 0;
-  right: 0;
-  background: #fffdf9;
-  border: 2px solid rgba(255, 173, 173, 0.3);
-  max-height: 230px;
-  overflow-y: auto;
-  border-radius: 12px;
-  z-index: 999;
-  box-shadow: 0 8px 14px rgba(0,0,0,0.08);
-}
-
-.treatments-page .options div{
-  padding: 10px 12px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.treatments-page .options div:hover{ background: #fff1f1; }
-
-.treatments-page .input-validator-icon{
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  display: none;
-}
-
-.treatments-page .input-validator-icon.error{ color: #ff6b6b; display: block; }
-.treatments-page .input-validator-icon.ok{ color: #4caf50; display: block; }
-
-/* Filters */
-.treatments-page .filters{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 12px;
-}
-
-.treatments-page .clear-all-wrapper{
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-}
-
-.treatments-page #clearAllFilters{
-  background: transparent;
-  border: 2px solid #ffadad;
-  color: #ffadad;
-  padding: 10px 16px;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(255, 173, 173, 0.25);
-}
-
-.treatments-page #clearAllFilters:hover{
-  background: #ffadad;
-  color: #fff;
-  transform: translateY(-2px);
-}
-
-/* Chips */
-.treatments-page .active-filters{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.treatments-page .tg-chip{
-  border: 1px solid rgba(255, 173, 173, 0.45);
-  background: #fff;
-  color: #444;
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12.5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.treatments-page .tg-chip i{ color: #ffadad; }
-.treatments-page .tg-chip:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-}
-
-/* Table */
-.treatments-page .table-card{ padding: 0; overflow: hidden; }
-.treatments-page .table-head{
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 173, 173, 0.25);
-  background: rgba(255, 253, 249, 0.75);
-}
-
-.treatments-page .table-title{
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.treatments-page .table-title h2{
-  border-left: 5px solid #ffadad;
-  padding-left: 10px;
-  font-size: 18px;
-  margin: 0;
-}
-
-.treatments-page .muted{ color: #777; font-size: 13px; }
-
-.treatments-page .table-scroll{
-  max-height: 520px;
-  overflow: auto;
-}
-
-.treatments-page .treatments-table{
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.treatments-page .treatments-table thead th{
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: #fff7d9;
-  color: #444;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  padding: 12px 12px;
-  border-bottom: 2px solid #ffd6d6;
-  text-align: left;
-}
-
-.treatments-page .treatments-table tbody td{
-  padding: 12px 12px;
-  font-size: 14.5px;
-  color: #444;
-  border-bottom: 1px solid rgba(255, 173, 173, 0.18);
-  max-width: 220px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.treatments-page .treat-row{
-  background: #fff;
-  cursor: pointer;
-  transition: background .15s ease;
-}
-
-.treatments-page .treat-row:hover{
-  background: #fffaf6;
-}
-
-/* Status pills */
-.treatments-page .status-paid{
-  background: #d8ffe0;
-  color: #178a3f;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12.5px;
-}
-
-.treatments-page .status-pending{
-  background: #ffe3e3;
-  color: #d93636;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12.5px;
-}
-
-/* Actions */
-.treatments-page .actions{
-  white-space: nowrap;
-}
-
-.treatments-page .actions button{
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #ffadad;
-  font-size: 18px;
-  transition: transform 0.2s ease, color 0.2s ease;
-  padding: 6px 6px;
-}
-
-.treatments-page .actions button:hover{
-  color: #f76e6e;
-  transform: scale(1.15);
-}
-
-/* Files / previews */
-.treatments-page .file-field{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.treatments-page .file-input-wrapper{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.treatments-page .file-input-wrapper input[type="file"]{ display: none; }
-
-.treatments-page .file-btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #fff;
-  border: 1.5px solid rgba(255, 173, 173, 0.6);
-  color: #444;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.treatments-page .file-btn:hover{
-  border-color: #ffadad;
-  background-color: #fff7f7;
-  color: #222;
-}
-
-.treatments-page .file-btn i{ color: #ffadad; font-size: 15px; }
-
-.treatments-page .file-name{
-  font-size: 13px;
-  color: #777;
-  font-style: italic;
-  max-width: 240px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.treatments-page .photo-mini-preview{
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
-  background: #fff;
-  border-radius: 12px;
-  display: none;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-}
-
-/* ================================
-   MODALES (dejo tu lógica intacta)
-================================ */
-.treatments-page .modal-overlay{
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 245, 245, 0.75);
-  backdrop-filter: blur(8px);
-  z-index: 6000;
-  justify-content: center;
-  align-items: center;
-  padding: 18px;
-}
-.treatments-page .modal-overlay.active{ display: flex; }
-
-.treatments-page .modal-box{
-  background: #fffdf9;
-  border-radius: 18px;
-  box-shadow: 0 8px 35px rgba(255, 173, 173, 0.25);
-  padding: 30px 34px;
-  width: 90%;
-  max-width: 720px;
-  animation: treatmentsSlideUp 0.25s ease-out;
-  position: relative;
-}
-
-@keyframes treatmentsSlideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-.treatments-page .close-btn{
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  background: none;
-  border: none;
-  color: #ffadad;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-/* Responsive */
-@media (max-width: 980px){
+  /* ============================================================
+    TuGabinete — Treatments (Pro UI)
+    Scope: SOLO dentro de .treatments-page
+    ============================================================ */
+
+  .treatments-page { font-family: "Poppins", sans-serif; }
+  .treatments-page * { box-sizing: border-box; }
+
+  /* MAIN container (mantiene tu estética actual) */
+  .treatments-page main.treatments-main{
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 100px auto 60px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    padding: 26px;
+    backdrop-filter: blur(5px);
+    animation: treatmentsFadeIn 0.8s ease-in-out;
+    position: relative;
+  }
+
+  @keyframes treatmentsFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .treatments-page .treatments-container{
+    width: 100%;
+  }
+
+  /* Header */
+  .treatments-page .treatments-head{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .treatments-page h1{
+    color: #ffadad;
+    margin: 0 0 6px;
+    font-size: 28px;
+  }
+
+  .treatments-page .treatments-subtitle{
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  /* GRID (opción B) */
   .treatments-page .treatments-grid{
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr 420px; /* izquierda ancha, derecha más angosta */
+    gap: 14px;
+    align-items: start;
   }
-  .treatments-page .filters{
-    grid-template-columns: 1fr;
+
+  .treatments-page .treatments-right{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
   }
+
+  /* Cards */
+  .treatments-page .tg-card{
+    background: #fffdf9;
+    border: 1.5px solid rgba(255, 173, 173, 0.30);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 5px 15px rgba(255, 173, 173, 0.10);
+  }
+
+  /* Card head */
+  .treatments-page .tg-card-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .treatments-page .tg-card h2{
+    margin: 0;
+    color: #444;
+    font-size: 18px;
+    font-weight: 800;
+    border-left: 5px solid #ffadad;
+    padding-left: 10px;
+  }
+
+  .treatments-page .tg-icon-btn{
+    border: none;
+    background: transparent;
+    color: #ffadad;
+    cursor: pointer;
+    border-radius: 12px;
+    padding: 8px 10px;
+    transition: transform .15s ease, background .15s ease;
+  }
+
+  .treatments-page .tg-icon-btn:hover{
+    background: rgba(255, 173, 173, 0.10);
+    transform: translateY(-1px);
+  }
+
+  /* Collapsible behavior */
+  .treatments-page .tg-collapse-body{ display: block; }
+  .treatments-page .tg-collapsible.is-collapsed .tg-collapse-body{ display: none; }
+  .treatments-page .tg-collapsible.is-collapsed .tg-icon-btn i{ transform: rotate(-90deg); }
+  .treatments-page .tg-icon-btn i{ transition: transform .15s ease; }
+
+  /* Register options */
+  .treatments-page .register-options{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  /* Form grid (2 columnas + fotos abajo) */
   .treatments-page .tg-form-grid{
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
   }
+
+  .treatments-page .tg-form-col{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .treatments-page .tg-inline-2{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
   .treatments-page .tg-photos-row{
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Header fijo + drawer arriba (como ya tenías) */
-.treatments-page .top-bar{
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 3000;
-}
-.treatments-page .drawer{
-  position: fixed;
-  top: 0 !important;
-  bottom: 0;
-  height: 100vh;
-  z-index: 4000;
-}
-.treatments-page .drawer-overlay{
-  position: fixed;
-  inset: 0;
-  z-index: 3500;
-}
-
-.treatments-page .active-filters--sticky{
-  padding: 10px 16px 14px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.treatments-page .tg-results-list{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.treatments-page .treat-card{
-  position: relative;
-  overflow: visible;
-  border: 1px solid rgba(255, 173, 173, 0.35);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.92);
-  padding: 22px 14px 12px;
-  cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.treatments-page .treat-card:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.treatments-page .treat-card-main{
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.treatments-page .treat-left{ min-width: 0; }
-
-.treatments-page .treat-title{
-  position: absolute;
-  top: -12px;
-  left: 14px;
-  background: #fffdf9;
-  border: 1px solid rgba(255, 173, 173, 0.55);
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-weight: 800;
-  font-size: 13px;
-  max-width: calc(100% - 150px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-}
-
-.treatments-page .treat-sub{
-  opacity: .75;
-  font-size: 13px;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.treatments-page .treat-right{
-  text-align: right;
-  flex: 0 0 auto;
-}
-
-.treatments-page .treat-amount{ font-weight: 800; }
-
-.treatments-page .treat-badges{
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 4px;
-}
-
-.treatments-page .treat-method{
-  font-size: 12px;
-  opacity: .75;
-}
-
-.treatments-page .treat-card-actions{
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.treatments-page .treat-card-actions button{ cursor: pointer; }
-
-.treatments-page .treat-sub--stack{
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.treatments-page .treat-sub-line{
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
-
-.treatments-page .treat-sub-line .lbl{
-  font-size: 12px;
-  opacity: .65;
-  min-width: 92px;
-}
-
-.treatments-page .treat-sub-line .val{
-  font-weight: 600;
-}
-
-.tg-card-head--between{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.treatments-page .sale-head-actions{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;              /* <-- separación */
-  flex-wrap: wrap;        /* <-- por si en mobile no entra */
-  padding: 12px 0 6px;
-}
-
-/* ✅ FIX SOLO para el modal "Editar tratamiento" (que no se estire Guardar cambios) */
-.treatments-page #editTreatmentModal .modal-actions{
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.treatments-page #editTreatmentModal .modal-actions .btn-save,
-.treatments-page #editTreatmentModal .modal-actions .btn-cancel{
-  width: auto !important;
-  flex: 0 0 auto !important;
-  min-width: 180px;
-  max-width: 260px;
-}
-
-/* Si el botón viene con display:block de otro CSS */
-.treatments-page #editTreatmentModal .modal-actions .btn-save{
-  display: inline-flex !important;
-}
-
-/* Mobile */
-@media (max-width: 520px){
-  .treatments-page .modal-detail-pro .detail-photos{
-    grid-template-columns: 1fr;
-  }
-  .treatments-page .modal-detail-pro .detail-photos .photo-frame{
-    height: 200px;
-    max-height: 200px;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+    margin-top: 4px;
   }
 
-  .treatments-page .treatments-grid{ grid-template-columns: 1fr; }
-}
+  /* Inputs base */
+  .treatments-page label{
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+  }
 
-.treatments-page #imagePreviewModal{
-  z-index: 6500 !important;
-}
+  .treatments-page input,
+  .treatments-page select,
+  .treatments-page textarea{
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid #ffd6d6;
+    background: #fff;
+    padding: 10px 12px;
+    font-size: 14.5px;
+    transition: all 0.2s ease;
+    font-family: "Poppins", sans-serif;
+    color: #333;
+  }
 
-/* ============================================================
-   MODALES DETALLE (Tratamiento + Venta) — PRO UI
-   Aplica a .modal-box.modal-detail-pro (viewTreatment + viewSale)
+  .treatments-page input:focus,
+  .treatments-page select:focus,
+  .treatments-page textarea:focus{
+    border-color: #ffadad;
+    box-shadow: 0 0 8px rgba(255, 173, 173, 0.25);
+    outline: none;
+  }
+
+  .treatments-page textarea{ resize: vertical; min-height: 80px; }
+
+  /* Buttons (mantengo tu gradiente rosa) */
+  .treatments-page .btn-patient,
+  .treatments-page .btn-save-treatment,
+  .treatments-page .btn-cancel-treatment{
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    font-family: "Poppins", sans-serif;
+    box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+  }
+
+  /* ✅ FIX: que los botones no se estiren a 100% */
+  .treatments-page .action-buttons{
+    justify-content: center;
+  }
+
+  .treatments-page .action-buttons .btn-save-treatment,
+  .treatments-page .action-buttons .btn-cancel-treatment{
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 180px;   /* tamaño “normal” */
+    max-width: 260px;   /* evita que se haga enorme */
+  }
+
+  /* ✅ FIX: botones del modal EDITAR (ahí tu botón es .btn-save, no .btn-save-treatment) */
+  .treatments-page .modal-actions{
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .modal-actions .btn-save,
+  .treatments-page .modal-actions .btn-cancel{
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 180px;
+    max-width: 260px;
+  }
+
+  .treatments-page .btn-patient,
+  .treatments-page .btn-save-treatment{
+    background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+    color: #fff;
+  }
+
+  .treatments-page .btn-patient:hover,
+  .treatments-page .btn-save-treatment:hover{
+    background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
+    color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 173, 173, 0.35);
+  }
+
+  .treatments-page .btn-cancel-treatment{
+    background: transparent;
+    border: 2px solid #ffadad;
+    color: #ffadad;
+    box-shadow: 0 5px 15px rgba(255, 173, 173, 0.15);
+  }
+
+  .treatments-page .btn-cancel-treatment:hover{
+    background: #ffadad;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 173, 173, 0.25);
+  }
+
+  .treatments-page .action-buttons{
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  /* Searchable select */
+  .treatments-page .searchable-select{ position: relative; width: 100%; }
+  .treatments-page .searchable-select input{ padding-right: 34px; }
+
+  .treatments-page .options{
+    display: none;
+    position: absolute;
+    top: 46px;
+    left: 0;
+    right: 0;
+    background: #fffdf9;
+    border: 2px solid rgba(255, 173, 173, 0.3);
+    max-height: 230px;
+    overflow-y: auto;
+    border-radius: 12px;
+    z-index: 999;
+    box-shadow: 0 8px 14px rgba(0,0,0,0.08);
+  }
+
+  .treatments-page .options div{
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .treatments-page .options div:hover{ background: #fff1f1; }
+
+  .treatments-page .input-validator-icon{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    display: none;
+  }
+
+  .treatments-page .input-validator-icon.error{ color: #ff6b6b; display: block; }
+  .treatments-page .input-validator-icon.ok{ color: #4caf50; display: block; }
+
+  /* Filters */
+  .treatments-page .filters{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+  }
+
+  .treatments-page .clear-all-wrapper{
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .treatments-page #clearAllFilters{
+    background: transparent;
+    border: 2px solid #ffadad;
+    color: #ffadad;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(255, 173, 173, 0.25);
+  }
+
+  .treatments-page #clearAllFilters:hover{
+    background: #ffadad;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* Chips */
+  .treatments-page .active-filters{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .treatments-page .tg-chip{
+    border: 1px solid rgba(255, 173, 173, 0.45);
+    background: #fff;
+    color: #444;
+    border-radius: 999px;
+    padding: 7px 10px;
+    font-size: 12.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .treatments-page .tg-chip i{ color: #ffadad; }
+  .treatments-page .tg-chip:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  }
+
+  /* Table */
+  .treatments-page .table-card{ padding: 0; overflow: hidden; }
+  .treatments-page .table-head{
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 173, 173, 0.25);
+    background: rgba(255, 253, 249, 0.75);
+  }
+
+  .treatments-page .table-title{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .treatments-page .table-title h2{
+    border-left: 5px solid #ffadad;
+    padding-left: 10px;
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .treatments-page .muted{ color: #777; font-size: 13px; }
+
+  .treatments-page .table-scroll{
+    max-height: 520px;
+    overflow: auto;
+  }
+
+  .treatments-page .treatments-table{
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .treatments-page .treatments-table thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff7d9;
+    color: #444;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    padding: 12px 12px;
+    border-bottom: 2px solid #ffd6d6;
+    text-align: left;
+  }
+
+  .treatments-page .treatments-table tbody td{
+    padding: 12px 12px;
+    font-size: 14.5px;
+    color: #444;
+    border-bottom: 1px solid rgba(255, 173, 173, 0.18);
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .treatments-page .treat-row{
+    background: #fff;
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+
+  .treatments-page .treat-row:hover{
+    background: #fffaf6;
+  }
+
+  /* Status pills */
+  .treatments-page .status-paid{
+    background: #d8ffe0;
+    color: #178a3f;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+
+  .treatments-page .status-pending{
+    background: #ffe3e3;
+    color: #d93636;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12.5px;
+  }
+
+  /* Actions */
+  .treatments-page .actions{
+    white-space: nowrap;
+  }
+
+  .treatments-page .actions button{
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #ffadad;
+    font-size: 18px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    padding: 6px 6px;
+  }
+
+  .treatments-page .actions button:hover{
+    color: #f76e6e;
+    transform: scale(1.15);
+  }
+
+  /* Files / previews */
+  .treatments-page .file-field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .treatments-page .file-input-wrapper{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .file-input-wrapper input[type="file"]{ display: none; }
+
+  .treatments-page .file-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff;
+    border: 1.5px solid rgba(255, 173, 173, 0.6);
+    color: #444;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .treatments-page .file-btn:hover{
+    border-color: #ffadad;
+    background-color: #fff7f7;
+    color: #222;
+  }
+
+  .treatments-page .file-btn i{ color: #ffadad; font-size: 15px; }
+
+  .treatments-page .file-name{
+    font-size: 13px;
+    color: #777;
+    font-style: italic;
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .treatments-page .photo-mini-preview{
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 12px;
+    display: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+
+  /* ================================
+    MODALES (dejo tu lógica intacta)
+  ================================ */
+  .treatments-page .modal-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 245, 245, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 6000;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+  }
+  .treatments-page .modal-overlay.active{ display: flex; }
+
+  .treatments-page .modal-box{
+    background: #fffdf9;
+    border-radius: 18px;
+    box-shadow: 0 8px 35px rgba(255, 173, 173, 0.25);
+    padding: 30px 34px;
+    width: 90%;
+    max-width: 720px;
+    animation: treatmentsSlideUp 0.25s ease-out;
+    position: relative;
+  }
+
+  @keyframes treatmentsSlideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .treatments-page .close-btn{
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    color: #ffadad;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  /* Responsive */
+  @media (max-width: 980px){
+    .treatments-page .treatments-grid{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .filters{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .tg-form-grid{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .tg-photos-row{
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Header fijo + drawer arriba (como ya tenías) */
+  .treatments-page .top-bar{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 3000;
+  }
+  .treatments-page .drawer{
+    position: fixed;
+    top: 0 !important;
+    bottom: 0;
+    height: 100vh;
+    z-index: 4000;
+  }
+  .treatments-page .drawer-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 3500;
+  }
+
+  .treatments-page .active-filters--sticky{
+    padding: 10px 16px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .treatments-page .tg-results-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .treatments-page .treat-card{
+    position: relative;
+    overflow: visible;
+    border: 1px solid rgba(255, 173, 173, 0.35);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.92);
+    padding: 22px 14px 12px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .treatments-page .treat-card:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  .treatments-page .treat-card-main{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .treatments-page .treat-left{ min-width: 0; }
+
+  .treatments-page .treat-title{
+    position: absolute;
+    top: -12px;
+    left: 14px;
+    background: #fffdf9;
+    border: 1px solid rgba(255, 173, 173, 0.55);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-weight: 800;
+    font-size: 13px;
+    max-width: calc(100% - 150px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  }
+
+  .treatments-page .treat-sub{
+    opacity: .75;
+    font-size: 13px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .treatments-page .treat-right{
+    text-align: right;
+    flex: 0 0 auto;
+  }
+
+  .treatments-page .treat-amount{ font-weight: 800; }
+
+  .treatments-page .treat-badges{
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .treatments-page .treat-method{
+    font-size: 12px;
+    opacity: .75;
+  }
+
+  .treatments-page .treat-card-actions{
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .treatments-page .treat-card-actions button{ cursor: pointer; }
+
+  .treatments-page .treat-sub--stack{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .treatments-page .treat-sub-line{
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .treatments-page .treat-sub-line .lbl{
+    font-size: 12px;
+    opacity: .65;
+    min-width: 92px;
+  }
+
+  .treatments-page .treat-sub-line .val{
+    font-weight: 600;
+  }
+
+  .tg-card-head--between{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .sale-head-actions{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;              /* <-- separación */
+    flex-wrap: wrap;        /* <-- por si en mobile no entra */
+    padding: 12px 0 6px;
+  }
+
+  /* ✅ FIX SOLO para el modal "Editar tratamiento" (que no se estire Guardar cambios) */
+  .treatments-page #editTreatmentModal .modal-actions{
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page #editTreatmentModal .modal-actions .btn-save,
+  .treatments-page #editTreatmentModal .modal-actions .btn-cancel{
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: 180px;
+    max-width: 260px;
+  }
+
+  /* Si el botón viene con display:block de otro CSS */
+  .treatments-page #editTreatmentModal .modal-actions .btn-save{
+    display: inline-flex !important;
+  }
+
+  /* Mobile */
+  @media (max-width: 520px){
+    .treatments-page .modal-detail-pro .detail-photos{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .modal-detail-pro .detail-photos .photo-frame{
+      height: 200px;
+      max-height: 200px;
+    }
+
+    .treatments-page .treatments-grid{ grid-template-columns: 1fr; }
+  }
+
+  .treatments-page #imagePreviewModal{
+    z-index: 6500 !important;
+  }
+
+  /* ============================================================
+    MODALES DETALLE (Tratamiento + Venta) — PRO UI
+    Aplica a .modal-box.modal-detail-pro (viewTreatment + viewSale)
+    ============================================================ */
+
+  /* Caja detalle: tamaño, scroll, padding */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro{
+    width: min(920px, 96vw);
+    max-height: 86vh;
+    overflow: auto;
+    padding: 22px 22px 18px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(255, 173, 173, 0.30);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.12);
+  }
+
+  /* Scrollbar prolijo dentro del modal */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar{ width: 10px; }
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar-thumb{
+    background: rgba(255, 173, 173, 0.45);
+    border-radius: 999px;
+  }
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar-track{
+    background: rgba(255, 173, 173, 0.10);
+    border-radius: 999px;
+  }
+
+  /* Header */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro h2{
+    margin: 4px 0 14px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 56px; /* espacio para la X */
+    line-height: 1.2;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro h2 i{ color: #ffadad; }
+
+  /* ✅ Cerrar: arriba derecha, visible, no depende de otros CSS */
+  .treatments-page .modal-overlay .modal-box > .close-btn{
+    position: absolute !important;
+    top: 12px !important;
+    right: 14px !important;
+    left: auto !important;
+
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+
+    background: rgba(255, 173, 173, 0.14);
+    border: 1px solid rgba(255, 173, 173, 0.30);
+    color: #ffadad;
+
+    display: grid;
+    place-items: center;
+
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease;
+  }
+
+  .treatments-page .modal-overlay .modal-box > .close-btn:hover{
+    background: rgba(255, 173, 173, 0.22);
+    transform: translateY(-1px);
+  }
+
+  /* Grid de tarjetas (Paciente / Tratamiento o Venta) */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  /* Tarjetas */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card{
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(255, 173, 173, 0.25);
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card h3{
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card h3 i{ color: #ffadad; }
+
+  /* Líneas label/valor: legibles, con wrap */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p{
+    margin: 8px 0;
+    font-size: 13.5px;
+    color: #444;
+    line-height: 1.45;
+
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    column-gap: 10px;
+    align-items: baseline;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p strong{
+    opacity: .75;
+    font-weight: 700;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card span{
+    overflow-wrap: anywhere;   /* corta strings largos sin romper layout */
+    word-break: break-word;
+  }
+
+  /* Notas */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes{
+    margin-top: 14px;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255, 173, 173, 0.22);
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes h3{
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes h3 i{ color: #ffadad; }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes p{
+    margin: 0;
+    font-size: 13.5px;
+    color: #444;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 220px;     /* evita modales eternos por notas enormes */
+    overflow: auto;
+  }
+
+  /* Fotos (solo existe en el modal de tratamiento, pero lo dejamos “bien” igual) */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos > div{
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255, 173, 173, 0.22);
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos p{
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #444;
+  }
+
+  /* Frame fijo para que no colapse cuando no hay imagen */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
+    width: 100%;
+    height: 240px;
+    max-height: 240px;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Imagen ocupa todo el frame */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+    cursor: zoom-in;
+  }
+
+  /* Placeholder cuando no hay foto */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty{
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    text-align: center;
+
+    background: rgba(255,255,255,0.70);
+    border: 2px dashed rgba(255, 173, 173, 0.55);
+    border-radius: 14px;
+
+    color: #777;
+    font-weight: 700;
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty i{
+    color: #ffadad;
+    font-size: 22px;
+  }
+
+  /* Botón acciones (PDF) */
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .modal-actions{
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .modal-actions .btn-save{
+    min-width: 220px;
+    width: auto !important;
+    padding: 12px 18px;
+    border-radius: 14px;
+  }
+
+  /* Responsive */
+  @media (max-width: 760px){
+    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
+      grid-template-columns: 1fr;
+    }
+    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
+      height: 210px;
+      max-height: 210px;
+    }
+  }
+
+  @media (max-width: 520px){
+    .treatments-page main.treatments-main{
+      padding: 16px;
+    }
+    .treatments-page .treatments-head{
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* Mobile: mostrar Paciente / Fecha / Pago / Acciones */
+    .treatments-page .treatments-table th:nth-child(3),
+    .treatments-page .treatments-table td:nth-child(3),
+    .treatments-page .treatments-table th:nth-child(4),
+    .treatments-page .treatments-table td:nth-child(4),
+    .treatments-page .treatments-table th:nth-child(6),
+    .treatments-page .treatments-table td:nth-child(6){
+      display: none;
+    }
+  }
+
+  .treatments-page .modal-loading{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    height:300px;
+    font-size:16px;
+    font-weight:600;
+    color:#444;
+  }
+
+  .treatments-page .modal-loading i{
+    font-size:32px;
+    color:#ffadad;
+  }
+
+  #editTreatmentModal .edit-treatment-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    flex-wrap: nowrap;
+  }
+
+  #editTreatmentModal .btn-edit-treatment-save,
+  #editTreatmentModal .btn-edit-treatment-cancel {
+    width: 180px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #editTreatmentModal .btn-edit-treatment-save {
+    background: #ffadad;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+  }
+
+  #editTreatmentModal .btn-edit-treatment-save:hover {
+    background: #fff3c2;
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  #editTreatmentModal .btn-edit-treatment-cancel {
+    background: #fff;
+    color: #f29a9a;
+    border: 1px solid #f7b1b1;
+  }
+
+  #editTreatmentModal .btn-edit-treatment-cancel:hover {
+    background: #fff8f8;
+  }
+
+  #editSaleModal .edit-sale-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 22px;
+    flex-wrap: nowrap;
+  }
+
+  #editSaleModal .btn-edit-sale-save,
+  #editSaleModal .btn-edit-sale-cancel {
+    width: 180px;
+    height: 52px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  #editSaleModal .btn-edit-sale-save {
+    background: #ffadad;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+  }
+
+  #editSaleModal .btn-edit-sale-save:hover {
+    background: #fff3c2;
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  #editSaleModal .btn-edit-sale-cancel {
+    background: #fff;
+    color: #f29a9a;
+    border: 1px solid #f7b1b1;
+  }
+
+  #editSaleModal .btn-edit-sale-cancel:hover {
+    background: #fff8f8;
+  }
+
+  /* ============================================================
+   EDITAR TRATAMIENTO — FOTOS
    ============================================================ */
 
-/* Caja detalle: tamaño, scroll, padding */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro{
+.treatments-page #editTreatmentModal .modal-edit-pro{
   width: min(920px, 96vw);
-  max-height: 86vh;
-  overflow: auto;
-  padding: 22px 22px 18px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(255, 173, 173, 0.30);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.12);
+  max-height: 88vh;
+  overflow-y: auto;
 }
 
-/* Scrollbar prolijo dentro del modal */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar{ width: 10px; }
-.treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar-thumb{
-  background: rgba(255, 173, 173, 0.45);
-  border-radius: 999px;
-}
-.treatments-page .modal-overlay .modal-box.modal-detail-pro::-webkit-scrollbar-track{
-  background: rgba(255, 173, 173, 0.10);
-  border-radius: 999px;
+.treatments-page #editTreatmentModal .edit-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
 }
 
-/* Header */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro h2{
-  margin: 4px 0 14px;
-  font-size: 20px;
-  font-weight: 800;
-  color: #333;
+.treatments-page #editTreatmentModal .edit-column{
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
-  padding-right: 56px; /* espacio para la X */
-  line-height: 1.2;
+  min-width: 0;
 }
 
-.treatments-page .modal-overlay .modal-box.modal-detail-pro h2 i{ color: #ffadad; }
+.treatments-page #editTreatmentModal .edit-photo-section{
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
 
-/* ✅ Cerrar: arriba derecha, visible, no depende de otros CSS */
-.treatments-page .modal-overlay .modal-box > .close-btn{
-  position: absolute !important;
-  top: 12px !important;
-  right: 14px !important;
-  left: auto !important;
+.treatments-page #editTreatmentModal .photo-block{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
 
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+.treatments-page #editTreatmentModal .photo-block > label{
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+}
 
-  background: rgba(255, 173, 173, 0.14);
-  border: 1px solid rgba(255, 173, 173, 0.30);
-  color: #ffadad;
+.treatments-page #editTreatmentModal .photo-preview{
+  width: 100%;
+  height: 190px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 173, 173, 0.28);
+  background: #fffaf9;
+  overflow: hidden;
+  position: relative;
+}
 
+.treatments-page #editTreatmentModal .photo-preview.is-empty{
+  border: 2px dashed rgba(255, 173, 173, 0.45);
+  background: rgba(255, 245, 245, 0.55);
+}
+
+.treatments-page #editTreatmentModal .photo-preview.is-loading{
+  border: 2px dashed rgba(255, 173, 173, 0.45);
+  background: rgba(255, 245, 245, 0.55);
+}
+
+.treatments-page #editTreatmentModal .photo-preview.is-loading::after{
+  content: "Cargando foto...";
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
-
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform .15s ease, background .15s ease;
-}
-
-.treatments-page .modal-overlay .modal-box > .close-btn:hover{
-  background: rgba(255, 173, 173, 0.22);
-  transform: translateY(-1px);
-}
-
-/* Grid de tarjetas (Paciente / Tratamiento o Venta) */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 8px;
-}
-
-/* Tarjetas */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card{
-  background: rgba(255,255,255,0.82);
-  border: 1px solid rgba(255, 173, 173, 0.25);
-  border-radius: 16px;
-  padding: 14px 14px 12px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card h3{
-  margin: 0 0 10px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #444;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card h3 i{ color: #ffadad; }
-
-/* Líneas label/valor: legibles, con wrap */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p{
-  margin: 8px 0;
-  font-size: 13.5px;
-  color: #444;
-  line-height: 1.45;
-
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  column-gap: 10px;
-  align-items: baseline;
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p strong{
-  opacity: .75;
+  font-size: 13px;
   font-weight: 700;
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card span{
-  overflow-wrap: anywhere;   /* corta strings largos sin romper layout */
-  word-break: break-word;
-}
-
-/* Notas */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes{
-  margin-top: 14px;
-  background: rgba(255,255,255,0.78);
-  border: 1px solid rgba(255, 173, 173, 0.22);
-  border-radius: 16px;
-  padding: 14px;
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes h3{
-  margin: 0 0 8px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #444;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes h3 i{ color: #ffadad; }
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes p{
-  margin: 0;
-  font-size: 13.5px;
-  color: #444;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  max-height: 220px;     /* evita modales eternos por notas enormes */
-  overflow: auto;
-}
-
-/* Fotos (solo existe en el modal de tratamiento, pero lo dejamos “bien” igual) */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos > div{
-  background: rgba(255,255,255,0.78);
-  border: 1px solid rgba(255, 173, 173, 0.22);
-  border-radius: 16px;
+  color: #8a7b7b;
+  text-align: center;
   padding: 12px;
 }
 
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos p{
-  margin: 0 0 8px;
-  font-size: 13px;
-  font-weight: 900;
-  color: #444;
-}
-
-/* Frame fijo para que no colapse cuando no hay imagen */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
-  width: 100%;
-  height: 240px;
-  max-height: 240px;
-  border-radius: 14px;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Imagen ocupa todo el frame */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 14px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+.treatments-page #editTreatmentModal .photo-preview img{
   cursor: zoom-in;
 }
 
-/* Placeholder cuando no hay foto */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty{
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  text-align: center;
-
-  background: rgba(255,255,255,0.70);
-  border: 2px dashed rgba(255, 173, 173, 0.55);
-  border-radius: 14px;
-
-  color: #777;
-  font-weight: 700;
-  font-size: 13px;
-  gap: 8px;
+.treatments-page #editTreatmentModal .photo-preview img{
+  width: 100%;
+  height: 100%;
+  display: none;
+  object-fit: cover;
+  object-position: center;
 }
 
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty i{
-  color: #ffadad;
-  font-size: 22px;
+.treatments-page #editTreatmentModal input[type="file"]{
+  width: 100%;
 }
 
-/* Botón acciones (PDF) */
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .modal-actions{
-  margin-top: 14px;
-  display: flex;
-  justify-content: center;
-}
-
-.treatments-page .modal-overlay .modal-box.modal-detail-pro .modal-actions .btn-save{
-  min-width: 220px;
-  width: auto !important;
-  padding: 12px 18px;
-  border-radius: 14px;
-}
-
-/* Responsive */
 @media (max-width: 760px){
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid{
+  .treatments-page #editTreatmentModal .edit-grid{
     grid-template-columns: 1fr;
   }
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
+
+  .treatments-page #editTreatmentModal .edit-photo-section{
     grid-template-columns: 1fr;
   }
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
+
+  .treatments-page #editTreatmentModal .photo-preview{
     height: 210px;
-    max-height: 210px;
   }
-}
-
-@media (max-width: 520px){
-  .treatments-page main.treatments-main{
-    padding: 16px;
-  }
-  .treatments-page .treatments-head{
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  /* Mobile: mostrar Paciente / Fecha / Pago / Acciones */
-  .treatments-page .treatments-table th:nth-child(3),
-  .treatments-page .treatments-table td:nth-child(3),
-  .treatments-page .treatments-table th:nth-child(4),
-  .treatments-page .treatments-table td:nth-child(4),
-  .treatments-page .treatments-table th:nth-child(6),
-  .treatments-page .treatments-table td:nth-child(6){
-    display: none;
-  }
-}
-
-.treatments-page .modal-loading{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  height:300px;
-  font-size:16px;
-  font-weight:600;
-  color:#444;
-}
-
-.treatments-page .modal-loading i{
-  font-size:32px;
-  color:#ffadad;
 }

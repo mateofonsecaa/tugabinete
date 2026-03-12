@@ -23,18 +23,17 @@ export function Patients() {
 
         <nav class="drawer-nav">
             <a href="/dashboard" data-link><i class="fa-solid fa-house"></i> Dashboard</a>
-          <a href="/agenda" data-link><i class="fa-solid fa-calendar-days"></i> Agenda</a>
-          <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
-          <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
-          <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
-          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
-          <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
+            <a href="/agenda" data-link><i class="fa-solid fa-calendar-days"></i> Agenda</a>
+            <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
+            <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
+            <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
+            <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
+            <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
         </nav>
         </aside>
 
         <div id="drawer-overlay" class="drawer-overlay"></div>
 
-        <!-- CONTENIDO REAL -->
         <main>
         <div class="main-top-actions">
             <button id="back-btn" class="btn-back">
@@ -58,13 +57,13 @@ export function Patients() {
                     <th>Nombre</th>
                     <th>Teléfono</th>
                     <th>Edad</th>
-                    <th>Último tratamiento</th>
+                    <th>Última sesión</th>
                     <th>Acciones</th>
                 </tr>
-                </thead>
-                <tbody></tbody>
-                </table>
-            </div>
+            </thead>
+            <tbody></tbody>
+            </table>
+        </div>
         </main>
     </div>
     `;
@@ -72,19 +71,5 @@ export function Patients() {
 
 export function initPatients() {
   initDrawer();
-  initPatientsEvents();
   initPatientsPage();
-}
-
-function initPatientsEvents() {
-  // Volver al dashboard
-  document.getElementById("back-btn").addEventListener("click", () => {
-    history.pushState(null, "", "/dashboard");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  });
-
-  // Buscar paciente (placeholder)
-  document.getElementById("search").addEventListener("input", (e) => {
-    console.log("Buscar:", e.target.value);
-  });
 }

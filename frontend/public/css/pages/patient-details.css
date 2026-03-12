@@ -1,442 +1,810 @@
-.modal-overlay-edit {
-  position: fixed;
-  inset: 0;
-  background: rgba(147, 84, 119, 0.25);
-  backdrop-filter: blur(3px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.25s ease-out;
-}
+  /* =========================================================
+    PATIENT DETAILS — TuGabinete
+    Rehecho desde cero
+  ========================================================= */
 
-.modal-overlay-edit.active {
-  display: flex;
-}
+  body.is-patient-details {
+    background: #fffdfb url("../../images/body.png") center top / cover fixed no-repeat;
+    color: #3f3a3d;
+  }
 
-.modal-overlay-notify {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(3px);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  animation: fadeIn 0.3s ease;
-}
+  /* Seguridad para elementos ocultos */
+  .patient-details-page [hidden] {
+    display: none !important;
+  }
 
-.modal-overlay-notify.active {
-  display: flex;
-}
+  .patient-details-page {
+    min-height: 100vh;
+    background: transparent;
+    color: #3f3a3d;
+  }
 
-.modal-overlay-image {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+  /* =========================================================
+    TOKENS
+  ========================================================= */
 
-.modal-overlay-image.active {
-  display: flex;
-}
+  .patient-details-page {
+    --pd-bg: #fffdfb;
+    --pd-surface: #ffffff;
+    --pd-surface-soft: #fff7f8;
+    --pd-border: #f0dede;
+    --pd-border-strong: #e8caca;
+    --pd-text: #40393d;
+    --pd-text-soft: #7d7077;
+    --pd-title: #342f32;
+    --pd-primary: #e9b7bd;
+    --pd-primary-strong: #dc9fa8;
+    --pd-primary-deep: #c98590;
+    --pd-accent: #fff1f3;
+    --pd-danger: #d77c8d;
+    --pd-shadow: 0 10px 30px rgba(209, 168, 176, 0.14);
+    --pd-shadow-soft: 0 6px 18px rgba(209, 168, 176, 0.1);
+    --pd-radius-xl: 24px;
+    --pd-radius-lg: 18px;
+    --pd-radius-md: 14px;
+    --pd-radius-sm: 10px;
+    --pd-max-width: 1180px;
+  }
 
+  /* =========================================================
+    MAIN LAYOUT
+  ========================================================= */
 
-/* ================================
-🌸 MODAL EDITAR TRATAMIENTO — BEAUTYCARE PRO (SIN SCROLL)
-================================ */
+  .patient-details-page main {
+    width: 100%;
+    padding: 28px 20px 42px;
+    box-sizing: border-box;
+  }
 
-/* Caja principal */
-.modal-edit-pro {
-  background: linear-gradient(180deg, #fffdf9 0%, #fff9f7 100%);
-  border-radius: 22px;
-  box-shadow: 0 12px 40px rgba(255, 173, 173, 0.25);
-  width: min(920px, 96vw);
-  max-width: 1100px;
+  .patient-details-page .pd-content {
+    width: min(100%, var(--pd-max-width));
+    margin: 0 auto;
+  }
 
-  /* 👇 La clave para evitar el bug */
-  height: auto;
-  overflow: auto;
+  /* =========================================================
+    LOADER
+  ========================================================= */
 
-  padding: 22px 22px 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  color: #444;
-  animation: slideUp 0.3s ease-out;
-  animation-delay: 0.02s;
-  font-family: "Poppins", sans-serif;
-}
+  .patient-details-page .pd-loading {
+    width: min(100%, var(--pd-max-width));
+    margin: 26px auto 0;
+  }
 
-/* Botón de cierre */
-.modal-edit-pro .close-btn {
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  background: none;
-  border: none;
-  color: #ffadad;
-  font-size: 26px;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.modal-edit-pro .close-btn:hover {
-  color: #f56b6b;
-}
-
-/* Título */
-.modal-edit-pro h2 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 22px;
-  color: #333;
-  border-left: 5px solid #ffadad;
-  padding-left: 10px;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-/* GRID principal */
-.edit-grid {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
-}
-
-.edit-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.edit-column label {
-  font-weight: 600;
-  color: #555;
-  font-size: 15px;
-}
-
-.edit-column input,
-.edit-column select,
-.edit-column textarea {
-  border: 1.5px solid #ffd6d6;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 15px;
-  background: #fffdf9;
-  font-family: "Poppins", sans-serif;
-  color: #333;
-  transition: all 0.25s ease;
-
-  /* 🔥 FIX DEL SOLAPAMIENTO */
-  width: 100%;
-  display: block;
-  box-sizing: border-box;
-}
-
-/* 🔥 El textarea necesita altura mínima estable */
-.edit-column textarea {
-  min-height: 90px;
-}
-
-/* Hover & Focus */
-.edit-column input:focus,
-.edit-column select:focus,
-.edit-column textarea:focus {
-  border-color: #ffadad;
-  box-shadow: 0 0 8px rgba(255, 173, 173, 0.3);
-  outline: none;
-}
-
-/* Select con flecha */
-.edit-column select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='10'><path fill='%23ffadad' d='M7 10L0 0h14z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 10px;
-}
-
-/* ================================
-📸 FOTOS ANTES / DESPUÉS
-================================ */
-.edit-photo-section {
-  display: flex;
-  justify-content: space-between;
-  gap: 28px;
-  margin-top: 15px;
-}
-
-.photo-block {
-  flex: 1;
-  text-align: center;
-}
-
-.photo-block label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #444;
-}
-
-.photo-preview {
-  width: 100%;
-  height: 140px;
-  border: 2px dashed rgba(255, 173, 173, 0.35);
-  border-radius: 14px;
-  background: #fffdf9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.photo-preview:hover {
-  border-color: #ffadad;
-  box-shadow: 0 0 10px rgba(255, 173, 173, 0.25);
-}
-
-.photo-preview img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: cover;
-  border-radius: 12px;
-  transition: transform 0.25s ease;
-}
-
-.photo-preview img:hover {
-  transform: scale(1.05);
-}
-
-/* ================================
-⏱️ Input hora coherente
-================================ */
-input[type="time"] {
-  width: 100%;
-  background-color: #fffdf9;
-  border: 1.5px solid rgba(255, 173, 173, 0.4);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-  color: #444;
-  transition: all 0.25s ease;
-  cursor: pointer;
-}
-
-input[type="time"]:hover {
-  border-color: #ffadad;
-  background-color: #fff7f7;
-}
-
-input[type="time"]:focus {
-  outline: none;
-  border-color: #ffadad;
-  background-color: #fffaf9;
-  box-shadow: 0 0 8px rgba(255, 173, 173, 0.3);
-}
-
-/* ================================
-📱 RESPONSIVE
-================================ */
-@media (max-width: 768px) {
-  .edit-grid {
+  .patient-details-page .pd-loading-card {
+    min-height: 260px;
+    background: var(--pd-surface);
+    border: 1px solid var(--pd-border);
+    border-radius: var(--pd-radius-xl);
+    box-shadow: var(--pd-shadow);
+    display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 16px;
   }
 
-  .edit-photo-section {
-    flex-direction: column;
-    gap: 20px;
+  .patient-details-page .pd-spinner {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 4px solid #f4dfe3;
+    border-top-color: var(--pd-primary-deep);
+    animation: pd-spin 0.9s linear infinite;
   }
 
-  .photo-preview {
-    height: 120px;
+  .patient-details-page .pd-loading-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--pd-text-soft);
   }
 
-  .modal-edit-pro {
-    height: auto;
-    max-height: 92vh;
+  @keyframes pd-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
-}
 
-/* ✔️ Ajuste buscador de tratamiento dentro del modal Editar */
-.modal-edit-pro .searchable-select {
-  width: 100% !important;
-  position: relative;
-}
+  /* =========================================================
+    HEADER / ACTIONS
+  ========================================================= */
 
-.modal-edit-pro #editTreatmentInput {
-  width: 100% !important;
-  box-sizing: border-box;
-  border: 1.5px solid #ffd6d6;
-  border-radius: 10px;
-  padding: 10px 14px;
-  background: #fffdf9;
-  font-family: "Poppins", sans-serif;
-  font-size: 15px;
-}
-
-.modal-edit-pro #editTreatmentOptions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  max-height: 180px;
-  overflow-y: auto;
-  border-radius: 10px;
-  border: 1px solid #ffd6d6;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  display: none;
-  z-index: 50;
-}
-
-.modal-edit-pro #editTreatmentOptions div {
-  padding: 10px 12px;
-  cursor: pointer;
-}
-
-.modal-edit-pro #editTreatmentOptions div:hover {
-  background: #fff3c2;
-}
-
-/* =========================
-   PATIENT DETAILS — FIX FINAL
-   ========================= */
-
-.patient-details-page .main-top-actions{
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  width: 100% !important;
-  margin: 0 0 14px 0 !important;
-  padding: 0 !important;
-}
-
-.patient-details-page .main-top-actions .right-actions{
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  margin-left: auto !important;
-  justify-content: flex-end !important;
-}
-
-/* Si algo te los centra, lo matamos */
-.patient-details-page .main-top-actions button{
-  margin: 0 !important;
-}
-
-/* Botones */
-.patient-details-page .btn-back{
-  background: transparent !important;
-  color: #ffadad !important;
-  border: 2px solid #ffadad !important;
-  border-radius: 10px !important;
-  padding: 10px 18px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: 0.3s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-.patient-details-page .btn-back:hover{
-  background: #ffadad !important;
-  color: #fff !important;
-  transform: translateY(-2px) !important;
-}
-
-.patient-details-page .btn-add{
-  background: #ffadad !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 10px !important;
-  padding: 12px 20px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: 0.3s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-.patient-details-page .btn-add:hover{
-  background: #fff3c2 !important;
-  color: #333 !important;
-  transform: translateY(-2px) !important;
-}
-
-/* Tablas */
-.patient-details-page .table-container{
-  border-radius: 10px !important;
-  border: 1px solid rgba(255,173,173,0.3) !important;
-  background: rgba(255,255,255,0.6) !important;
-  width: 100% !important;
-  max-width: 1000px !important;
-  margin: 0 auto !important;
-  overflow: hidden !important;
-}
-
-.patient-details-page table{
-  width: 100% !important;
-  border-collapse: collapse !important;
-  text-align: left !important;
-}
-
-.patient-details-page th,
-.patient-details-page td{
-  padding: 14px 18px !important;
-  border-bottom: 1px solid rgba(255,173,173,0.3) !important;
-}
-
-.patient-details-page th{
-  background: rgba(255,243,194,0.8) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 2 !important;
-}
-
-.patient-details-page tr:hover{
-  background: rgba(255,255,255,0.7) !important;
-}
-
-/* Solo turnos scrolleable */
-.patient-details-page .table-container.table-scroll{
-  max-height: 420px !important;
-  overflow-y: auto !important;
-  scrollbar-width: thin !important;
-  scrollbar-color: #ffadad #fff3c2 !important;
-}
-.patient-details-page .table-container.table-scroll::-webkit-scrollbar{ width: 8px; }
-.patient-details-page .table-container.table-scroll::-webkit-scrollbar-thumb{
-  background-color: #ffadad; border-radius: 4px;
-}
-.patient-details-page .table-container.table-scroll::-webkit-scrollbar-track{
-  background-color: #fff3c2;
-}
-
-@media (max-width: 700px){
-  .patient-details-page .main-top-actions{
-    flex-direction: column !important;
-    align-items: stretch !important;
+  .patient-details-page .main-top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--pd-border);
+    border-radius: 20px;
+    box-shadow: var(--pd-shadow-soft);
   }
-  .patient-details-page .main-top-actions .right-actions{
-    margin-left: 0 !important;
-    justify-content: space-between !important;
+
+  .patient-details-page .right-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
+
   .patient-details-page .btn-back,
-  .patient-details-page .btn-add{
-    width: 100% !important;
-    justify-content: center !important;
+  .patient-details-page .btn-add,
+  .patient-details-page .btn-edit-treatment-save,
+  .patient-details-page .btn-edit-treatment-cancel {
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    font: inherit;
+    transition: all 0.28s ease;
   }
-}
+
+  .patient-details-page .btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 18px;
+    border: 2px solid #ffadad;
+    border-radius: 10px;
+    background: transparent;
+    color: #ffadad;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .patient-details-page .btn-back:hover {
+    background: #ffadad;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  .patient-details-page .btn-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 10px;
+    background: #ffadad;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .patient-details-page .btn-add:hover {
+    background: #fff3c2;
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  .patient-details-page .btn-add:disabled {
+    cursor: not-allowed;
+    opacity: 0.6 !important;
+  }
+
+  .patient-details-page h1#patient-name {
+    margin: 0 0 18px;
+    font-size: clamp(1.9rem, 2.8vw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--pd-title);
+  }
+
+  /* =========================================================
+    GENERIC CARDS / TABLE WRAPPERS
+  ========================================================= */
+
+  .patient-details-page .table-container {
+    background: var(--pd-surface);
+    border: 1px solid var(--pd-border);
+    border-radius: var(--pd-radius-xl);
+    box-shadow: var(--pd-shadow);
+    overflow: hidden;
+  }
+
+  .patient-details-page .table-scroll {
+    overflow-x: auto;
+  }
+
+  .patient-details-page table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  .patient-details-page th,
+  .patient-details-page td {
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .patient-details-page tbody tr + tr {
+    border-top: 1px solid #f5e7e8;
+  }
+
+  /* =========================================================
+    PATIENT INFO TABLE
+  ========================================================= */
+
+  .patient-details-page #patient-info td {
+    padding: 16px 20px;
+    font-size: 0.98rem;
+    color: var(--pd-text);
+  }
+
+  .patient-details-page #patient-info tr td:first-child {
+    width: 240px;
+    font-weight: 700 !important;
+    color: var(--pd-title);
+    background: #fffafb;
+  }
+
+  /* =========================================================
+    SECTION TITLES
+  ========================================================= */
+
+  .patient-details-page h2 {
+    margin: 24px 0 12px;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    color: var(--pd-title);
+  }
+
+  /* =========================================================
+    HOMECARE SECTION
+  ========================================================= */
+
+  .patient-details-page .homecare-section {
+    margin-top: 26px !important;
+  }
+
+  .patient-details-page .homecare-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    margin-bottom: 12px;
+    min-height: 48px;
+  }
+
+  .patient-details-page .homecare-header h2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .patient-details-page .homecare-actions {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .patient-details-page #homecare-empty {
+    background: linear-gradient(180deg, #fffafa 0%, #fff7f8 100%);
+  }
+
+  .patient-details-page #homecare-empty > div {
+    padding: 20px 22px !important;
+  }
+
+  .patient-details-page #homecare-empty strong {
+    display: inline-block;
+    font-size: 1rem;
+    color: var(--pd-title);
+  }
+
+  .patient-details-page #homecare-empty p:last-child {
+    color: var(--pd-text-soft) !important;
+    line-height: 1.6;
+  }
+
+  .patient-details-page #homecare-content .table-container:first-child tbody tr td,
+  .patient-details-page #homecare-content .table-container:first-child tbody tr th {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f6e8e9;
+  }
+
+  .patient-details-page #homecare-content .table-container:first-child tbody tr:last-child td,
+  .patient-details-page #homecare-content .table-container:first-child tbody tr:last-child th {
+    border-bottom: none;
+  }
+
+  .patient-details-page #homecare-content .table-container:first-child th {
+    width: 240px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: var(--pd-title);
+    background: #fffafb;
+  }
+
+  .patient-details-page #homecare-content .table-container:first-child td {
+    color: var(--pd-text);
+    line-height: 1.55;
+  }
+
+  .patient-details-page #homecare-content .table-scroll {
+    margin-top: 14px !important;
+  }
+
+  .patient-details-page #homecare-content .table-scroll {
+    overflow-x: visible;
+  }
+
+  .patient-details-page #homecare-content .table-scroll table {
+    table-layout: fixed;
+  }
+
+  .patient-details-page #homecare-content thead th {
+    padding: 12px 10px;
+    background: linear-gradient(180deg, #fff6f7 0%, #fff1f3 100%);
+    color: #5a4d54;
+    font-size: 0.84rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--pd-border);
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .patient-details-page #homecare-items td {
+    padding: 12px 10px;
+    font-size: 0.88rem;
+    color: var(--pd-text);
+    line-height: 1.35;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .patient-details-page #homecare-items td:nth-child(1) {
+    width: 52px;
+    font-weight: 700;
+    color: var(--pd-title);
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(1),
+  .patient-details-page #homecare-items td:nth-child(1) {
+    width: 10%;
+    min-width: 72px;
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(2),
+  .patient-details-page #homecare-items td:nth-child(2) {
+    width: 16%;
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(3),
+  .patient-details-page #homecare-items td:nth-child(3) {
+    width: 26%;
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(4),
+  .patient-details-page #homecare-items td:nth-child(4) {
+    width: 26%;
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(5),
+  .patient-details-page #homecare-items td:nth-child(5) {
+    width: 22%;
+  }
+
+  .patient-details-page #homecare-content thead th:nth-child(1) {
+    white-space: nowrap;
+    word-break: normal;
+  }
+
+  .patient-details-page #homecare-items tr:hover {
+    background: #fffafb;
+  }
+
+  /* =========================================================
+    LAST APPOINTMENTS TABLE
+  ========================================================= */
+
+  .patient-details-page #patient-appointments thead th {
+    padding: 15px 18px;
+    background: linear-gradient(180deg, #fff6f7 0%, #fff1f3 100%);
+    color: #5a4d54;
+    font-size: 0.92rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--pd-border);
+    white-space: nowrap;
+  }
+
+  .patient-details-page #patient-appointments td {
+    padding: 16px 18px;
+    font-size: 0.96rem;
+    color: var(--pd-text);
+    line-height: 1.45;
+  }
+
+  .patient-details-page #patient-appointments tr:hover {
+    background: #fffafb;
+  }
+
+  /* =========================================================
+    MODAL
+  ========================================================= */
+
+  .patient-details-page .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(64, 52, 59, 0.34);
+    backdrop-filter: blur(8px);
+  }
+
+  .patient-details-page .modal-overlay.active {
+    display: flex;
+  }
+
+  .patient-details-page .modal-box {
+    width: min(1100px, 100%);
+    max-height: min(88vh, 920px);
+    overflow: auto;
+    background: linear-gradient(180deg, #fffdfd 0%, #fff8f8 100%);
+    border: 1px solid rgba(232, 202, 202, 0.9);
+    border-radius: 28px;
+    box-shadow: 0 28px 70px rgba(109, 80, 89, 0.18);
+    padding: 28px 28px 24px;
+    position: relative;
+  }
+
+  .patient-details-page .modal-edit-pro {
+    width: min(1100px, 100%);
+  }
+
+  .patient-details-page .modal-box h2 {
+    margin: 0 0 20px;
+    padding-right: 42px;
+    font-size: 1.45rem;
+    color: var(--pd-title);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .patient-details-page .modal-box .close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--pd-border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--pd-text);
+    font-size: 1.55rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--pd-shadow-soft);
+  }
+
+  .patient-details-page .modal-box .close-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--pd-border-strong);
+  }
+
+  /* =========================================================
+    FORM LAYOUT
+  ========================================================= */
+
+  .patient-details-page .homecare-form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .patient-details-page .homecare-main-card,
+  .patient-details-page .homecare-steps-card {
+    width: 100%;
+  }
+
+  .patient-details-page .homecare-card-title {
+    margin: 0 0 16px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--pd-title);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .patient-details-page .homecare-steps-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .patient-details-page .homecare-steps-header .homecare-card-title {
+    margin: 0;
+  }
+
+  .patient-details-page .homecare-form-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .patient-details-page .edit-column {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #f2dfdf;
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .patient-details-page .edit-column label {
+    display: block;
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--pd-title);
+  }
+
+  .patient-details-page .edit-column label:not(:first-child) {
+    margin-top: 14px;
+  }
+
+  .patient-details-page .edit-column input,
+  .patient-details-page .edit-column select,
+  .patient-details-page .edit-column textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ead4d7;
+    background: #fff;
+    color: var(--pd-text);
+    border-radius: 14px;
+    padding: 13px 14px;
+    font: inherit;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .patient-details-page .edit-column input:focus,
+  .patient-details-page .edit-column select:focus,
+  .patient-details-page .edit-column textarea:focus {
+    outline: none;
+    border-color: var(--pd-primary-deep);
+    box-shadow: 0 0 0 4px rgba(225, 171, 180, 0.16);
+    background: #fffefe;
+  }
+
+  .patient-details-page .edit-column textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  /* =========================================================
+    HOMECARE FORM ITEMS
+  ========================================================= */
+
+  .patient-details-page .homecare-steps-empty {
+    padding: 14px;
+    border: 1px dashed #e7cfd3;
+    border-radius: 14px;
+    color: #7d7077;
+    background: #fffafa;
+  }
+
+  .patient-details-page .homecare-step-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .patient-details-page .homecare-step-card {
+    background: linear-gradient(180deg, #fffdfd 0%, #fff7f8 100%);
+    border: 1px solid #efd9dc !important;
+    border-radius: 18px !important;
+    padding: 16px !important;
+    margin-bottom: 0 !important;
+    box-shadow: var(--pd-shadow-soft);
+  }
+
+  .patient-details-page .homecare-step-card strong {
+    font-size: 1rem;
+    color: var(--pd-title);
+  }
+
+  .patient-details-page .homecare-remove-item-btn {
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #ebd0d5;
+    color: #7b5b63;
+    font-weight: 700;
+  }
+
+  .patient-details-page .homecare-remove-item-btn:hover {
+    transform: translateY(-1px);
+    border-color: #dfbcc3;
+    background: #fff6f7;
+  }
+
+  /* =========================================================
+    MODAL ACTIONS
+  ========================================================= */
+
+  .patient-details-page .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .patient-details-page .edit-treatment-actions {
+    padding-top: 6px;
+  }
+
+  .patient-details-page .btn-edit-treatment-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 10px;
+    background: #ffadad;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .patient-details-page .btn-edit-treatment-save:hover {
+    background: #fff3c2;
+    color: #333;
+    transform: translateY(-2px);
+  }
+
+  .patient-details-page .btn-edit-treatment-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 20px;
+    border: 2px solid #ffadad;
+    border-radius: 10px;
+    background: transparent;
+    color: #ffadad;
+    font-weight: 600;
+    box-shadow: none;
+  }
+
+  .patient-details-page .btn-edit-treatment-cancel:hover {
+    background: #ffadad;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+
+  /* =========================================================
+    RESPONSIVE
+  ========================================================= */
+
+  @media (max-width: 980px) {
+    .patient-details-page main {
+      padding: 22px 16px 34px;
+    }
+
+    .patient-details-page .main-top-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .patient-details-page .right-actions {
+      width: 100%;
+    }
+
+    .patient-details-page .right-actions .btn-add,
+    .patient-details-page .btn-back {
+      width: 100%;
+    }
+
+    .patient-details-page .homecare-header {
+      position: static;
+      flex-direction: column;
+      align-items: stretch;
+      min-height: auto;
+    }
+
+    .patient-details-page .homecare-header h2 {
+      position: static;
+      transform: none;
+      text-align: center;
+      white-space: normal;
+    }
+
+    .patient-details-page .homecare-actions {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .patient-details-page .homecare-actions .btn-add {
+      width: 100%;
+    }
+
+    .patient-details-page .modal-box {
+      padding: 24px 18px 20px;
+      max-height: 90vh;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .patient-details-page main {
+      padding: 18px 12px 26px;
+    }
+
+    .patient-details-page h1#patient-name {
+      font-size: 1.65rem;
+      margin-bottom: 14px;
+    }
+
+    .patient-details-page .main-top-actions {
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+    }
+
+    .patient-details-page .table-container {
+      border-radius: 18px;
+    }
+
+    .patient-details-page #patient-info td,
+    .patient-details-page #homecare-content .table-container:first-child th,
+    .patient-details-page #homecare-content .table-container:first-child td,
+    .patient-details-page #patient-appointments th,
+    .patient-details-page #patient-appointments td,
+    .patient-details-page #homecare-content thead th,
+    .patient-details-page #homecare-items td {
+      padding: 14px 14px;
+    }
+
+    .patient-details-page #patient-info tr td:first-child,
+    .patient-details-page #homecare-content .table-container:first-child th {
+      width: 160px;
+    }
+
+    .patient-details-page .modal-overlay {
+      padding: 10px;
+    }
+
+    .patient-details-page .modal-box {
+      border-radius: 22px;
+      padding: 20px 14px 16px;
+    }
+
+    .patient-details-page .edit-column {
+      padding: 16px;
+      border-radius: 18px;
+    }
+
+    .patient-details-page .modal-actions {
+      flex-direction: column;
+    }
+
+    .patient-details-page .btn-edit-treatment-save,
+    .patient-details-page .btn-edit-treatment-cancel {
+      width: 100%;
+    }
+  }

@@ -16,6 +16,9 @@ router.post("/", authenticate, controller.create);
 // Actualizar paciente
 router.put("/:id", authenticate, controller.update);
 
+// Guardar rutina domiciliaria
+router.put("/:id/homecare", authenticate, controller.saveHomeCare);
+
 // Eliminar paciente
 router.delete("/:id", authenticate, controller.remove);
 
