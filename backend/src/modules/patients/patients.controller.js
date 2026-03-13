@@ -11,14 +11,19 @@ export const getAll = async (req, res, next) => {
 };
 
 export const getById = async (req, res, next) => {
-    try {
-        const userId = req.user.id;
-        const id = Number(req.params.id);
-        const patient = await service.getById(userId, id);
-        res.json(patient);
-    } catch (err) {
-        next(err);
+  try {
+    const userId = req.user.id;
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ message: "ID de paciente inválido" });
     }
+
+    const patient = await service.getById(userId, id);
+    res.json(patient);
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const create = async (req, res, next) => {
