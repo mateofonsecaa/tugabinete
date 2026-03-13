@@ -4,7 +4,9 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
