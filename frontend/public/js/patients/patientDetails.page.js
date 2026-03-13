@@ -351,9 +351,15 @@ async function onSaveHomeCare(e) {
     const saved = await res.json().catch(() => null);
 
     if (!res.ok) {
+      console.error("PUT /patients/:id/homecare failed", {
+        status: res.status,
+        patientId: currentPatientId,
+        body: saved,
+        payload,
+      });
+
       throw new Error(saved?.error || saved?.message || "No se pudo guardar la rutina.");
     }
-
     currentHomeCarePlan = saved;
 
     closeHomeCareModal();

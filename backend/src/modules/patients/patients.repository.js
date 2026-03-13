@@ -50,6 +50,13 @@ export const getById = async (userId, id) => {
     include: {
       appointments: {
         orderBy: { date: "desc" }
+      },
+      homeCarePlan: {
+        include: {
+          items: {
+            orderBy: { stepOrder: "asc" }
+          }
+        }
       }
     }
   });
@@ -64,102 +71,113 @@ export const getById = async (userId, id) => {
 };
 
 export const saveHomeCare = async (userId, patientId, data) => {
-  const patient = await prisma.patient.findFirst({
-    where: { id: patientId, userId },
-    select: { id: true }
-  });
-
-  if (!patient) {
-    throw new Error("Paciente no encontrado");
-  }
-
-  const title = cleanString(data?.title);
-  const objective = cleanString(data?.objective);
-  const status = cleanString(data?.status) || "Activa";
-  const generalNotes = cleanString(data?.generalNotes);
-  const startDate = parseOptionalDate(data?.startDate, "La fecha de inicio");
-  const endDate = parseOptionalDate(data?.endDate, "La fecha de fin");
-
-  if (startDate && endDate && endDate < startDate) {
-    throw new Error("La fecha de fin no puede ser anterior a la fecha de inicio");
-  }
-
-  if (!title) {
-    throw new Error("El nombre de la rutina es obligatorio");
-  }
-
-  const rawItems = Array.isArray(data?.items) ? data.items : [];
-
-  const items = rawItems
-    .map((item, index) => {
-      const action = cleanString(item?.action);
-      if (!action) return null;
-
-      const stepOrder = Number(item?.stepOrder);
-      return {
-        stepOrder: Number.isInteger(stepOrder) && stepOrder > 0 ? stepOrder : index + 1,
-        moment: cleanString(item?.moment),
-        action,
-        product: cleanString(item?.product),
-        frequency: cleanString(item?.frequency),
-        instructions: cleanString(item?.instructions),
-        duration: cleanString(item?.duration),
-        notes: cleanString(item?.notes),
-      };
-    })
-    .filter(Boolean);
-
-  return prisma.$transaction(async (tx) => {
-    const plan = await tx.homeCarePlan.upsert({
-      where: { patientId },
-      update: {
-        title,
-        objective,
-        startDate,
-        endDate,
-        status,
-        generalNotes,
-      },
-      create: {
-        patientId,
-        title,
-        objective,
-        startDate,
-        endDate,
-        status,
-        generalNotes,
-      }
+  try {
+    const patient = await prisma.patient.findFirst({
+      where: { id: patientId, userId },
+      select: { id: true }
     });
 
-    await tx.homeCarePlanItem.deleteMany({
-      where: { planId: plan.id }
-    });
+    if (!patient) {
+      throw new Error("Paciente no encontrado");
+    }
 
-    if (items.length) {
-    await tx.homeCarePlanItem.createMany({
-      data: items.map((item) => ({
-        planId: plan.id,
-        stepOrder: item.stepOrder,
-        moment: item.moment,
-        action: item.action,
-        product: item.product,
-        frequency: item.frequency,
-        instructions: item.instructions,
-        duration: item.duration,
-        notes: item.notes,
-      }))
-    });
-  }
+    const title = cleanString(data?.title);
+    const objective = cleanString(data?.objective);
+    const status = cleanString(data?.status) || "Activa";
+    const generalNotes = cleanString(data?.generalNotes);
+    const startDate = parseOptionalDate(data?.startDate, "La fecha de inicio");
+    const endDate = parseOptionalDate(data?.endDate, "La fecha de fin");
 
-    return tx.homeCarePlan.findUnique({
-      where: { id: plan.id },
-      include: {
-        items: {
-          orderBy: { stepOrder: "asc" }
+    if (startDate && endDate && endDate < startDate) {
+      throw new Error("La fecha de fin no puede ser anterior a la fecha de inicio");
+    }
+
+    if (!title) {
+      throw new Error("El nombre de la rutina es obligatorio");
+    }
+
+    const rawItems = Array.isArray(data?.items) ? data.items : [];
+
+    const items = rawItems
+      .map((item, index) => {
+        const action = cleanString(item?.action);
+        if (!action) return null;
+
+        const stepOrder = Number(item?.stepOrder);
+        return {
+          stepOrder: Number.isInteger(stepOrder) && stepOrder > 0 ? stepOrder : index + 1,
+          moment: cleanString(item?.moment),
+          action,
+          product: cleanString(item?.product),
+          frequency: cleanString(item?.frequency),
+          instructions: cleanString(item?.instructions),
+          duration: cleanString(item?.duration),
+          notes: cleanString(item?.notes),
+        };
+      })
+      .filter(Boolean);
+
+    return prisma.$transaction(async (tx) => {
+      const plan = await tx.homeCarePlan.upsert({
+        where: { patientId },
+        update: {
+          title,
+          objective,
+          startDate,
+          endDate,
+          status,
+          generalNotes,
+        },
+        create: {
+          patientId,
+          title,
+          objective,
+          startDate,
+          endDate,
+          status,
+          generalNotes,
         }
+      });
+
+      await tx.homeCarePlanItem.deleteMany({
+        where: { planId: plan.id }
+      });
+
+      if (items.length) {
+        await tx.homeCarePlanItem.createMany({
+          data: items.map((item) => ({
+            planId: plan.id,
+            stepOrder: item.stepOrder,
+            moment: item.moment,
+            action: item.action,
+            product: item.product,
+            frequency: item.frequency,
+            instructions: item.instructions,
+            duration: item.duration,
+            notes: item.notes,
+          }))
+        });
       }
+
+      return tx.homeCarePlan.findUnique({
+        where: { id: plan.id },
+        include: {
+          items: {
+            orderBy: { stepOrder: "asc" }
+          }
+        }
+      });
     });
-  });
+  } catch (err) {
+    console.error("patients.saveHomeCare failed", {
+      userId,
+      patientId,
+      data,
+      message: err.message,
+      stack: err.stack,
+    });
+    throw err;
+  }
 };
 
 export const create = (userId, data) => {
