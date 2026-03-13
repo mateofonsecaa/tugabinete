@@ -44,22 +44,23 @@ export const getAll = async (userId) => {
   }));
 };
 
-export const getById = (userId, id) => {
-  return prisma.patient.findFirst({
+export const getById = async (userId, id) => {
+  const patient = await prisma.patient.findFirst({
     where: { id, userId },
     include: {
-      appointments: { orderBy: { date: "desc" } },
-      interview: true,
-      observation: true,
-      homeCarePlan: {
-        include: {
-          items: {
-            orderBy: { stepOrder: "asc" }
-          }
-        }
+      appointments: {
+        orderBy: { date: "desc" }
       }
     }
   });
+
+  if (!patient) {
+    const err = new Error("Paciente no encontrado");
+    err.status = 404;
+    throw err;
+  }
+
+  return patient;
 };
 
 export const saveHomeCare = async (userId, patientId, data) => {
