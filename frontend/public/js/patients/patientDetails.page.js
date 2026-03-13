@@ -485,17 +485,24 @@ async function loadPatient(id) {
 
   try {
     const res = await api.getPatientById(id);
-    if (!res.ok) throw new Error("No se pudo cargar el paciente");
+    const data = await res.json().catch(() => null);
 
-    const p = await res.json();
+    if (!res.ok) {
+      console.error("Error response GET /patients/:id", {
+        status: res.status,
+        body: data,
+        patientId: id,
+      });
+      throw new Error(data?.error || data?.message || "No se pudo cargar el paciente");
+    }
+
+    const p = data;
 
     currentPatientId = p.id;
     currentHomeCarePlan = p.homeCarePlan || null;
 
-    // Header
     document.getElementById("patient-name").textContent = p.fullName || "Paciente";
 
-    // Datos personales
     const info = document.getElementById("patient-info");
     info.innerHTML = [
       row("Teléfono", p.phone || "-"),
@@ -505,10 +512,8 @@ async function loadPatient(id) {
       row("Profesión", p.profession || "-"),
     ].join("");
 
-    // Rutina en casa
     renderHomeCare(p.homeCarePlan || null);
 
-    // Turnos (últimos 10)
     const ap = document.getElementById("patient-appointments");
     const list = Array.isArray(p.appointments) ? p.appointments.slice(0, 10) : [];
 
@@ -528,6 +533,8 @@ async function loadPatient(id) {
     if (content) content.hidden = false;
 
   } catch (err) {
+    console.error("loadPatient failed", { patientId: id, error: err });
+
     const txt = document.querySelector("#pd-loading .pd-loading-text");
     if (txt) txt.textContent = "Error al cargar";
 
