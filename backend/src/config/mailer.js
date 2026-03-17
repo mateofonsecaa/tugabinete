@@ -7,3 +7,14 @@ export const mailer = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+console.log("📨 EMAIL_USER:", process.env.EMAIL_USER);
+console.log("📨 EMAIL_PASS cargado:", !!process.env.EMAIL_PASS);
+
+mailer.verify((err, success) => {
+  if (err) {
+    console.error("Mailer verify error:", err);
+  } else {
+    console.log("Mailer listo para enviar correos");
+  }
+});

@@ -10,10 +10,15 @@ export const findUserByEmail = (email) => {
     return prisma.user.findUnique({ where: { email } });
 };
 
-export const createVerificationToken = (userId, token) => {
-    return prisma.verificationToken.create({
-        data: { userId, token, createdAt: new Date() },
-    });
+export const createVerificationToken = (userId, token, expiresAt) => {
+  return prisma.verificationToken.create({
+    data: {
+      userId,
+      token,
+      createdAt: new Date(),
+      expiresAt,
+    },
+  });
 };
 
 export const findVerificationToken = (token) => {
@@ -43,5 +48,18 @@ export const updateUser = (id, data) => {
   return prisma.user.update({
     where: { id },
     data,
+  });
+};
+
+export const findVerificationTokenWithUser = (token) => {
+  return prisma.verificationToken.findUnique({
+    where: { token },
+    include: { user: true },
+  });
+};
+
+export const deleteUserById = (id) => {
+  return prisma.user.delete({
+    where: { id },
   });
 };

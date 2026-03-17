@@ -12,6 +12,7 @@ export const register = async (req, res, next) => {
     const result = await service.register(req.body);
     res.json(result);
   } catch (err) {
+    console.error("register error:", err);
     next(err);
   }
 };

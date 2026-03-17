@@ -9,22 +9,25 @@ export const register = async (data) => {
   const { name, email, password } = data;
 
   const hashed = await bcrypt.hash(password, 10);
+
   const user = await repo.createUser({
     name,
     email,
     password: hashed,
   });
 
-  const token = crypto.randomBytes(32).toString("hex");
-  await repo.createVerificationToken(user.id, token);
+  try {
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    await repo.createVerificationToken(user.id, token, expiresAt);
 
-  const verifyUrl = `${process.env.BASE_URL}/api/auth/verify/${token}`;
+    const verifyUrl = `${process.env.BASE_URL}/api/auth/verify/${token}`;
 
-  const subject = "Confirmá tu correo para activar TuGabinete";
-  const preheader =
-    "Un último paso: verificá tu cuenta para empezar a usar TuGabinete.";
+    const subject = "Confirmá tu correo para activar TuGabinete";
+    const preheader =
+      "Un último paso: verificá tu cuenta para empezar a usar TuGabinete.";
 
-  const html = `
+    const html = `
 <!doctype html>
 <html lang="es">
   <head>
@@ -33,7 +36,6 @@ export const register = async (data) => {
     <title>${subject}</title>
   </head>
   <body style="margin:0;padding:0;background:#fff7f7;">
-    <!-- Preheader (texto oculto que se ve en la bandeja) -->
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
       ${preheader}
     </div>
@@ -42,8 +44,6 @@ export const register = async (data) => {
       <tr>
         <td align="center">
           <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,0.08);">
-            
-            <!-- Header -->
             <tr>
               <td style="padding:22px 26px;background:linear-gradient(135deg,#ffadad 0%, #ffd6d6 100%);">
                 <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#ffffff;font-weight:700;font-size:20px;letter-spacing:0.2px;">
@@ -55,7 +55,6 @@ export const register = async (data) => {
               </td>
             </tr>
 
-            <!-- Body -->
             <tr>
               <td style="padding:28px 26px 10px 26px;">
                 <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#111827;font-size:18px;font-weight:700;line-height:1.35;">
@@ -67,7 +66,6 @@ export const register = async (data) => {
                   confirmá tu correo haciendo clic en el botón:
                 </div>
 
-                <!-- CTA -->
                 <div style="text-align:center;margin:20px 0 18px 0;">
                   <a href="${verifyUrl}"
                      style="display:inline-block;background:#ffadad;color:#ffffff;text-decoration:none;
@@ -88,12 +86,12 @@ export const register = async (data) => {
                 <hr style="border:none;border-top:1px solid #f1f5f9;margin:18px 0;" />
 
                 <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#6b7280;font-size:12.5px;line-height:1.6;">
+                  Este enlace vence en 2 horas.<br/>
                   Si vos no creaste una cuenta en TuGabinete, podés ignorar este correo con tranquilidad.
                 </div>
               </td>
             </tr>
 
-            <!-- Footer -->
             <tr>
               <td style="padding:16px 26px 22px 26px;background:#ffffff;">
                 <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#9ca3af;font-size:11.5px;line-height:1.6;">
@@ -105,7 +103,6 @@ export const register = async (data) => {
 
           </table>
 
-          <!-- Outer small note -->
           <div style="max-width:560px;margin-top:14px;font-family:Poppins, Arial, Helvetica, sans-serif;color:#9ca3af;font-size:11.5px;line-height:1.5;text-align:center;">
             ¿Necesitás ayuda? Respondé este correo o escribinos desde la sección de soporte dentro de TuGabinete.
           </div>
@@ -116,7 +113,7 @@ export const register = async (data) => {
 </html>
 `;
 
-  const text = `
+const text = `
 TuGabinete - Verificación de cuenta
 
 Hola, ${name}!
@@ -125,18 +122,24 @@ Gracias por registrarte en TuGabinete.
 Para activar tu cuenta, abrí este enlace:
 ${verifyUrl}
 
+Este enlace vence en 2 horas.
+
 Si vos no creaste una cuenta, podés ignorar este correo.
 `;
 
-  await mailer.sendMail({
-    from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject,
-    text,
-    html,
-  });
+    await mailer.sendMail({
+      from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject,
+      text,
+      html,
+    });
 
-  return { message: "Correo de verificación enviado." };
+    return { message: "Correo de verificación enviado." };
+  } catch (err) {
+    await repo.deleteUserById(user.id);
+    throw err;
+  }
 };
 
 export const login = async (data) => {
@@ -163,8 +166,27 @@ export const login = async (data) => {
 };
 
 export const verifyEmail = async (token) => {
-  const record = await repo.findVerificationToken(token);
-  if (!record) throw new Error("Token inválido o expirado");
+  const record = await repo.findVerificationTokenWithUser(token);
+
+  if (!record) {
+    return {
+      redirectUrl: `${process.env.FRONTEND_URL}/verify?status=invalid`,
+    };
+  }
+
+  const now = new Date();
+
+  if (now > new Date(record.expiresAt)) {
+    await repo.deleteVerificationToken(token);
+
+    if (record.user && !record.user.isVerified) {
+      await repo.deleteUserById(record.user.id);
+    }
+
+    return {
+      redirectUrl: `${process.env.FRONTEND_URL}/verify?status=expired`,
+    };
+  }
 
   await repo.verifyUser(record.userId);
   await repo.deleteVerificationToken(token);
