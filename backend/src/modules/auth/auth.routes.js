@@ -6,6 +6,7 @@ import upload from "../../core/middlewares/upload.js";
 const router = Router();
 
 router.post("/register", controller.register);
+router.post("/resend-verification", controller.resendVerification);
 router.post("/login", controller.login);
 router.get("/verify/:token", controller.verifyEmail);
 
@@ -16,7 +17,7 @@ router.get("/me", verifyToken, controller.me);
 router.put(
   "/edit-profile",
   verifyToken,
-  upload.single("profileImage"), // Multer en memoria
+  upload.single("profileImage"),
   controller.updateProfile
 );
 

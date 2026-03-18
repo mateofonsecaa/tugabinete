@@ -10,9 +10,22 @@ import { uploadToSupabase } from "../../core/utils/upload.js";
 export const register = async (req, res, next) => {
   try {
     const result = await service.register(req.body);
-    res.json(result);
+    return res.status(result.status ?? 200).json(result);
   } catch (err) {
     console.error("register error:", err);
+    next(err);
+  }
+};
+
+// ======================================================
+// RESEND VERIFICATION
+// ======================================================
+export const resendVerification = async (req, res, next) => {
+  try {
+    const result = await service.resendVerification(req.body);
+    return res.status(result.status ?? 200).json(result);
+  } catch (err) {
+    console.error("resendVerification error:", err);
     next(err);
   }
 };
@@ -36,8 +49,7 @@ export const verifyEmail = async (req, res, next) => {
   try {
     const token = req.params.token;
     const result = await service.verifyEmail(token);
-    const redirectUrl = "https://www.tugabinete.com/verify?status=success";
-    res.redirect(result.redirectUrl);
+    return res.redirect(result.redirectUrl);
   } catch (err) {
     next(err);
   }
@@ -62,7 +74,6 @@ export const me = async (req, res) => {
       phone: user.phone,
       profileImage: user.profileImage,
     });
-
   } catch (err) {
     return res.status(500).json({ message: "Error obteniendo usuario actual" });
   }
@@ -81,7 +92,6 @@ export const updateProfile = async (req, res) => {
       phone,
     };
 
-    // Si viene imagen => subir a Supabase
     if (req.file) {
       const buffer = req.file.buffer;
       const originalName = req.file.originalname;
@@ -89,7 +99,7 @@ export const updateProfile = async (req, res) => {
       const publicUrl = await uploadToSupabase(
         buffer,
         originalName,
-        "profile" // carpeta dentro del bucket
+        "profile"
       );
 
       data.profileImage = publicUrl;
@@ -101,13 +111,11 @@ export const updateProfile = async (req, res) => {
       message: "Perfil actualizado correctamente",
       user: updated,
     });
-
-    } catch (err) {
-    console.error("❌ updateProfile error:", err); // <-- clave
+  } catch (err) {
+    console.error("❌ updateProfile error:", err);
     return res.status(500).json({
       message: "No se pudo actualizar el perfil",
       error: err.message,
     });
   }
-
 };

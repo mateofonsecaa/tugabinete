@@ -1,55 +1,36 @@
-// auth.service.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import * as repo from "./auth.repository.js";
 import { mailer } from "../../config/mailer.js";
 
-export const register = async (data) => {
-  const { name, email, password } = data;
+const VERIFICATION_TTL_MINUTES = 15;
 
-  console.log("1) register start:", email);
+const normalizeEmail = (email = "") => String(email).trim().toLowerCase();
 
-  const existingUser = await repo.findUserByEmail(email);
-  console.log("2) existing user:", !!existingUser);
+const buildVerifyUrl = (token) =>
+  `${process.env.BASE_URL}/api/auth/verify/${token}`;
 
-  if (existingUser) {
-    if (existingUser.isVerified) {
-      throw new Error("Ya existe una cuenta registrada con este correo.");
-    }
+async function issueFreshVerificationToken(userId) {
+  await repo.deleteVerificationTokensByUserId(userId);
 
-    console.log("3) existing user not verified, deleting old user:", existingUser.id);
-    await repo.deleteVerificationTokensByUserId(existingUser.id);
-    await repo.deleteUserById(existingUser.id);
-    console.log("4) old unverified user deleted");
-  }
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(
+    Date.now() + VERIFICATION_TTL_MINUTES * 60 * 1000
+  );
 
-  const hashed = await bcrypt.hash(password, 10);
-  console.log("5) password hashed");
+  await repo.createVerificationToken(userId, token, expiresAt);
 
-  const user = await repo.createUser({
-    name,
-    email,
-    password: hashed,
-  });
-  console.log("6) user created:", user.id);
+  return { token, expiresAt };
+}
 
-  try {
-    const token = crypto.randomBytes(32).toString("hex");
-    console.log("7) token generated");
+async function sendVerificationEmail({ name, email, token }) {
+  const verifyUrl = buildVerifyUrl(token);
+  const subject = "Confirmá tu correo para activar TuGabinete";
+  const preheader =
+    "Un último paso: verificá tu cuenta para empezar a usar TuGabinete.";
 
-    const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
-    await repo.createVerificationToken(user.id, token, expiresAt);
-    console.log("8) verification token created");
-
-    const verifyUrl = `${process.env.BASE_URL}/api/auth/verify/${token}`;
-    console.log("9) verify url built");
-
-    const subject = "Confirmá tu correo para activar TuGabinete";
-    const preheader =
-      "Un último paso: verificá tu cuenta para empezar a usar TuGabinete.";
-
-    const html = `
+  const html = `
 <!doctype html>
 <html lang="es">
   <head>
@@ -108,7 +89,7 @@ export const register = async (data) => {
                 <hr style="border:none;border-top:1px solid #f1f5f9;margin:18px 0;" />
 
                 <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#6b7280;font-size:12.5px;line-height:1.6;">
-                  Este enlace vence en 2 horas.<br/>
+                  Este enlace vence en ${VERIFICATION_TTL_MINUTES} minutos.<br/>
                   Si vos no creaste una cuenta en TuGabinete, podés ignorar este correo con tranquilidad.
                 </div>
               </td>
@@ -135,7 +116,7 @@ export const register = async (data) => {
 </html>
 `;
 
-    const text = `
+  const text = `
 TuGabinete - Verificación de cuenta
 
 Hola, ${name}!
@@ -144,32 +125,169 @@ Gracias por registrarte en TuGabinete.
 Para activar tu cuenta, abrí este enlace:
 ${verifyUrl}
 
-Este enlace vence en 2 horas.
+Este enlace vence en ${VERIFICATION_TTL_MINUTES} minutos.
 
 Si vos no creaste una cuenta, podés ignorar este correo.
 `;
 
-    console.log("10) before sendMail");
-    await mailer.sendMail({
-      from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject,
-      text,
-      html,
-    });
-    console.log("11) after sendMail");
+  await mailer.sendMail({
+    from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject,
+    text,
+    html,
+  });
+}
 
-    return { message: "Correo de verificación enviado." };
-  } catch (err) {
-    console.error("❌ register catch:", err);
-    await repo.deleteVerificationTokensByUserId(user.id);
-    await repo.deleteUserById(user.id);
-    throw err;
+export const register = async (data) => {
+  const name = String(data.name ?? "").trim();
+  const email = normalizeEmail(data.email);
+  const password = data.password;
+
+  console.log("1) register start:", email);
+
+  const existingUser = await repo.findUserByEmail(email);
+  console.log("2) existing user:", !!existingUser);
+
+  if (existingUser?.isVerified) {
+    return {
+      status: 409,
+      ok: false,
+      code: "EMAIL_ALREADY_REGISTERED",
+      message: "Ya existe una cuenta registrada con este correo.",
+    };
   }
+
+  const hashed = await bcrypt.hash(password, 10);
+  console.log("3) password hashed");
+
+  let user;
+  let status;
+  let code;
+  let message;
+
+  if (existingUser) {
+    console.log(
+      "4) existing user not verified, refreshing pending registration:",
+      existingUser.id
+    );
+
+    user = await repo.updateUser(existingUser.id, {
+      name,
+      email,
+      password: hashed,
+      isVerified: false,
+    });
+
+    status = 200;
+    code = "EMAIL_ALREADY_PENDING_VERIFICATION";
+    message =
+      "Tu cuenta ya existe pero todavía no fue verificada. Te reenviamos el correo.";
+  } else {
+    user = await repo.createUser({
+      name,
+      email,
+      password: hashed,
+    });
+
+    console.log("5) user created:", user.id);
+
+    status = 201;
+    code = "VERIFY_EMAIL_SENT";
+    message = "Correo de verificación enviado.";
+  }
+
+  const { token } = await issueFreshVerificationToken(user.id);
+  console.log("6) fresh verification token created");
+
+  try {
+    console.log("7) before sendMail");
+    await sendVerificationEmail({
+      name: user.name,
+      email: user.email,
+      token,
+    });
+    console.log("8) after sendMail");
+  } catch (err) {
+    console.error("❌ register mail error:", err);
+
+    return {
+      status: 503,
+      ok: false,
+      code: "MAIL_SEND_FAILED",
+      message:
+        "No pudimos enviar el correo de verificación. Intentá nuevamente en unos minutos.",
+      email: user.email,
+    };
+  }
+
+  return {
+    status,
+    ok: true,
+    code,
+    message,
+    email: user.email,
+    expiresInMinutes: VERIFICATION_TTL_MINUTES,
+  };
+};
+
+export const resendVerification = async (data) => {
+  const email = normalizeEmail(data.email);
+
+  const user = await repo.findUserByEmail(email);
+
+  if (!user) {
+    return {
+      status: 404,
+      ok: false,
+      code: "PENDING_ACCOUNT_NOT_FOUND",
+      message: "No existe una cuenta pendiente con ese correo.",
+    };
+  }
+
+  if (user.isVerified) {
+    return {
+      status: 409,
+      ok: false,
+      code: "EMAIL_ALREADY_VERIFIED",
+      message: "Esa cuenta ya fue verificada. Iniciá sesión.",
+    };
+  }
+
+  const { token } = await issueFreshVerificationToken(user.id);
+
+  try {
+    await sendVerificationEmail({
+      name: user.name,
+      email: user.email,
+      token,
+    });
+  } catch (err) {
+    console.error("❌ resendVerification mail error:", err);
+
+    return {
+      status: 503,
+      ok: false,
+      code: "MAIL_SEND_FAILED",
+      message:
+        "No pudimos reenviar el correo de verificación. Intentá nuevamente en unos minutos.",
+      email: user.email,
+    };
+  }
+
+  return {
+    status: 200,
+    ok: true,
+    code: "VERIFICATION_EMAIL_RESENT",
+    message: "Te reenviamos el correo de verificación.",
+    email: user.email,
+    expiresInMinutes: VERIFICATION_TTL_MINUTES,
+  };
 };
 
 export const login = async (data) => {
-  const { email, password } = data;
+  const email = normalizeEmail(data.email);
+  const { password } = data;
 
   const user = await repo.findUserByEmail(email);
   if (!user) throw new Error("Usuario no encontrado");
@@ -205,17 +323,13 @@ export const verifyEmail = async (token) => {
   if (now > new Date(record.expiresAt)) {
     await repo.deleteVerificationToken(token);
 
-    if (record.user && !record.user.isVerified) {
-      await repo.deleteUserById(record.user.id);
-    }
-
     return {
       redirectUrl: `${process.env.FRONTEND_URL}/verify?status=expired`,
     };
   }
 
   await repo.verifyUser(record.userId);
-  await repo.deleteVerificationToken(token);
+  await repo.deleteVerificationTokensByUserId(record.userId);
 
   return {
     redirectUrl: `${process.env.FRONTEND_URL}/verify?status=success`,
