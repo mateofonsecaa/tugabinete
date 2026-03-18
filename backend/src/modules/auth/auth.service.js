@@ -131,7 +131,6 @@ Si vos no creaste una cuenta, podés ignorar este correo.
 `;
 
   await mailer.sendMail({
-    from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
     to: email,
     subject,
     text,
