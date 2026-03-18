@@ -63,3 +63,9 @@ export const deleteUserById = (id) => {
     where: { id },
   });
 };
+
+export const deleteVerificationTokensByUserId = (userId) => {
+  return prisma.verificationToken.deleteMany({
+    where: { userId },
+  });
+};

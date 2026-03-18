@@ -74,7 +74,7 @@ export function startCleanupExpiredUnverifiedUsersJob() {
     }
   );
 
-  console.log("🕒 Cron de limpieza iniciado: cada hora");
+  console.log("🕒 Cron de limpieza iniciado: cada media hora");
 
   cleanupExpiredUnverifiedUsers().catch((err) => {
     console.error("❌ Initial cleanup error:", err);

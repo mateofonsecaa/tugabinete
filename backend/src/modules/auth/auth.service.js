@@ -8,20 +8,42 @@ import { mailer } from "../../config/mailer.js";
 export const register = async (data) => {
   const { name, email, password } = data;
 
+  console.log("1) register start:", email);
+
+  const existingUser = await repo.findUserByEmail(email);
+  console.log("2) existing user:", !!existingUser);
+
+  if (existingUser) {
+    if (existingUser.isVerified) {
+      throw new Error("Ya existe una cuenta registrada con este correo.");
+    }
+
+    console.log("3) existing user not verified, deleting old user:", existingUser.id);
+    await repo.deleteVerificationTokensByUserId(existingUser.id);
+    await repo.deleteUserById(existingUser.id);
+    console.log("4) old unverified user deleted");
+  }
+
   const hashed = await bcrypt.hash(password, 10);
+  console.log("5) password hashed");
 
   const user = await repo.createUser({
     name,
     email,
     password: hashed,
   });
+  console.log("6) user created:", user.id);
 
   try {
     const token = crypto.randomBytes(32).toString("hex");
+    console.log("7) token generated");
+
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
     await repo.createVerificationToken(user.id, token, expiresAt);
+    console.log("8) verification token created");
 
     const verifyUrl = `${process.env.BASE_URL}/api/auth/verify/${token}`;
+    console.log("9) verify url built");
 
     const subject = "Confirmá tu correo para activar TuGabinete";
     const preheader =
@@ -113,7 +135,7 @@ export const register = async (data) => {
 </html>
 `;
 
-const text = `
+    const text = `
 TuGabinete - Verificación de cuenta
 
 Hola, ${name}!
@@ -127,6 +149,7 @@ Este enlace vence en 2 horas.
 Si vos no creaste una cuenta, podés ignorar este correo.
 `;
 
+    console.log("10) before sendMail");
     await mailer.sendMail({
       from: `"TuGabinete" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -134,9 +157,12 @@ Si vos no creaste una cuenta, podés ignorar este correo.
       text,
       html,
     });
+    console.log("11) after sendMail");
 
     return { message: "Correo de verificación enviado." };
   } catch (err) {
+    console.error("❌ register catch:", err);
+    await repo.deleteVerificationTokensByUserId(user.id);
     await repo.deleteUserById(user.id);
     throw err;
   }
