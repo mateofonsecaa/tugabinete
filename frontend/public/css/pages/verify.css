@@ -1,19 +1,12 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
-
-body {
+.tg-verify-page {
+  min-height: 100vh;
   background: url("../../public/images/body.png") no-repeat center center fixed;
   background-size: cover;
   background-color: #ffadad;
-  min-height: 100vh;
   color: #333;
 }
 
-.verify-section {
+.tg-verify-page .tg-verify-section {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -21,7 +14,7 @@ body {
   padding: 32px 16px;
 }
 
-.verify-card {
+.tg-verify-page .tg-verify-card {
   width: 100%;
   max-width: 460px;
   background: rgba(255, 255, 255, 0.95);
@@ -32,7 +25,7 @@ body {
   backdrop-filter: blur(8px);
 }
 
-.verify-icon {
+.tg-verify-page .tg-verify-icon {
   width: 74px;
   height: 74px;
   margin: 0 auto 18px;
@@ -43,70 +36,70 @@ body {
   background: #fff5f5;
 }
 
-.verify-card.is-success .verify-icon {
+.tg-verify-page .tg-verify-card.is-success .tg-verify-icon {
   background: #eefae8;
 }
 
-.verify-card.is-warning .verify-icon {
+.tg-verify-page .tg-verify-card.is-warning .tg-verify-icon {
   background: #fff7e8;
 }
 
-.verify-card.is-error .verify-icon {
+.tg-verify-page .tg-verify-card.is-error .tg-verify-icon {
   background: #fff1f1;
 }
 
-.verify-icon i {
+.tg-verify-page .tg-verify-icon i {
   font-size: 32px;
 }
 
-.verify-card.is-success .verify-icon i {
+.tg-verify-page .tg-verify-card.is-success .tg-verify-icon i {
   color: #73b85a;
 }
 
-.verify-card.is-warning .verify-icon i {
+.tg-verify-page .tg-verify-card.is-warning .tg-verify-icon i {
   color: #d89b28;
 }
 
-.verify-card.is-error .verify-icon i {
+.tg-verify-page .tg-verify-card.is-error .tg-verify-icon i {
   color: #e16a6a;
 }
 
-.verify-card h2 {
+.tg-verify-page .tg-verify-card h2 {
   font-size: 28px;
   margin-bottom: 10px;
   color: #ffadad;
 }
 
-.verify-card p {
+.tg-verify-page .tg-verify-card p {
   font-size: 15px;
   line-height: 1.6;
   color: #555;
   margin-bottom: 22px;
 }
 
-.verify-dynamic-content {
+.tg-verify-page .tg-verify-dynamic-content {
   width: 100%;
 }
 
-.verify-form {
+.tg-verify-page .tg-verify-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 14px;
 }
 
-.verify-input-group {
+.tg-verify-page .tg-verify-input-group {
   text-align: left;
 }
 
-.verify-input-group label {
+.tg-verify-page .tg-verify-input-group label {
   display: block;
   font-weight: 600;
   margin-bottom: 8px;
   color: #333;
 }
 
-.verify-input-group input {
+.tg-verify-page .tg-verify-input-group input {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
@@ -116,19 +109,19 @@ body {
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.verify-input-group input:focus {
+.tg-verify-page .tg-verify-input-group input:focus {
   border-color: #ffadad;
   box-shadow: 0 0 6px rgba(255, 173, 173, 0.4);
   outline: none;
 }
 
-.verify-input-group input:disabled {
+.tg-verify-page .tg-verify-input-group input:disabled {
   cursor: not-allowed;
   opacity: 0.8;
 }
 
-.btn-login,
-.btn-secondary {
+.tg-verify-page .tg-verify-primary-btn,
+.tg-verify-page .tg-verify-secondary-btn {
   width: 100%;
   border: none;
   border-radius: 12px;
@@ -144,19 +137,19 @@ body {
   transition: all 0.25s ease;
 }
 
-.btn-login {
+.tg-verify-page .tg-verify-primary-btn {
   background: #ffadad;
   color: #fff;
   box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
 }
 
-.btn-login:hover {
+.tg-verify-page .tg-verify-primary-btn:hover {
   background: #fff3c2;
   color: #333;
   transform: translateY(-2px);
 }
 
-.btn-login:disabled {
+.tg-verify-page .tg-verify-primary-btn:disabled {
   background: #f3b6b6;
   color: #fff;
   cursor: not-allowed;
@@ -164,33 +157,33 @@ body {
   box-shadow: none;
 }
 
-.btn-secondary {
+.tg-verify-page .tg-verify-secondary-btn {
   background: #fff7f7;
   color: #d97b86;
   border: 1px solid #ffd1d1;
 }
 
-.btn-secondary:hover {
+.tg-verify-page .tg-verify-secondary-btn:hover {
   background: #fff0f0;
   transform: translateY(-1px);
 }
 
-.verify-actions {
+.tg-verify-page .tg-verify-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.submit-spinner {
+.tg-verify-page .tg-verify-submit-spinner {
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.45);
   border-top-color: #ffffff;
   border-radius: 50%;
-  animation: spin 0.75s linear infinite;
+  animation: tg-verify-spin 0.75s linear infinite;
 }
 
-.notification-container {
+.tg-verify-page .tg-verify-notification-container {
   position: fixed;
   top: 25px;
   right: 25px;
@@ -201,7 +194,7 @@ body {
   max-width: 340px;
 }
 
-.notification-toast {
+.tg-verify-page .tg-verify-notification-toast {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -218,55 +211,55 @@ body {
   font-weight: 500;
 }
 
-.notification-toast.show {
+.tg-verify-page .tg-verify-notification-toast.show {
   opacity: 1;
   transform: translateY(0);
 }
 
-.notification-toast.success {
+.tg-verify-page .tg-verify-notification-toast.success {
   border-left-color: #90d26d;
 }
 
-.notification-toast.error {
+.tg-verify-page .tg-verify-notification-toast.error {
   border-left-color: #ff7171;
 }
 
-.notification-toast.success i {
+.tg-verify-page .tg-verify-notification-toast.success i {
   color: #90d26d;
 }
 
-.notification-toast.error i {
+.tg-verify-page .tg-verify-notification-toast.error i {
   color: #ff7171;
 }
 
-@keyframes spin {
+@keyframes tg-verify-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (max-width: 480px) {
-  .verify-card {
+  .tg-verify-page .tg-verify-card {
     padding: 28px 20px;
     border-radius: 14px;
   }
 
-  .verify-card h2 {
+  .tg-verify-page .tg-verify-card h2 {
     font-size: 23px;
   }
 
-  .verify-card p,
-  .verify-input-group input {
+  .tg-verify-page .tg-verify-card p,
+  .tg-verify-page .tg-verify-input-group input {
     font-size: 14px;
   }
 
-  .btn-login,
-  .btn-secondary {
+  .tg-verify-page .tg-verify-primary-btn,
+  .tg-verify-page .tg-verify-secondary-btn {
     padding: 12px;
     font-size: 15px;
   }
 
-  .notification-container {
+  .tg-verify-page .tg-verify-notification-container {
     right: 10px;
     top: 10px;
     max-width: 90%;
