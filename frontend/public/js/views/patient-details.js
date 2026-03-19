@@ -55,9 +55,6 @@ export function PatientDetails() {
                 <i class="fa-solid fa-clipboard-list"></i> Ver entrevista
               </button>
 
-              <button id="edit-btn" class="btn-add">
-                <i class="fa-solid fa-pen"></i> Editar paciente
-              </button>
             </div>
           </div>
 

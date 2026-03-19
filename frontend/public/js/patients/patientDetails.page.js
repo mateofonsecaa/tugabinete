@@ -404,7 +404,6 @@ export async function initPatientDetailsPage() {
   }
 
   document.getElementById("back-btn")?.addEventListener("click", () => go("/patients"));
-  document.getElementById("edit-btn")?.addEventListener("click", () => go(`/patients/${id}/edit`));
 
   document.getElementById("view-interview-btn")?.addEventListener("click", () => {
     go(`/patients/${id}/interview`);

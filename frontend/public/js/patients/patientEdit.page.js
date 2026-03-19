@@ -30,7 +30,7 @@ export async function initPatientEditPage() {
     return;
   }
 
-  document.getElementById("back-btn")?.addEventListener("click", () => go(`/patients/${id}`));
+  document.getElementById("back-btn")?.addEventListener("click", () => go("/patients"));
   document.getElementById("to-details-btn")?.addEventListener("click", () => go(`/patients/${id}`));
 
   await loadPatientIntoForm(id);
@@ -164,7 +164,7 @@ async function onSubmit(e, id) {
     // Para que el listado se refresque (tu listado usa cache)
     localStorage.removeItem("patients");
 
-    go(`/patients/${id}`);
+    go("/patients");
   } catch (err) {
     Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
   }
