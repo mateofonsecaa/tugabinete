@@ -5,9 +5,9 @@ let allPatients = [];
 // Se llama desde views/patients.js cuando la vista YA está en el DOM
 export async function initPatientsPage() {
   bindTopButtons();
+  setupEvents();
   loadPatientsFast();
   await loadPatientsFromServer();
-  setupEvents();
 }
 
 // ===== navegación SPA =====
