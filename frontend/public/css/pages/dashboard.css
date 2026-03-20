@@ -150,125 +150,330 @@
     }
     .notification-toast.error { background: #ff7171; }
 
-  /* ============================================
-   📱 RESPONSIVE DASHBOARD
-   ============================================ */
-@media (max-width: 480px) {
+    /* =========================================
+   DASHBOARD - RESPONSIVE MOBILE
+   Agregar al final de dashboard.css
+   ========================================= */
 
-  html {
-    height: 100vh;
-    overflow: hidden;
+/* ---------- Tablet / móvil general ---------- */
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    height: 100vh;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
+    background-attachment: scroll;
   }
 
   .dashboard-page {
-    min-height: 100vh;
-    overflow: hidden;
+    min-height: 100dvh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .dashboard-page main {
-    padding: 10px;
+  /* ===== TOP BAR ===== */
+  .top-bar {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 10px;
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+  }
+
+  .top-bar::after {
+    content: "";
+    display: block;
+    width: 44px;
+    height: 44px;
+  }
+
+  .top-bar .menu-btn {
+    grid-column: 1;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 60px);
+  }
+
+  .top-bar .app-title {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 700;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ===== DRAWER ===== */
+  .drawer {
+    width: min(84vw, 320px);
+    max-width: 320px;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    z-index: 1300;
+  }
+
+  .drawer-overlay {
+    z-index: 1200;
+  }
+
+  .drawer-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 16px;
     display: flex;
     align-items: center;
-    flex-direction: column;
+    gap: 12px;
   }
 
+  #drawer-username {
+    min-width: 0;
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .close-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+  }
+
+  .drawer-nav {
+    padding: 8px 0 16px;
+  }
+
+  .drawer-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .drawer-nav a i {
+    flex: 0 0 20px;
+    text-align: center;
+  }
+
+  /* ===== MAIN ===== */
+  .dashboard-page main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    text-align: center;
+    padding: 20px 16px 28px;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  /* ===== BLOQUE BIENVENIDA ===== */
   .welcome {
-      padding: 15px 18px;
-      width: 92%;
-      max-width: 330px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.88);
-
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-
-      /* 🔥 LO IMPORTANTE */
-      height: auto;          /* Se ajusta al contenido */
-      min-height: 260px;     /* Asegura una forma bonita */
+    width: min(100%, 680px);
+    margin: 0 auto;
+    padding: 24px 18px;
+    border-radius: 18px;
+    backdrop-filter: blur(8px);
   }
 
   .welcome h1 {
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.2;        /* 🔥 reduce alto vertical */
-    margin-bottom: 6px;      /* 🔥 menos espacio */
+    font-size: clamp(24px, 5.8vw, 30px);
+    line-height: 1.2;
+    margin-bottom: 18px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
-  /* --- Contenedor del grid --- */
+  .welcome p {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  /* ===== ACCIONES ===== */
   .dashboard-actions {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
     margin-top: 10px;
-    justify-items: center;
   }
 
-  /* --- Cards profesionales --- */
   .action-card {
     width: 100%;
-    height: 120px;
+    min-width: 0;
+    height: auto;
+    min-height: 136px;
+    padding: 18px 14px;
     border-radius: 16px;
-
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(8px);
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255, 173, 173, 0.25);
-
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
-    transition: all 0.25s ease;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .action-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(255, 173, 173, 0.25);
+    transform: none;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
   }
 
-  /* --- Iconos más finos y modernos --- */
+  .action-card:active {
+    transform: scale(0.98);
+  }
+
   .action-card i {
-    font-size: 28px;
-    margin-bottom: 6px;
-    color: #ffadad;
+    font-size: 32px;
+    margin-bottom: 0;
+    flex: 0 0 auto;
   }
 
   .action-card span {
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.35;
     font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
-  /* --- Header mobile --- */
-  header {
-    height: 60px;
-    padding: 0 15px;
+  /* ===== NOTIFICACIONES ===== */
+  .notification-toast {
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+    right: 12px;
+    left: 12px;
+    width: auto;
+    padding: 13px 16px;
+    font-size: 14px;
+    line-height: 1.35;
+    border-radius: 12px;
   }
 
-  .logo {
-    font-size: 20px;
+  /* ===== ACCESIBILIDAD BÁSICA ===== */
+  .menu-btn:focus-visible,
+  .close-btn:focus-visible,
+  .drawer-nav a:focus-visible,
+  .action-card:focus-visible {
+    outline: 2px solid rgba(255, 173, 173, 0.95);
+    outline-offset: 3px;
+  }
+}
+
+/* ---------- Móvil chico ---------- */
+@media (max-width: 480px) {
+  .top-bar {
+    padding: calc(env(safe-area-inset-top, 0px) + 10px) 14px 10px;
   }
 
-  .nav-icons {
-    gap: 18px;
+  .top-bar .app-title {
+    font-size: 17px;
   }
 
-  .nav-icons a i {
-    font-size: 18px;
+  .drawer {
+    width: min(88vw, 300px);
+  }
+
+  .drawer-header {
+    padding: 14px;
+  }
+
+  .drawer-nav a {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .dashboard-page main {
+    padding: 16px 14px 24px;
+  }
+
+  .welcome {
+    padding: 20px 14px;
+    border-radius: 16px;
+  }
+
+  .welcome h1 {
+    font-size: clamp(22px, 7vw, 26px);
+    margin-bottom: 16px;
+  }
+
+  .welcome p {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  .dashboard-actions {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .action-card {
+    min-height: 112px;
+    padding: 16px 14px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 12px;
+  }
+
+  .action-card i {
+    font-size: 26px;
+    flex: 0 0 32px;
+    text-align: center;
+  }
+
+  .action-card span {
+    text-align: left;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .notification-toast {
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    right: 10px;
+    left: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Reducción de movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .welcome,
+  .action-card,
+  .notification-toast {
+    animation: none;
+    transition: none;
   }
 }

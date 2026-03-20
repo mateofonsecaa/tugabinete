@@ -101,7 +101,7 @@ export function Home() {
 }
 
 export function initHome() {
-  const header = document.querySelector("header");
+  const header = document.querySelector(".public-header");
   if (!header) return;
 
   setTimeout(() => header.classList.add("visible"), 200);
