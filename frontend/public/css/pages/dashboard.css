@@ -1,11 +1,16 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
 
-    .dashboard-page body {
+    body {
       background: url("../../public/images/body.png") no-repeat center center fixed;
       background-size: cover;
       background-color: #ffadad;
       color: #333;
       min-height: 100vh;
+    }
+
+    .dashboard-page {
+      height: 100dvh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
@@ -18,9 +23,10 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 60px 20px;
+      padding: 20px;
       background: transparent;
       box-shadow: none;
+      overflow: hidden;
     }
 
     .welcome {
@@ -154,22 +160,26 @@
     overflow: hidden;
   }
 
-  /* --- Ajustes generales --- */
   body {
-  height: 100vh;
-  overflow: hidden;     /* 🔥 EVITA EL FONDO BLANCO GIGANTE */
-  background-size: cover;
-  background-position: center;
+    height: 100vh;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
   }
 
-  main {
-  padding: 5px 10px;
-  justify-content: center;
-  height: calc(100vh - 60px);   /* 🔥 resta el header */
-  overflow: hidden;             /* 🔥 bloquea el crecimiento */
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  .dashboard-page {
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .dashboard-page main {
+    padding: 10px;
+    justify-content: center;
+    min-height: calc(100vh - 60px);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
   }
 
   .welcome {

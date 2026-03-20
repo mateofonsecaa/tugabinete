@@ -346,6 +346,12 @@ export function Treatments() {
 
                 <div class="tg-collapse-body" id="filtersBody">
                   <div class="filters">
+                    <select id="filterRecordType">
+                      <option value="">Todos los resultados</option>
+                      <option value="treatment">Solo tratamientos</option>
+                      <option value="sale">Solo ventas</option>
+                    </select>
+
                     <input type="text" id="filterPatient" placeholder="Buscar paciente..." />
                     <input type="date" id="filterDate" placeholder="Seleccionar fecha" />
 
@@ -353,7 +359,7 @@ export function Treatments() {
                       <input
                         type="text"
                         id="filterTypeInput"
-                        placeholder="Tipo de tratamiento..."
+                        placeholder="Buscar tratamiento o producto..."
                         autocomplete="off"
                       />
                       <div class="options" id="filterTypeOptions">
@@ -801,12 +807,20 @@ function renderActiveFilterChips() {
   const wrap = document.getElementById("activeFilters");
   if (!wrap) return;
 
+  const recordType = (document.getElementById("filterRecordType")?.value || "").trim();
   const patient = (document.getElementById("filterPatient")?.value || "").trim();
   const date = (document.getElementById("filterDate")?.value || "").trim();
   const type = (document.getElementById("filterTypeInput")?.value || "").trim();
   const status = (document.getElementById("filterStatus")?.value || "").trim();
 
   const chips = [];
+
+  if (recordType) {
+    chips.push({
+      key: "recordType",
+      label: `Resultado: ${recordType === "treatment" ? "Tratamientos" : "Ventas"}`
+    });
+  }
 
   if (patient) chips.push({ key: "patient", label: `Paciente: ${patient}` });
   if (date) chips.push({ key: "date", label: `Fecha: ${date}` });
@@ -832,6 +846,8 @@ function renderActiveFilterChips() {
   wrap.querySelectorAll(".tg-chip").forEach((btn) => {
     btn.addEventListener("click", () => {
       const key = btn.dataset.chip;
+
+      if (key === "recordType") document.getElementById("filterRecordType").selectedIndex = 0;
       if (key === "patient") document.getElementById("filterPatient").value = "";
       if (key === "date") document.getElementById("filterDate").value = "";
       if (key === "type") document.getElementById("filterTypeInput").value = "";
@@ -892,6 +908,7 @@ function bindUI() {
     el?.showPicker?.();
   });
   // Filtros
+  bindOnce("#filterRecordType", "change", () => applyFilters());
   bindOnce("#filterPatient", "input", () => applyFilters());
   bindOnce("#filterDate", "change", () => applyFilters());
   bindOnce("#filterStatus", "change", () => applyFilters());
@@ -1513,36 +1530,50 @@ function renderResults(items) {
 }
 
 function applyFilters() {
+  const recordTypeFilter = document.getElementById("filterRecordType")?.value || "";
   const patientFilter = (document.getElementById("filterPatient")?.value || "").toLowerCase();
   const dateFilter = document.getElementById("filterDate")?.value || "";
   const typeFilter = (document.getElementById("filterTypeInput")?.value || "").toLowerCase();
   const statusFilter = document.getElementById("filterStatus")?.value || "";
 
-  // 1) Filtrar tratamientos
-  const filteredTreatments = (allTreatments || []).filter((t) => {
-    const matchesPatient = !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
+  const filteredTreatments =
+    recordTypeFilter === "sale"
+      ? []
+      : (allTreatments || []).filter((t) => {
+          const matchesPatient =
+            !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
-    const matchesDate = !dateFilter || (t.date && String(t.date).slice(0, 10) === dateFilter);
+          const matchesDate =
+            !dateFilter || (t.date && String(t.date).slice(0, 10) === dateFilter);
 
-    const matchesType = !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
-    const matchesStatus = !statusFilter || (t.status === statusFilter);
+          const matchesType =
+            !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
 
-    return matchesPatient && matchesDate && matchesType && matchesStatus;
-  });
+          const matchesStatus =
+            !statusFilter || t.status === statusFilter;
 
-  // 2) Filtrar ventas (typeFilter lo aplico al "product")
-  const filteredSales = (allSales || []).filter((s) => {
-    const matchesPatient = !patientFilter || (s.patient?.fullName || "").toLowerCase().includes(patientFilter);
+          return matchesPatient && matchesDate && matchesType && matchesStatus;
+        });
 
-    const matchesDate = !dateFilter || (s.date && String(s.date).slice(0, 10) === dateFilter);
+  const filteredSales =
+    recordTypeFilter === "treatment"
+      ? []
+      : (allSales || []).filter((s) => {
+          const matchesPatient =
+            !patientFilter || (s.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
-    const matchesType = !typeFilter || (s.product || "").toLowerCase().includes(typeFilter);
-    const matchesStatus = !statusFilter || (s.status === statusFilter);
+          const matchesDate =
+            !dateFilter || (s.date && String(s.date).slice(0, 10) === dateFilter);
 
-    return matchesPatient && matchesDate && matchesType && matchesStatus;
-  });
+          const matchesType =
+            !typeFilter || (s.product || "").toLowerCase().includes(typeFilter);
 
-  // 3) Combinar + ordenar por fecha
+          const matchesStatus =
+            !statusFilter || s.status === statusFilter;
+
+          return matchesPatient && matchesDate && matchesType && matchesStatus;
+        });
+
   const t = filteredTreatments.map((x) => ({ ...x, __type: "treatment" }));
   const s = filteredSales.map((x) => ({ ...x, __type: "sale" }));
 
@@ -1552,19 +1583,22 @@ function applyFilters() {
       const time = item.time || "00:00";
       return new Date(`${d}T${time}:00`).getTime() || 0;
     }
+
     const d = item.date ? String(item.date).split("T")[0] : "";
     return new Date(`${d}T00:00:00`).getTime() || 0;
   };
 
   const combined = [...t, ...s].sort((a, b) => toTime(b) - toTime(a));
 
-  // 4) Pintar todo
   updateResultsCount(combined.length);
   renderActiveFilterChips();
   renderResults(combined);
 }
 
 function clearAllFilters() {
+  const frt = document.getElementById("filterRecordType");
+  if (frt) frt.selectedIndex = 0;
+
   const fp = document.getElementById("filterPatient");
   if (fp) fp.value = "";
 
@@ -1573,6 +1607,7 @@ function clearAllFilters() {
 
   const ft = document.getElementById("filterTypeInput");
   if (ft) ft.value = "";
+
   const fto = document.getElementById("filterTypeOptions");
   if (fto) fto.style.display = "none";
 
