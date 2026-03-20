@@ -1,20 +1,33 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
 import * as repo from "./auth.repository.js";
-import { mailer } from "../../config/mailer.js";
+import { sendPasswordResetEmail, sendVerificationEmail } from "./auth.email.js";
+import {
+  generateOpaqueToken,
+  getRequestIp,
+  getRequestUserAgent,
+  hashToken,
+  PASSWORD_HASH_ROUNDS,
+  PASSWORD_RESET_TTL_MINUTES,
+  VERIFICATION_TTL_MINUTES,
+} from "./auth.security.js";
+import {
+  normalizeEmail,
+  validatePasswordPolicy,
+} from "./auth.validation.js";
 
-const VERIFICATION_TTL_MINUTES = 15;
-
-const normalizeEmail = (email = "") => String(email).trim().toLowerCase();
-
-const buildVerifyUrl = (token) =>
-  `${process.env.BASE_URL}/api/auth/verify/${token}`;
+const GENERIC_FORGOT_PASSWORD_RESPONSE = {
+  status: 200,
+  ok: true,
+  code: "PASSWORD_RESET_REQUEST_ACCEPTED",
+  message:
+    "Si el correo ingresado está registrado, te vamos a enviar un enlace para restablecer tu contraseña.",
+};
 
 async function issueFreshVerificationToken(userId) {
   await repo.deleteVerificationTokensByUserId(userId);
 
-  const token = crypto.randomBytes(32).toString("hex");
+  const token = generateOpaqueToken();
   const expiresAt = new Date(
     Date.now() + VERIFICATION_TTL_MINUTES * 60 * 1000
   );
@@ -24,129 +37,95 @@ async function issueFreshVerificationToken(userId) {
   return { token, expiresAt };
 }
 
-async function sendVerificationEmail({ name, email, token }) {
-  const verifyUrl = buildVerifyUrl(token);
-  const subject = "Confirmá tu correo para activar TuGabinete";
-  const preheader =
-    "Un último paso: verificá tu cuenta para empezar a usar TuGabinete.";
+async function issueFreshPasswordResetToken(userId, req) {
+  await repo.deleteActivePasswordResetTokensByUserId(userId);
 
-  const html = `
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${subject}</title>
-  </head>
-  <body style="margin:0;padding:0;background:#fff7f7;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
-      ${preheader}
-    </div>
+  const rawToken = generateOpaqueToken();
+  const tokenHash = hashToken(rawToken);
+  const expiresAt = new Date(
+    Date.now() + PASSWORD_RESET_TTL_MINUTES * 60 * 1000
+  );
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff7f7;padding:28px 14px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,0.08);">
-            <tr>
-              <td style="padding:22px 26px;background:linear-gradient(135deg,#ffadad 0%, #ffd6d6 100%);">
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#ffffff;font-weight:700;font-size:20px;letter-spacing:0.2px;">
-                  TuGabinete
-                </div>
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#ffffff;opacity:0.9;font-size:13px;margin-top:4px;">
-                  Gestión simple y profesional para tu gabinete
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td style="padding:28px 26px 10px 26px;">
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#111827;font-size:18px;font-weight:700;line-height:1.35;">
-                  Hola, ${name} 👋
-                </div>
-
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#374151;font-size:14px;line-height:1.6;margin-top:10px;">
-                  Gracias por registrarte en <strong>TuGabinete</strong>. Para activar tu cuenta y empezar a usar la plataforma,
-                  confirmá tu correo haciendo clic en el botón:
-                </div>
-
-                <div style="text-align:center;margin:20px 0 18px 0;">
-                  <a href="${verifyUrl}"
-                     style="display:inline-block;background:#ffadad;color:#ffffff;text-decoration:none;
-                            font-family:Poppins, Arial, Helvetica, sans-serif;font-size:14px;font-weight:700;
-                            padding:12px 20px;border-radius:12px;">
-                    Verificar cuenta
-                  </a>
-                </div>
-
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#6b7280;font-size:12.5px;line-height:1.6;">
-                  Si el botón no funciona, copiá y pegá este enlace en tu navegador:
-                </div>
-
-                <div style="font-family:Arial, Helvetica, sans-serif;color:#111827;font-size:12.5px;line-height:1.6;margin-top:6px;word-break:break-all;">
-                  <a href="${verifyUrl}" style="color:#ff7f7f;text-decoration:underline;">${verifyUrl}</a>
-                </div>
-
-                <hr style="border:none;border-top:1px solid #f1f5f9;margin:18px 0;" />
-
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#6b7280;font-size:12.5px;line-height:1.6;">
-                  Este enlace vence en ${VERIFICATION_TTL_MINUTES} minutos.<br/>
-                  Si vos no creaste una cuenta en TuGabinete, podés ignorar este correo con tranquilidad.
-                </div>
-              </td>
-            </tr>
-
-            <tr>
-              <td style="padding:16px 26px 22px 26px;background:#ffffff;">
-                <div style="font-family:Poppins, Arial, Helvetica, sans-serif;color:#9ca3af;font-size:11.5px;line-height:1.6;">
-                  © ${new Date().getFullYear()} TuGabinete. Todos los derechos reservados.<br/>
-                  Este es un correo automático, por favor no respondas a este mensaje.
-                </div>
-              </td>
-            </tr>
-
-          </table>
-
-          <div style="max-width:560px;margin-top:14px;font-family:Poppins, Arial, Helvetica, sans-serif;color:#9ca3af;font-size:11.5px;line-height:1.5;text-align:center;">
-            ¿Necesitás ayuda? Respondé este correo o escribinos desde la sección de soporte dentro de TuGabinete.
-          </div>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
-`;
-
-  const text = `
-TuGabinete - Verificación de cuenta
-
-Hola, ${name}!
-
-Gracias por registrarte en TuGabinete.
-Para activar tu cuenta, abrí este enlace:
-${verifyUrl}
-
-Este enlace vence en ${VERIFICATION_TTL_MINUTES} minutos.
-
-Si vos no creaste una cuenta, podés ignorar este correo.
-`;
-
-  await mailer.sendMail({
-    to: email,
-    subject,
-    text,
-    html,
+  await repo.createPasswordResetToken({
+    userId,
+    tokenHash,
+    expiresAt,
+    requestedIp: getRequestIp(req),
+    requestedUserAgent: getRequestUserAgent(req),
   });
+
+  return {
+    rawToken,
+    expiresAt,
+  };
+}
+
+async function inspectPasswordResetToken(rawToken) {
+  const token = String(rawToken ?? "").trim();
+
+  if (!token) {
+    return {
+      ok: false,
+      response: {
+        status: 400,
+        ok: false,
+        code: "INVALID_RESET_TOKEN",
+        message: "El enlace de recuperación es inválido o incompleto.",
+      },
+    };
+  }
+
+  const tokenHash = hashToken(token);
+  const record = await repo.findPasswordResetTokenByHash(tokenHash);
+
+  if (!record) {
+    return {
+      ok: false,
+      response: {
+        status: 400,
+        ok: false,
+        code: "INVALID_RESET_TOKEN",
+        message: "El enlace de recuperación es inválido o no existe.",
+      },
+    };
+  }
+
+  if (record.usedAt) {
+    return {
+      ok: false,
+      response: {
+        status: 409,
+        ok: false,
+        code: "USED_RESET_TOKEN",
+        message: "Este enlace ya fue utilizado. Solicitá uno nuevo.",
+      },
+    };
+  }
+
+  if (new Date(record.expiresAt) <= new Date()) {
+    return {
+      ok: false,
+      response: {
+        status: 410,
+        ok: false,
+        code: "EXPIRED_RESET_TOKEN",
+        message: "Este enlace venció. Solicitá uno nuevo.",
+      },
+    };
+  }
+
+  return {
+    ok: true,
+    record,
+  };
 }
 
 export const register = async (data) => {
   const name = String(data.name ?? "").trim();
   const email = normalizeEmail(data.email);
-  const password = data.password;
-
-  console.log("1) register start:", email);
+  const password = String(data.password ?? "");
 
   const existingUser = await repo.findUserByEmail(email);
-  console.log("2) existing user:", !!existingUser);
 
   if (existingUser?.isVerified) {
     return {
@@ -157,8 +136,7 @@ export const register = async (data) => {
     };
   }
 
-  const hashed = await bcrypt.hash(password, 10);
-  console.log("3) password hashed");
+  const hashed = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
 
   let user;
   let status;
@@ -166,11 +144,6 @@ export const register = async (data) => {
   let message;
 
   if (existingUser) {
-    console.log(
-      "4) existing user not verified, refreshing pending registration:",
-      existingUser.id
-    );
-
     user = await repo.updateUser(existingUser.id, {
       name,
       email,
@@ -189,26 +162,21 @@ export const register = async (data) => {
       password: hashed,
     });
 
-    console.log("5) user created:", user.id);
-
     status = 201;
     code = "VERIFY_EMAIL_SENT";
     message = "Correo de verificación enviado.";
   }
 
   const { token } = await issueFreshVerificationToken(user.id);
-  console.log("6) fresh verification token created");
 
   try {
-    console.log("7) before sendMail");
     await sendVerificationEmail({
       name: user.name,
       email: user.email,
       token,
     });
-    console.log("8) after sendMail");
   } catch (err) {
-    console.error("❌ register mail error:", err);
+    console.error("register mail error:", err?.message || err);
 
     return {
       status: 503,
@@ -262,7 +230,7 @@ export const resendVerification = async (data) => {
       token,
     });
   } catch (err) {
-    console.error("❌ resendVerification mail error:", err);
+    console.error("resendVerification mail error:", err?.message || err);
 
     return {
       status: 503,
@@ -296,7 +264,11 @@ export const login = async (data) => {
   if (!valid) throw new Error("Contraseña incorrecta");
 
   const token = jwt.sign(
-    { id: user.id, email: user.email },
+    {
+      id: user.id,
+      email: user.email,
+      tokenVersion: user.authTokenVersion ?? 0,
+    },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
@@ -332,5 +304,105 @@ export const verifyEmail = async (token) => {
 
   return {
     redirectUrl: `${process.env.FRONTEND_URL}/verify?status=success`,
+  };
+};
+
+export const forgotPassword = async (data, req) => {
+  const email = normalizeEmail(data?.email);
+
+  if (!email) {
+    return GENERIC_FORGOT_PASSWORD_RESPONSE;
+  }
+
+  const user = await repo.findUserByEmail(email);
+
+  if (!user || !user.isVerified) {
+    return GENERIC_FORGOT_PASSWORD_RESPONSE;
+  }
+
+  const { rawToken } = await issueFreshPasswordResetToken(user.id, req);
+
+  void sendPasswordResetEmail({
+    name: user.name,
+    email: user.email,
+    token: rawToken,
+  }).catch((err) => {
+    console.error("forgotPassword mail error:", err?.message || err);
+  });
+
+  return GENERIC_FORGOT_PASSWORD_RESPONSE;
+};
+
+export const validateResetToken = async (data) => {
+  const inspection = await inspectPasswordResetToken(data?.token);
+
+  if (!inspection.ok) {
+    return inspection.response;
+  }
+
+  return {
+    status: 200,
+    ok: true,
+    code: "VALID_RESET_TOKEN",
+    message: "Token válido. Ya podés restablecer tu contraseña.",
+  };
+};
+
+export const resetPassword = async (data, req) => {
+  const password = String(data?.password ?? "");
+  const confirmPassword = String(data?.confirmPassword ?? "");
+  const token = String(data?.token ?? "");
+
+  const policy = validatePasswordPolicy({
+    password,
+    confirmPassword,
+    requireConfirmation: true,
+  });
+
+  if (!policy.ok) {
+    return {
+      status: 400,
+      ok: false,
+      code: "PASSWORD_VALIDATION_FAILED",
+      message: "Revisá los campos marcados.",
+      fieldErrors: policy.errors,
+    };
+  }
+
+  const inspection = await inspectPasswordResetToken(token);
+
+  if (!inspection.ok) {
+    return inspection.response;
+  }
+
+  const passwordHash = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
+
+  try {
+    await repo.consumePasswordResetTokenAndUpdatePassword({
+      resetTokenId: inspection.record.id,
+      userId: inspection.record.userId,
+      passwordHash,
+      consumedIp: getRequestIp(req),
+      consumedUserAgent: getRequestUserAgent(req),
+    });
+  } catch (err) {
+    if (err?.code === "RESET_TOKEN_NOT_USABLE") {
+      return {
+        status: 409,
+        ok: false,
+        code: "USED_RESET_TOKEN",
+        message: "Este enlace ya no está disponible. Solicitá uno nuevo.",
+      };
+    }
+
+    throw err;
+  }
+
+  return {
+    status: 200,
+    ok: true,
+    code: "PASSWORD_RESET_SUCCESS",
+    message:
+      "Tu contraseña fue actualizada correctamente. Ya podés iniciar sesión.",
   };
 };

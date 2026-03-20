@@ -2,6 +2,8 @@ import { Home, initHome } from "./views/home.js";
 import { Login, initLogin } from "./views/login.js";
 import { Verify, initVerify } from "./views/verify.js";
 import { Register, initRegister } from "./views/register.js";
+import { Recover, initRecover } from "./views/recover.js";
+import { ResetPassword, initResetPassword } from "./views/reset-password.js";
 import { Dashboard, initDashboard } from "./views/dashboard.js";
 import { Patients, initPatients } from "./views/patients.js";
 import { Agenda, initAgenda } from "./views/agenda.js";
@@ -28,52 +30,42 @@ export function router() {
   const path = window.location.pathname;
   const token = localStorage.getItem("token");
 
-    const setBodyViewClass = () => {
-      document.body.classList.remove(
-        "is-login",
-        "is-register",
-        "is-verify",
-        "is-patient-details",
-        "is-patient-edit",
-        "is-interview-view",
-        "is-interview-edit-1",
-        "is-interview-edit-2",
-        "is-treatments",
-        "is-profile",
-        "is-contact",
-        "is-help",
-        "is-help-page"
-      );
+  const setBodyViewClass = () => {
+    document.body.classList.remove(
+      "is-login",
+      "is-register",
+      "is-verify",
+      "is-recover",
+      "is-reset-password",
+      "is-patient-details",
+      "is-patient-edit",
+      "is-interview-view",
+      "is-interview-edit-1",
+      "is-interview-edit-2",
+      "is-treatments",
+      "is-profile",
+      "is-contact",
+      "is-help",
+      "is-help-page"
+    );
 
-      if (path === "/login") document.body.classList.add("is-login");
-      else if (path === "/register") document.body.classList.add("is-register");
-      else if (path === "/verify") document.body.classList.add("is-verify");
-      else if (path === "/profile") {document.body.classList.add("is-profile");
-        }
+    if (path === "/login") document.body.classList.add("is-login");
+    else if (path === "/register") document.body.classList.add("is-register");
+    else if (path === "/verify") document.body.classList.add("is-verify");
+    else if (path === "/recover") document.body.classList.add("is-recover");
+    else if (path === "/reset-password") document.body.classList.add("is-reset-password");
+    else if (path === "/profile") document.body.classList.add("is-profile");
+    else if (/^\/patients\/\d+$/.test(path)) document.body.classList.add("is-patient-details");
+    else if (/^\/patients\/\d+\/edit$/.test(path)) document.body.classList.add("is-patient-edit");
+    else if (/^\/patients\/\d+\/interview$/.test(path)) document.body.classList.add("is-interview-view");
+    else if (/^\/patients\/\d+\/interview\/edit\/1$/.test(path)) document.body.classList.add("is-interview-edit-1");
+    else if (/^\/patients\/\d+\/interview\/edit\/2$/.test(path)) document.body.classList.add("is-interview-edit-2");
+    else if (path === "/ayuda") document.body.classList.add("is-help-page");
+    else if (path === "/contact") document.body.classList.add("is-contact");
+  };
 
-      // /patients/:id (details)
-      else if (/^\/patients\/\d+$/.test(path)) document.body.classList.add("is-patient-details");
+  setBodyViewClass();
 
-      else if (/^\/patients\/\d+\/edit$/.test(path)) document.body.classList.add("is-patient-edit");
-
-      // /patients/:id/interview (view)
-      else if (/^\/patients\/\d+\/interview$/.test(path)) document.body.classList.add("is-interview-view");
-
-      // /patients/:id/interview/edit/1
-      else if (/^\/patients\/\d+\/interview\/edit\/1$/.test(path)) document.body.classList.add("is-interview-edit-1");
-
-      // /patients/:id/interview/edit/2
-      else if (/^\/patients\/\d+\/interview\/edit\/2$/.test(path)) document.body.classList.add("is-interview-edit-2");
-      
-      else if (path === "/ayuda") document.body.classList.add("is-help-page");
-
-      else if (path === "/contact") document.body.classList.add("is-contact");
-
-    };
-
-    setBodyViewClass();
-
-  // helper para rutas protegidas
   const requireAuth = () => {
     if (!token) {
       history.replaceState(null, "", "/login");
@@ -84,9 +76,6 @@ export function router() {
     return true;
   };
 
-  // =========================
-  // RUTAS PÚBLICAS
-  // =========================
   if (path === "/login") {
     app.innerHTML = Login();
     initLogin();
@@ -99,6 +88,18 @@ export function router() {
     return;
   }
 
+  if (path === "/recover") {
+    app.innerHTML = Recover();
+    initRecover();
+    return;
+  }
+
+  if (path === "/reset-password") {
+    app.innerHTML = ResetPassword();
+    initResetPassword();
+    return;
+  }
+
   if (path === "/verify") {
     const params = new URLSearchParams(window.location.search);
     const status = params.get("status");
@@ -108,50 +109,47 @@ export function router() {
   }
 
   if (path === "/policies") {
-  app.innerHTML = Policies();
-  initPolicies();
-  return;
-}
+    app.innerHTML = Policies();
+    initPolicies();
+    return;
+  }
 
-if (path === "/terms") {
-  app.innerHTML = Terms();
-  initTerms();
-  return;
-}
+  if (path === "/terms") {
+    app.innerHTML = Terms();
+    initTerms();
+    return;
+  }
 
-if (path === "/help") {
-  app.innerHTML = Help();
-  initHelp();
-  return;
-}
+  if (path === "/help") {
+    app.innerHTML = Help();
+    initHelp();
+    return;
+  }
 
-if (path === "/ayuda") {
-  app.innerHTML = HelpPage();
-  initHelpPage();
-  return;
-}
+  if (path === "/ayuda") {
+    app.innerHTML = HelpPage();
+    initHelpPage();
+    return;
+  }
 
-if (path === "/about") {
-  app.innerHTML = About();
-  initAbout();
-  return;
-}
+  if (path === "/about") {
+    app.innerHTML = About();
+    initAbout();
+    return;
+  }
 
-if (path === "/contact") {
-  app.innerHTML = Contact();
-  initContact();
-  return;
-}
+  if (path === "/contact") {
+    app.innerHTML = Contact();
+    initContact();
+    return;
+  }
 
-if (path === "/plans") {
-  app.innerHTML = Plans();
-  initPlans();
-  return;
-}
+  if (path === "/plans") {
+    app.innerHTML = Plans();
+    initPlans();
+    return;
+  }
 
-  // =========================
-  // RUTAS PROTEGIDAS
-  // =========================
   if (path === "/dashboard") {
     if (!requireAuth()) return;
     app.innerHTML = Dashboard();
@@ -180,7 +178,6 @@ if (path === "/plans") {
     return;
   }
 
-  // /patients/:id/interview
   const iv = path.match(/^\/patients\/(\d+)\/interview$/);
   if (iv) {
     if (!requireAuth()) return;
@@ -189,7 +186,6 @@ if (path === "/plans") {
     return;
   }
 
-  // /patients/:id/interview/edit/1
   const ie1 = path.match(/^\/patients\/(\d+)\/interview\/edit\/1$/);
   if (ie1) {
     if (!requireAuth()) return;
@@ -198,7 +194,6 @@ if (path === "/plans") {
     return;
   }
 
-  // /patients/:id/interview/edit/2
   const ie2 = path.match(/^\/patients\/(\d+)\/interview\/edit\/2$/);
   if (ie2) {
     if (!requireAuth()) return;
@@ -216,7 +211,6 @@ if (path === "/plans") {
     return;
   }
 
-  // /patients/:id  (ej: /patients/123)
   const patientIdMatch = path.match(/^\/patients\/(\d+)$/);
   if (patientIdMatch) {
     if (!requireAuth()) return;
@@ -233,22 +227,19 @@ if (path === "/plans") {
   }
 
   if (path === "/profile/edit") {
-  if (!requireAuth()) return;
-  app.innerHTML = ProfileEdit();
-  initProfileEdit();
-  return;
-}
+    if (!requireAuth()) return;
+    app.innerHTML = ProfileEdit();
+    initProfileEdit();
+    return;
+  }
 
-if (path === "/treatments") {
-  if (!requireAuth()) return;
-  app.innerHTML = Treatments();
-  initTreatments();
-  return;
-}
+  if (path === "/treatments") {
+    if (!requireAuth()) return;
+    app.innerHTML = Treatments();
+    initTreatments();
+    return;
+  }
 
-  // =========================
-  // DEFAULT / HOME
-  // =========================
   app.innerHTML = Home();
   initHome();
 }

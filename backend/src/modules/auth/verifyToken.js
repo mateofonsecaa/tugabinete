@@ -1,24 +1,52 @@
 import jwt from "jsonwebtoken";
+import prisma from "../../config/prisma.js";
 
-export default function verifyToken(req, res, next) {
-const authHeader = req.headers.authorization;
+export default async function verifyToken(req, res, next) {
+  const header = req.headers.authorization;
 
-    if (!authHeader)
-        return res.status(401).json({ message: "No token provided" });
+  if (!header) {
+    return res.status(401).json({ error: "Token requerido" });
+  }
 
-    const token = authHeader.split(" ")[1]; // "Bearer token"
+  const [scheme, token] = header.split(" ");
 
-    if (!token)
-        return res.status(401).json({ message: "Token inválido" });
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Token inválido" });
+  }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Esto queda disponible para cualquier controlador
-        req.user = decoded;
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        email: true,
+        authTokenVersion: true,
+      },
+    });
 
-        next();
-    } catch (err) {
-        return res.status(403).json({ message: "Token expirado o inválido" });
+    if (!user) {
+      return res.status(401).json({ error: "Usuario no válido" });
     }
+
+    const tokenVersion = Number.isInteger(decoded.tokenVersion)
+      ? decoded.tokenVersion
+      : 0;
+
+    if (tokenVersion !== (user.authTokenVersion ?? 0)) {
+      return res.status(401).json({
+        error: "Tu sesión dejó de ser válida. Iniciá sesión nuevamente.",
+      });
+    }
+
+    req.user = {
+      id: user.id,
+      email: user.email,
+    };
+
+    return next();
+  } catch {
+    return res.status(403).json({ error: "Token inválido o expirado" });
+  }
 }

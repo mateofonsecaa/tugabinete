@@ -1,12 +1,7 @@
 import * as service from "./auth.service.js";
 import * as repo from "./auth.repository.js";
-
-// Supabase uploader
 import { uploadToSupabase } from "../../core/utils/upload.js";
 
-// ======================================================
-// REGISTER
-// ======================================================
 export const register = async (req, res, next) => {
   try {
     const result = await service.register(req.body);
@@ -17,9 +12,6 @@ export const register = async (req, res, next) => {
   }
 };
 
-// ======================================================
-// RESEND VERIFICATION
-// ======================================================
 export const resendVerification = async (req, res, next) => {
   try {
     const result = await service.resendVerification(req.body);
@@ -30,9 +22,6 @@ export const resendVerification = async (req, res, next) => {
   }
 };
 
-// ======================================================
-// LOGIN
-// ======================================================
 export const login = async (req, res, next) => {
   try {
     const result = await service.login(req.body);
@@ -42,9 +31,6 @@ export const login = async (req, res, next) => {
   }
 };
 
-// ======================================================
-// VERIFY EMAIL
-// ======================================================
 export const verifyEmail = async (req, res, next) => {
   try {
     const token = req.params.token;
@@ -55,9 +41,33 @@ export const verifyEmail = async (req, res, next) => {
   }
 };
 
-// ======================================================
-// /me — obtiene el usuario actual
-// ======================================================
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const result = await service.forgotPassword(req.body, req);
+    return res.status(result.status ?? 200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const validateResetToken = async (req, res, next) => {
+  try {
+    const result = await service.validateResetToken(req.body);
+    return res.status(result.status ?? 200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const result = await service.resetPassword(req.body, req);
+    return res.status(result.status ?? 200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const me = async (req, res) => {
   try {
     const user = await repo.findUserById(req.user.id);
@@ -79,9 +89,6 @@ export const me = async (req, res) => {
   }
 };
 
-// ======================================================
-// Actualizar perfil del usuario (con Supabase Storage)
-// ======================================================
 export const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, profession, phone } = req.body;
