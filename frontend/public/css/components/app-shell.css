@@ -38,6 +38,8 @@
   box-shadow: 10px 0 25px rgba(0,0,0,0.15);
   transition: left 0.3s ease;
   z-index: 3500;
+  display: flex;
+  flex-direction: column;
 }
 
 .drawer.open {
@@ -57,18 +59,83 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .drawer-nav a {
   text-decoration: none;
   color: #333;
-  font-size: 16px;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.drawer-nav a:hover {
+  background: rgba(255,243,194,0.42);
+  transform: translateX(2px);
+}
+
+.drawer-nav a.is-current {
+  background: rgba(255,173,173,0.14);
+  color: #ff8f8f;
+  font-weight: 700;
 }
 
 .drawer-nav i {
-  margin-right: 10px;
+  margin-right: 0;
+  width: 18px;
+  text-align: center;
   color: #ffadad;
+  flex-shrink: 0;
+}
+
+.drawer-feedback {
+  margin: auto 20px 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,173,173,0.25);
+}
+
+.drawer-feedback-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #333;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,243,194,0.78) 0%, rgba(255,255,255,0.96) 100%);
+  border: 1px solid rgba(255,173,173,0.28);
+  box-shadow: 0 8px 18px rgba(255,173,173,0.12);
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.drawer-feedback-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(255,173,173,0.16);
+}
+
+.drawer-feedback-link i {
+  width: 18px;
+  text-align: center;
+  color: #ffadad;
+}
+
+.drawer-feedback-link.is-current {
+  background: #ffadad;
+  color: #fff;
+  border-color: #ffadad;
+  box-shadow: 0 10px 22px rgba(255,173,173,0.26);
+}
+
+.drawer-feedback-link.is-current i {
+  color: #fff;
 }
 
 /* ===== OVERLAY ===== */
@@ -91,5 +158,17 @@
   .top-bar {
     height: 60px;
     padding: 0 15px;
+  }
+
+  .drawer {
+    width: min(320px, 88vw);
+  }
+
+  .drawer-feedback {
+    margin: auto 16px 16px;
+  }
+
+  .drawer-nav {
+    padding: 16px;
   }
 }

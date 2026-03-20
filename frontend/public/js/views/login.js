@@ -118,16 +118,18 @@ function showNotification(message, type = "success") {
 
   const notification = document.createElement("div");
   notification.classList.add("notification-toast");
+
   if (type === "error") notification.classList.add("error");
-  notification.innerHTML = `
-    <i class="fa-solid fa-circle-check""></i>
-    <span>${message}</span>
-  `;
+
+  notification.innerHTML = `<span>${message}</span>`;
+
   document.body.appendChild(notification);
+
   setTimeout(() => {
     notification.style.opacity = "1";
     notification.style.transform = "translateY(0)";
   }, 50);
+
   setTimeout(() => {
     notification.style.opacity = "0";
     notification.style.transform = "translateY(-15px)";

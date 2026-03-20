@@ -87,12 +87,12 @@ export function Profile() {
                     <small>Pacientes activos</small>
                   </div>
 
-                  <div class="stat clickable" data-go="/agenda">
+                  <div class="stat clickable" data-go="/treatments">
                     <div class="stat-top">
-                      <i class="fa-solid fa-calendar-check"></i>
+                      <i class="fa-solid fa-bag-shopping"></i>
                       <span>0</span>
                     </div>
-                    <small>Turnos próximos</small>
+                    <small>Ventas realizadas</small>
                   </div>
                 </section>
               </div>
@@ -101,10 +101,16 @@ export function Profile() {
                 <div class="income-head">
                   <div>
                     <h3>Ingresos</h3>
-                    <p class="muted">Resumen de ingresos por tratamientos</p>
+                    <p class="muted" id="incomeSubtitle">Resumen de ingresos por tratamientos y ventas</p>
                   </div>
 
                   <div class="income-controls">
+                    <select id="incomeSource">
+                      <option value="both" selected>Ambos</option>
+                      <option value="treatments">Tratamientos</option>
+                      <option value="sales">Ventas</option>
+                    </select>
+
                     <select id="incomeRange">
                       <option value="6m" selected>Últimos 6 meses</option>
                       <option value="12m">Últimos 12 meses</option>
@@ -254,8 +260,8 @@ async function loadStats() {
     // 1: Pacientes activos
     if (spans[1]) spans[1].textContent = stats.totalPatients ?? "0";
 
-    // 2: Turnos próximos
-    if (spans[2]) spans[2].textContent = stats.upcomingAppointments ?? "0";
+    // 2: Ventas realizadas
+    if (spans[2]) spans[2].textContent = stats.totalSales ?? "0";
   } catch {
     console.warn("Error cargando stats");
   }
@@ -424,6 +430,37 @@ async function fetchAppointmentsForIncome(fromDate, neededMonths) {
   });
 }
 
+async function fetchSalesForIncome(fromDate) {
+  const limit = 200;
+  let offset = 0;
+  let all = [];
+
+  while (true) {
+    const res = await authFetch(`${API_URL}/sales?offset=${offset}&limit=${limit}`);
+    if (!res.ok) break;
+
+    const items = await res.json().catch(() => []);
+    if (!Array.isArray(items) || !items.length) break;
+
+    all.push(...items);
+
+    const last = items[items.length - 1];
+    const lastDate = last?.date ? new Date(last.date) : null;
+    if (lastDate && lastDate < fromDate) break;
+
+    if (items.length < limit) break;
+    offset += limit;
+
+    if (offset > 2000) break;
+  }
+
+  return all.filter((s) => {
+    if (!s?.date) return false;
+    const d = new Date(s.date);
+    return d >= fromDate;
+  });
+}
+
 function destroyIncomeChart() {
   if (incomeChartInstance) {
     incomeChartInstance.destroy();
@@ -431,13 +468,12 @@ function destroyIncomeChart() {
   }
 }
 
-function renderIncomeChart(labels, values) {
+function renderIncomeChart(labels, datasets) {
   const canvas = document.getElementById("incomeChart");
   const fallback = document.getElementById("incomeChartFallback");
   if (!canvas) return;
 
   if (!window.Chart) {
-    // Chart.js no cargó
     if (fallback) fallback.style.display = "block";
     canvas.style.display = "none";
     return;
@@ -453,25 +489,11 @@ function renderIncomeChart(labels, values) {
     type: "line",
     data: {
       labels,
-      datasets: [
-        {
-          label: "Ingresos",
-          data: values,
-          tension: 0.35,
-          fill: true,
-          borderWidth: 2,
-          borderColor: "#ffadad",
-          backgroundColor: "rgba(255, 173, 173, 0.22)",
-          pointRadius: 3,
-          pointHoverRadius: 5,
-        },
-      ],
+      datasets,
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-
-      // ✅ clave: que tome el punto por eje X aunque no “toques” el punto
       interaction: {
         mode: "index",
         intersect: false,
@@ -481,19 +503,17 @@ function renderIncomeChart(labels, values) {
         mode: "index",
         intersect: false,
       },
-
       plugins: {
-        legend: { display: false },
+        legend: { display: true },
         tooltip: {
           enabled: true,
           mode: "index",
           intersect: false,
           callbacks: {
-            label: (ctx) => ` ${formatARS(ctx.parsed.y)}`,
+            label: (ctx) => ` ${ctx.dataset.label}: ${formatARS(ctx.parsed.y)}`,
           },
         },
       },
-
       scales: {
         x: {
           grid: { display: false },
@@ -509,17 +529,18 @@ function renderIncomeChart(labels, values) {
   });
 }
 
-async function loadIncome(range = "6m") {
+async function loadIncome(range = "6m", source = "both") {
   const monthsCount = range === "12m" ? 12 : 6;
   const months = buildLastNMonths(monthsCount);
   const fromDate = months[0].start;
 
-  // Traemos tratamientos/turnos del backend
-  const rows = await fetchAppointmentsForIncome(fromDate, monthsCount);
+  const [appointmentRows, salesRows] = await Promise.all([
+    fetchAppointmentsForIncome(fromDate, monthsCount),
+    fetchSalesForIncome(fromDate),
+  ]);
 
-  // Sumatoria por mes SOLO Pagado
-  const sums = new Map();
-  rows.forEach((t) => {
+  const treatmentSums = new Map();
+  appointmentRows.forEach((t) => {
     if ((t.status || "").toLowerCase() !== "pagado") return;
 
     const amount = Number(t.amount);
@@ -527,31 +548,121 @@ async function loadIncome(range = "6m") {
 
     const d = new Date(t.date);
     const key = monthKey(d);
-    sums.set(key, (sums.get(key) || 0) + amount);
+    treatmentSums.set(key, (treatmentSums.get(key) || 0) + amount);
+  });
+
+  const salesSums = new Map();
+  salesRows.forEach((s) => {
+    const amount = Number(s.amount);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+
+    const d = new Date(s.date);
+    const key = monthKey(d);
+    salesSums.set(key, (salesSums.get(key) || 0) + amount);
   });
 
   const labels = months.map((m) => m.label);
-  const values = months.map((m) => Math.round(sums.get(m.key) || 0));
+  const treatmentValues = months.map((m) => Math.round(treatmentSums.get(m.key) || 0));
+  const salesValues = months.map((m) => Math.round(salesSums.get(m.key) || 0));
+  const combinedValues = months.map((_, i) => treatmentValues[i] + salesValues[i]);
 
-  // KPIs
-  const total = values.reduce((acc, v) => acc + v, 0);
+  let datasets = [];
+  let valuesForKpis = [];
+  const subtitle = document.getElementById("incomeSubtitle");
+
+  if (source === "treatments") {
+    datasets = [
+      {
+        label: "Tratamientos",
+        data: treatmentValues,
+        tension: 0.35,
+        fill: true,
+        borderWidth: 2,
+        borderColor: "#ffadad",
+        backgroundColor: "rgba(255, 173, 173, 0.22)",
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+    ];
+    valuesForKpis = treatmentValues;
+    if (subtitle) subtitle.textContent = "Resumen de ingresos por tratamientos";
+  } else if (source === "sales") {
+    datasets = [
+      {
+        label: "Ventas",
+        data: salesValues,
+        tension: 0.35,
+        fill: true,
+        borderWidth: 2,
+        borderColor: "#cdb4db",
+        backgroundColor: "rgba(205, 180, 219, 0.20)",
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+    ];
+    valuesForKpis = salesValues;
+    if (subtitle) subtitle.textContent = "Resumen de ingresos por ventas";
+  } else {
+    datasets = [
+      {
+        label: "Tratamientos",
+        data: treatmentValues,
+        tension: 0.35,
+        fill: false,
+        borderWidth: 2,
+        borderColor: "#ffadad",
+        backgroundColor: "rgba(255, 173, 173, 0.10)",
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+      {
+        label: "Ventas",
+        data: salesValues,
+        tension: 0.35,
+        fill: false,
+        borderWidth: 2,
+        borderColor: "#cdb4db",
+        backgroundColor: "rgba(205, 180, 219, 0.10)",
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+    ];
+    valuesForKpis = combinedValues;
+    if (subtitle) subtitle.textContent = "Resumen de ingresos por tratamientos y ventas";
+  }
+
+  const total = valuesForKpis.reduce((acc, v) => acc + v, 0);
   const avg = Math.round(total / monthsCount);
 
   const totalEl = document.getElementById("incomeTotal");
   const avgEl = document.getElementById("incomeAvg");
+
   if (totalEl) totalEl.textContent = formatARS(total);
   if (avgEl) avgEl.textContent = formatARS(avg);
 
-  renderIncomeChart(labels, values);
+  renderIncomeChart(labels, datasets);
 }
 
 function initIncome() {
-  const select = document.getElementById("incomeRange");
-  if (select && !select.dataset.bound) {
-    select.dataset.bound = "1";
-    select.addEventListener("change", () => loadIncome(select.value));
+  const rangeSelect = document.getElementById("incomeRange");
+  const sourceSelect = document.getElementById("incomeSource");
+
+  const reload = () => {
+    loadIncome(
+      rangeSelect?.value || "6m",
+      sourceSelect?.value || "both"
+    );
+  };
+
+  if (rangeSelect && !rangeSelect.dataset.bound) {
+    rangeSelect.dataset.bound = "1";
+    rangeSelect.addEventListener("change", reload);
   }
 
-  // primera carga
-  loadIncome(select?.value || "6m");
+  if (sourceSelect && !sourceSelect.dataset.bound) {
+    sourceSelect.dataset.bound = "1";
+    sourceSelect.addEventListener("change", reload);
+  }
+
+  reload();
 }

@@ -25,6 +25,8 @@ model User {
   verificationTokens  VerificationToken[]
   reminders           Reminder[]
   sales               Sale[]
+  feedbackItems        FeedbackItem[]
+  feedbackVotes        FeedbackVote[]
 }
 
 model Patient {
@@ -235,4 +237,65 @@ model HomeCarePlanItem {
   plan   HomeCarePlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@index([planId])
+}
+
+enum FeedbackCategory {
+  IDEA_NUEVA
+  MEJORA_VISUAL
+  ERROR_PROBLEMA
+  NUEVA_FUNCION
+  EXPERIENCIA_DE_USO
+  OTRA
+}
+
+enum FeedbackVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum FeedbackStatus {
+  OPEN
+  UNDER_REVIEW
+  PLANNED
+  DONE
+  REJECTED
+}
+
+model FeedbackItem {
+  id              Int                @id @default(autoincrement())
+  userId          Int
+  category        FeedbackCategory
+  description     String
+  descriptionHash String
+  visibility      FeedbackVisibility @default(PUBLIC)
+  status          FeedbackStatus     @default(OPEN)
+  contactAllowed  Boolean            @default(false)
+  attachmentUrl   String?
+  attachmentPath  String?
+  attachmentMime  String?
+  attachmentSize  Int?
+  votesCount      Int                @default(0)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes FeedbackVote[]
+
+  @@index([userId, createdAt])
+  @@index([descriptionHash])
+  @@index([visibility, createdAt])
+  @@index([visibility, votesCount])
+}
+
+model FeedbackVote {
+  id         Int      @id @default(autoincrement())
+  feedbackId Int
+  userId     Int
+  createdAt  DateTime @default(now())
+
+  feedback FeedbackItem @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([feedbackId, userId])
+  @@index([userId, createdAt])
 }

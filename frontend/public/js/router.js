@@ -24,6 +24,7 @@ import { HelpPage, initHelpPage } from "./views/help.page.js";
 import { About, initAbout } from "./views/about.js";
 import { Contact, initContact } from "./views/contact.js";
 import { Plans, initPlans } from "./views/plans.js";
+import { Feedback, initFeedback } from "./views/feedback.js";
 
 export function router() {
   const app = document.getElementById("app");
@@ -46,7 +47,8 @@ export function router() {
       "is-profile",
       "is-contact",
       "is-help",
-      "is-help-page"
+      "is-help-page",
+      "is-feedback"
     );
 
     if (path === "/login") document.body.classList.add("is-login");
@@ -62,6 +64,7 @@ export function router() {
     else if (/^\/patients\/\d+\/interview\/edit\/2$/.test(path)) document.body.classList.add("is-interview-edit-2");
     else if (path === "/ayuda") document.body.classList.add("is-help-page");
     else if (path === "/contact") document.body.classList.add("is-contact");
+    else if (path === "/feedback") document.body.classList.add("is-feedback");
   };
 
   setBodyViewClass();
@@ -175,6 +178,13 @@ export function router() {
     if (!requireAuth()) return;
     app.innerHTML = PatientNew();
     initPatientNew();
+    return;
+  }
+
+  if (path === "/feedback") {
+    if (!requireAuth()) return;
+    app.innerHTML = Feedback();
+    initFeedback();
     return;
   }
 

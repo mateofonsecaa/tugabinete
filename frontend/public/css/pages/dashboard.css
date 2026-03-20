@@ -1,6 +1,6 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
 
-    body {
+    .dashboard-page body {
       background: url("../../public/images/body.png") no-repeat center center fixed;
       background-size: cover;
       background-color: #ffadad;
@@ -11,7 +11,7 @@
     }
 
     /* ===== MAIN ===== */
-    main {
+    .dashboard-page main {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -19,6 +19,8 @@
       justify-content: center;
       text-align: center;
       padding: 60px 20px;
+      background: transparent;
+      box-shadow: none;
     }
 
     .welcome {

@@ -9,6 +9,7 @@ import simpleRoutes from "./modules/simple/simple.routes.js";
 import statsRoutes from "./modules/stats/stats.routes.js";
 import remindersRoutes from "./modules/reminders/reminders.routes.js";
 import salesRoutes from "./modules/sales/sales.routes.js";
+import feedbackRoutes from "./modules/feedback/feedback.routes.js";
 
 const router = Router();
 
@@ -20,8 +21,7 @@ router.use("/observations", observationRoutes);
 router.use("/simple", simpleRoutes);
 router.use("/stats", statsRoutes);
 router.use("/reminders", remindersRoutes);
-
-// ✅ Sales
 router.use("/sales", salesRoutes);
+router.use("/feedback", feedbackRoutes);
 
 export default router;
