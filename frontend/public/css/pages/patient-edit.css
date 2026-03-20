@@ -1,72 +1,276 @@
-/* ================================
-   Editar paciente (SPA)
-================================ */
+/* public/css/patient-edit.css */
 
-body.is-patient-edit .patients-page main{
-  max-width: 1100px;
+body.is-patient-edit .patients-page.patient-edit-page main {
+  max-width: 760px !important;
+  margin: 100px auto 60px !important;
+  padding: 34px 36px 36px !important;
 }
 
-/* Form en grid */
-body.is-patient-edit .patients-page main form{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 14px;
-  align-items: end;
-  margin-top: 18px;
-}
-
-/* En mobile baja a 1 columna */
-@media (max-width: 768px){
-  body.is-patient-edit .patients-page main form{
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Labels e inputs prolijos */
-body.is-patient-edit .patients-page main label{
-  font-weight: 600;
-  color: #555;
-  font-size: 14px;
-}
-
-body.is-patient-edit .patients-page main input,
-body.is-patient-edit .patients-page main select,
-body.is-patient-edit .patients-page main textarea{
-  width: 100%;
-  border: 1.5px solid #ffd6d6;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #fffdf9;
-  font-size: 15px;
-  font-family: "Poppins", sans-serif;
-  box-sizing: border-box;
-}
-
-body.is-patient-edit .patients-page main input:focus,
-body.is-patient-edit .patients-page main select:focus,
-body.is-patient-edit .patients-page main textarea:focus{
-  outline: none;
-  border-color: #ffadad;
-  box-shadow: 0 0 8px rgba(255, 173, 173, 0.25);
-}
-
-/* ===== Patient Edit: botones arriba bien alineados ===== */
-body.is-patient-edit .patients-page main .main-top-actions{
-  position: relative !important; /* pisa el absolute de patients.css */
+body.is-patient-edit .patients-page.patient-edit-page .main-top-actions {
+  position: relative !important;
   top: auto !important;
   left: auto !important;
   right: auto !important;
-
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  width:100% !important;
-  margin: 0 0 18px 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 18px !important;
 }
 
-body.is-patient-edit .patients-page main .main-top-actions .right-actions{
-  margin-left:auto !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
+body.is-patient-edit .patients-page.patient-edit-page .main-top-actions .right-actions {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+body.is-patient-edit .patient-edit-header {
+  display: block !important;
+  width: 100%;
+  text-align: center;
+}
+
+body.is-patient-edit .patient-edit-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+body.is-patient-edit .patient-edit-title {
+  display: block;
+  width: 100%;
+  margin: 0 0 10px !important;
+  text-align: center;
+  color: #ffadad !important;
+  font-size: 30px !important;
+  line-height: 1.15;
+}
+
+body.is-patient-edit .patient-edit-subtitle {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+body.is-patient-edit .patient-edit-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 173, 173, 0.22);
+  border-radius: 18px;
+  padding: 28px 24px;
+  box-shadow: 0 10px 24px rgba(255, 173, 173, 0.08);
+}
+
+body.is-patient-edit .patient-edit-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+}
+
+body.is-patient-edit .patient-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.is-patient-edit .patient-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+body.is-patient-edit .patient-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4c4c4c;
+}
+
+body.is-patient-edit .patient-field-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 173, 173, 0.12);
+  border: 1px solid rgba(255, 173, 173, 0.22);
+  color: #8a6f6f;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+body.is-patient-edit .patient-field-status--required {
+  color: #7c5757;
+  background: rgba(255, 173, 173, 0.18);
+}
+
+body.is-patient-edit .patient-edit-form input {
+  width: 100% !important;
+  min-height: 50px;
+  border: 1.5px solid #ffd6d6 !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  background: #fffdf9 !important;
+  color: #333 !important;
+  font-size: 15px !important;
+  line-height: 1.2;
+  box-sizing: border-box !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+body.is-patient-edit .patient-edit-form input::placeholder {
+  color: #a58f8f;
+}
+
+body.is-patient-edit .patient-edit-form input:focus {
+  outline: none !important;
+  border-color: #ffadad !important;
+  box-shadow: 0 0 0 4px rgba(255, 173, 173, 0.14) !important;
+  background: #ffffff !important;
+}
+
+body.is-patient-edit .patient-input-wrap {
+  position: relative;
+}
+
+body.is-patient-edit .patient-input-wrap .patient-input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffadad;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+body.is-patient-edit .patient-input-wrap--date input {
+  padding-right: 42px !important;
+  cursor: pointer;
+}
+
+body.is-patient-edit .patient-input-wrap--date input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+body.is-patient-edit .patient-field-help {
+  margin: 0;
+  min-height: 18px;
+  color: #8a7a7a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+body.is-patient-edit .patient-field-error {
+  margin: 0;
+  min-height: 18px;
+  color: #c26e6e;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+body.is-patient-edit .patient-field.is-error input {
+  border-color: #e49a9a !important;
+  box-shadow: 0 0 0 4px rgba(228, 154, 154, 0.12) !important;
+  background: #fffafa !important;
+}
+
+body.is-patient-edit .patient-form-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+body.is-patient-edit .patient-form-actions .btn-save {
+  width: 220px;
+  height: 52px;
+  padding: 0 28px;
+  margin: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+  border: 2px solid transparent;
+}
+
+body.is-patient-edit .patient-form-actions .btn-save:disabled {
+  opacity: 0.78;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+@media (max-width: 768px) {
+  body.is-patient-edit .patients-page.patient-edit-page main {
+    margin: 88px 14px 28px !important;
+    width: auto !important;
+    padding: 22px 16px 20px !important;
+  }
+
+  body.is-patient-edit .patients-page.patient-edit-page .main-top-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  body.is-patient-edit .patients-page.patient-edit-page .main-top-actions .right-actions {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  body.is-patient-edit .patients-page.patient-edit-page .main-top-actions .right-actions .btn-add {
+    width: 100%;
+  }
+
+  body.is-patient-edit .patient-edit-title {
+    font-size: 25px !important;
+  }
+
+  body.is-patient-edit .patient-edit-subtitle {
+    font-size: 13px;
+  }
+
+  body.is-patient-edit .patient-edit-card {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+
+  body.is-patient-edit .patient-edit-form {
+    gap: 16px !important;
+  }
+
+  body.is-patient-edit .patient-edit-form input {
+    min-height: 48px;
+    font-size: 14px !important;
+  }
+
+  body.is-patient-edit .patient-form-actions {
+    flex-direction: column;
+  }
+
+  body.is-patient-edit .patient-form-actions .btn-save {
+    width: 100%;
+    min-width: 0;
+  }
 }
