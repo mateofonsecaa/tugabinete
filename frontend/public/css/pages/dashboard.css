@@ -163,6 +163,13 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  .dashboard-actions,
+  .action-card,
+  .welcome,
+  .dashboard-page main {
+    min-width: 0;
+  }
+
   body {
     background-attachment: scroll;
   }
@@ -170,8 +177,7 @@
   .dashboard-page {
     min-height: 100dvh;
     height: auto;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: visible;
   }
 
   /* ===== TOP BAR ===== */
@@ -180,10 +186,19 @@
     grid-template-columns: 44px 1fr 44px;
     align-items: center;
     gap: 10px;
+    width: 100%;
     padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px;
     position: sticky;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1100;
+    flex-shrink: 0;
+    background: rgba(255, 253, 249, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 173, 173, 0.18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
   }
 
   .top-bar::after {
@@ -304,6 +319,7 @@
     padding: 24px 18px;
     border-radius: 18px;
     backdrop-filter: blur(8px);
+    box-sizing: border-box;
   }
 
   .welcome h1 {
@@ -332,17 +348,26 @@
     width: 100%;
     min-width: 0;
     height: auto;
-    min-height: 136px;
-    padding: 18px 14px;
-    border-radius: 16px;
-    display: flex;
+    min-height: 112px;
+    padding: 16px 14px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
     text-align: center;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
+    gap: 10px;
+  }
+
+  .action-card i {
+    font-size: 26px;
+    flex: 0 0 auto;
+    text-align: center;
+  }
+
+  .action-card span {
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.3;
+    width: 100%;
   }
 
   .action-card:hover {
@@ -352,20 +377,6 @@
 
   .action-card:active {
     transform: scale(0.98);
-  }
-
-  .action-card i {
-    font-size: 32px;
-    margin-bottom: 0;
-    flex: 0 0 auto;
-  }
-
-  .action-card span {
-    font-size: 15px;
-    line-height: 1.35;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-    word-break: break-word;
   }
 
   /* ===== NOTIFICACIONES ===== */
@@ -438,23 +449,27 @@
   }
 
   .action-card {
+    width: 100%;
+    min-width: 0;
+    height: auto;
     min-height: 112px;
     padding: 16px 14px;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    text-align: left;
-    gap: 12px;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
   }
 
   .action-card i {
     font-size: 26px;
-    flex: 0 0 32px;
+    flex: 0 0 auto;
     text-align: center;
   }
 
   .action-card span {
-    text-align: left;
+    width: 100%;
+    text-align: center;
     font-size: 15px;
     line-height: 1.3;
   }
