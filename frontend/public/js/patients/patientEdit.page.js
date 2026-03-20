@@ -22,7 +22,22 @@ function toDateInputValue(dateLike) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function setEditFormLocked(locked) {
+  const form = document.getElementById("patient-form");
+  if (!form) return;
+
+  form.classList.toggle("is-loading", locked);
+
+  form
+    .querySelectorAll("input, select, textarea, button[type='submit']")
+    .forEach((el) => {
+      el.disabled = locked;
+    });
+}
+
 export async function initPatientEditPage() {
+  setEditFormLocked(true);
+
   const id = getPatientIdFromEditPath();
   if (!id) {
     Swal.fire({ icon: "error", title: "Error", text: "ID inválido" });
@@ -33,46 +48,53 @@ export async function initPatientEditPage() {
   document.getElementById("back-btn")?.addEventListener("click", () => go("/patients"));
   document.getElementById("to-details-btn")?.addEventListener("click", () => go(`/patients/${id}`));
 
-  await loadPatientIntoForm(id);
+  try {
+    await loadPatientIntoForm(id);
+  } catch (err) {
+    console.error(err);
+    document.getElementById("patient-title").textContent = "No se pudo cargar el paciente";
 
-  // Permitir espacios y limitar largo mientras escribe
-const fullNameEl = document.getElementById("fullName");
-const phoneEl = document.getElementById("phone");
-const addressEl = document.getElementById("address");
-const professionEl = document.getElementById("profession");
+    await Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: err.message || "No se pudo cargar el paciente",
+    });
 
-if (fullNameEl) {
-  fullNameEl.maxLength = 20;
-  fullNameEl.addEventListener("input", () => {
-    // deja letras + espacios (no borra espacios)
-    fullNameEl.value = fullNameEl.value.replace(/[^\p{L}\s]/gu, "");
-  });
-}
+    return;
+  }
 
-if (phoneEl) {
-  phoneEl.maxLength = 20;
-  phoneEl.addEventListener("input", () => {
-    // solo números (permite vacío mientras escribe)
-    phoneEl.value = phoneEl.value.replace(/[^0-9]/g, "");
-  });
-}
+  const fullNameEl = document.getElementById("fullName");
+  const phoneEl = document.getElementById("phone");
+  const addressEl = document.getElementById("address");
+  const professionEl = document.getElementById("profession");
 
-if (addressEl) {
-  addressEl.maxLength = 30;
-  addressEl.addEventListener("input", () => {
-    // letras + números + espacios
-    addressEl.value = addressEl.value.replace(/[^\p{L}0-9\s]/gu, "");
-  });
-}
+  if (fullNameEl) {
+    fullNameEl.maxLength = 20;
+    fullNameEl.addEventListener("input", () => {
+      fullNameEl.value = fullNameEl.value.replace(/[^\p{L}\s]/gu, "");
+    });
+  }
 
-if (professionEl) {
-  professionEl.maxLength = 20;
-  professionEl.addEventListener("input", () => {
-    // letras + espacios
-    professionEl.value = professionEl.value.replace(/[^\p{L}\s]/gu, "");
-  });
-}
-  // Abrir calendario al click (Chrome/Edge)
+  if (phoneEl) {
+    phoneEl.maxLength = 20;
+    phoneEl.addEventListener("input", () => {
+      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, "");
+    });
+  }
+
+  if (addressEl) {
+    addressEl.maxLength = 30;
+    addressEl.addEventListener("input", () => {
+      addressEl.value = addressEl.value.replace(/[^\p{L}0-9\s]/gu, "");
+    });
+  }
+
+  if (professionEl) {
+    professionEl.maxLength = 20;
+    professionEl.addEventListener("input", () => {
+      professionEl.value = professionEl.value.replace(/[^\p{L}\s]/gu, "");
+    });
+  }
 
   const birth = document.getElementById("birthDate");
   if (birth) {
@@ -87,15 +109,17 @@ if (professionEl) {
 async function loadPatientIntoForm(id) {
   const res = await api.getPatientById(id);
   if (!res.ok) throw new Error("No se pudo cargar el paciente");
+
   const p = await res.json();
 
   document.getElementById("patient-title").textContent = p.fullName || "Paciente";
-
   document.getElementById("fullName").value = p.fullName || "";
   document.getElementById("birthDate").value = toDateInputValue(p.birthDate);
   document.getElementById("phone").value = p.phone || "";
   document.getElementById("address").value = p.address || "";
   document.getElementById("profession").value = p.profession || "";
+
+  setEditFormLocked(false);
 }
 
 async function onSubmit(e, id) {
@@ -106,11 +130,14 @@ async function onSubmit(e, id) {
   const address = document.getElementById("address").value.trim();
   const profession = document.getElementById("profession").value.trim();
 
-  const onlyLetters = (s) => /^[\p{L}\s]+$/u.test(s);           // letras unicode + espacios
+  const onlyLetters = (s) => /^[\p{L}\s]+$/u.test(s);
   const onlyDigits = (s) => /^[0-9]+$/.test(s);
-  const lettersDigits = (s) => /^[\p{L}0-9\s]+$/u.test(s);      // letras + números + espacios
+  const lettersDigits = (s) => /^[\p{L}0-9\s]+$/u.test(s);
 
   // Nombre
+  if (!fullName) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Nombre completo: es obligatorio." });
+  }
   if (fullName.length > 20) {
     return Swal.fire({ icon: "error", title: "Error", text: "Nombre: máximo 20 caracteres." });
   }
@@ -118,15 +145,15 @@ async function onSubmit(e, id) {
     return Swal.fire({ icon: "error", title: "Error", text: "Nombre: solo letras y espacios." });
   }
 
-  // Teléfono
+  // Teléfono opcional
   if (phone.length > 20) {
     return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: máximo 20 caracteres." });
   }
-  if (!onlyDigits(phone)) {
+  if (phone && !onlyDigits(phone)) {
     return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: solo números." });
   }
 
-  // Dirección (si viene vacía, ok)
+  // Dirección opcional
   if (address.length > 30) {
     return Swal.fire({ icon: "error", title: "Error", text: "Dirección: máximo 30 caracteres." });
   }
@@ -134,15 +161,15 @@ async function onSubmit(e, id) {
     return Swal.fire({ icon: "error", title: "Error", text: "Dirección: solo letras, números y espacios." });
   }
 
-  // Profesión (solo límite, como pediste)
+  // Profesión opcional
   if (profession.length > 20) {
     return Swal.fire({ icon: "error", title: "Error", text: "Profesión: máximo 20 caracteres." });
   }
 
   const data = {
     fullName,
-    birthDate: document.getElementById("birthDate").value, // yyyy-mm-dd
-    phone,
+    birthDate: document.getElementById("birthDate").value || null,
+    phone: phone || null,
     address: address || null,
     profession: profession || null,
   };
@@ -161,9 +188,7 @@ async function onSubmit(e, id) {
       showConfirmButton: false,
     });
 
-    // Para que el listado se refresque (tu listado usa cache)
     localStorage.removeItem("patients");
-
     go("/patients");
   } catch (err) {
     Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
@@ -171,5 +196,9 @@ async function onSubmit(e, id) {
 }
 
 async function safeJson(res) {
-  try { return await res.json(); } catch { return null; }
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
 }

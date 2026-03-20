@@ -56,14 +56,14 @@ export function PatientEdit() {
 
         <section class="patient-edit-view">
           <div class="patient-edit-header">
-            <h1 id="patient-title" class="patient-edit-title">Editar paciente</h1>
+            <h1 id="patient-title" class="patient-edit-title">Cargando paciente...</h1>
             <p class="patient-edit-subtitle">
               Modificá los datos básicos del paciente. Solo <strong>Nombre completo</strong> es obligatorio.
             </p>
           </div>
 
           <section class="patient-edit-card">
-            <form id="patient-form" class="patient-form patient-edit-form" novalidate>
+            <form id="patient-form" class="patient-form patient-edit-form is-loading" novalidate>
               <div class="patient-field" data-field="fullName">
                 <div class="patient-field-head">
                   <label for="fullName" class="patient-label">Nombre completo</label>
@@ -77,6 +77,7 @@ export function PatientEdit() {
                   maxlength="60"
                   autocomplete="name"
                   placeholder="Ej.: María Fernández"
+                  disabled
                 />
 
                 <p class="patient-field-help">Ingresá nombre y apellido del paciente.</p>
@@ -96,6 +97,7 @@ export function PatientEdit() {
                     max="${today}"
                     autocomplete="bday"
                     placeholder="Seleccionar fecha"
+                    disabled
                   />
                   <i class="fa-regular fa-calendar patient-input-icon" aria-hidden="true"></i>
                 </div>
@@ -117,6 +119,7 @@ export function PatientEdit() {
                   inputmode="tel"
                   autocomplete="tel"
                   placeholder="Ej.: +54 351 123 4567"
+                  disabled
                 />
 
                 <p class="patient-field-help">Podés escribirlo con espacios, guiones o código de país.</p>
@@ -135,6 +138,7 @@ export function PatientEdit() {
                   maxlength="80"
                   autocomplete="street-address"
                   placeholder="Ej.: Av. Colón 1234"
+                  disabled
                 />
 
                 <p class="patient-field-help">Usá una referencia breve y clara.</p>
@@ -153,6 +157,7 @@ export function PatientEdit() {
                   maxlength="50"
                   autocomplete="organization-title"
                   placeholder="Ej.: Cosmetóloga"
+                  disabled
                 />
 
                 <p class="patient-field-help">Campo libre para registrar ocupación o profesión.</p>
@@ -160,7 +165,7 @@ export function PatientEdit() {
               </div>
 
               <div class="patient-form-actions">
-                <button class="btn-save btn-save-edit" type="submit">
+                <button class="btn-save btn-save-edit" id="submit-edit-patient-btn" type="submit" disabled>
                   <i class="fa-solid fa-check"></i> Guardar cambios
                 </button>
               </div>

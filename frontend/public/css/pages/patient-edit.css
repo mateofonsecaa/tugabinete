@@ -222,6 +222,26 @@ body.is-patient-edit .patient-form-actions .btn-save:disabled {
   transform: none !important;
 }
 
+body.is-patient-edit .patient-edit-form.is-loading {
+  pointer-events: none;
+}
+
+body.is-patient-edit .patient-edit-form input:disabled,
+body.is-patient-edit .patient-edit-form select:disabled,
+body.is-patient-edit .patient-edit-form textarea:disabled {
+  background: #f7f3f3 !important;
+  color: #9a8f8f !important;
+  border-color: #eadede !important;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+body.is-patient-edit .patient-edit-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none !important;
+}
+
 @media (max-width: 768px) {
   body.is-patient-edit .patients-page.patient-edit-page main {
     margin: 88px 14px 28px !important;
