@@ -17,6 +17,7 @@ model User {
   profileImage        String?
   phone               String?
   profession          String?
+  authTokenVersion    Int                  @default(0)
   appointments        Appointment[]
   passwordResetTokens PasswordResetToken[]
   patients            Patient[]
@@ -84,12 +85,21 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  token     String   @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  tokenHash          String    @unique
+  createdAt          DateTime  @default(now())
+  expiresAt          DateTime
+  usedAt             DateTime?
+  requestedIp        String?
+  requestedUserAgent String?
+  consumedIp         String?
+  consumedUserAgent  String?
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, usedAt])
 }
 
 model Interview {
