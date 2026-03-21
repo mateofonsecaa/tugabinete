@@ -101,3 +101,230 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* =========================================
+   PATIENTS MOBILE
+   Mantener tabla en móvil
+   Mostrar solo Nombre + Acciones
+   Ocultar botón Volver
+   ========================================= */
+
+@media (max-width: 768px) {
+  .patients-page {
+    overflow-x: hidden;
+  }
+
+  /* ===== Top bar ===== */
+  .patients-page .top-bar {
+    height: 56px;
+    padding: 0 14px;
+    gap: 12px;
+  }
+
+  .patients-page .app-title {
+    min-width: 0;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .patients-page .menu-btn,
+  .patients-page .close-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  /* ===== Drawer ===== */
+  .patients-page .drawer {
+    width: min(82vw, 320px);
+    max-width: 320px;
+  }
+
+  /* ===== Main ===== */
+  .patients-page main {
+    max-width: none;
+    width: calc(100% - 24px);
+    margin: 78px auto 24px;
+    padding: 18px 14px 16px;
+    border-radius: 18px;
+  }
+
+  /* Ocultar volver en móvil */
+  .patients-page:not(.patient-details-page):not(.patient-edit-page):not(.patient-new-page) .main-top-actions {
+    display: none;
+  }
+
+  .patients-page h1 {
+    margin: 0 0 18px;
+    font-size: 26px;
+    line-height: 1.2;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  /* ===== Search bar ===== */
+  .patients-page .search-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .patients-page .search-bar input {
+    width: 100%;
+    min-height: 46px;
+    padding: 13px 14px;
+    font-size: 16px;
+  }
+
+  .patients-page .btn-add {
+    width: 50%;
+    min-height: 46px;
+    justify-content: center;
+    padding: 13px 16px;
+    margin: 0 auto;
+  }
+
+  /* ===== Tabla ===== */
+  .patients-page .table-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    overflow-x: hidden;
+    border-radius: 14px;
+  }
+
+  .patients-page #patientsTable {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .patients-page #patientsTable th,
+  .patients-page #patientsTable td {
+    padding: 12px 10px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  /* Mostrar solo Nombre y Acciones */
+  .patients-page #patientsTable th:nth-child(2),
+  .patients-page #patientsTable th:nth-child(3),
+  .patients-page #patientsTable th:nth-child(4),
+  .patients-page #patientsTable td:nth-child(2),
+  .patients-page #patientsTable td:nth-child(3),
+  .patients-page #patientsTable td:nth-child(4) {
+    display: none;
+  }
+
+  /* Ajuste de anchos de columnas visibles */
+  .patients-page #patientsTable th:nth-child(1),
+  .patients-page #patientsTable td:nth-child(1) {
+    width: auto;
+  }
+
+  .patients-page #patientsTable th:nth-child(5),
+  .patients-page #patientsTable td:nth-child(5) {
+    width: 116px;
+    text-align: center;
+  }
+
+  /* Nombre del paciente */
+  .patients-page #patientsTable td:nth-child(1) {
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
+    word-break: break-word;
+    line-height: 1.35;
+    font-weight: 500;
+  }
+
+  /* Acciones */
+  .patients-page .actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .patients-page .actions button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: rgba(255, 173, 173, 0.1);
+    border: 1px solid rgba(255, 173, 173, 0.28);
+  }
+
+  /* Fila vacía */
+  .patients-page #patientsTable td[colspan] {
+    display: table-cell !important;
+    text-align: center;
+    padding: 18px 12px;
+  }
+
+  /* Focus */
+  .patients-page .search-bar input:focus-visible,
+  .patients-page .btn-add:focus-visible,
+  .patients-page .actions button:focus-visible,
+  .patients-page .menu-btn:focus-visible,
+  .patients-page .close-btn:focus-visible {
+    outline: 2px solid rgba(255, 173, 173, 0.75);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .patients-page .top-bar {
+    padding: 0 12px;
+  }
+
+  .patients-page main {
+    width: calc(100% - 16px);
+    margin: 74px auto 16px;
+    padding: 16px 12px 14px;
+    border-radius: 16px;
+  }
+
+  .patients-page h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .patients-page .search-bar input,
+  .patients-page .btn-add {
+    min-height: 44px;
+  }
+
+  .patients-page #patientsTable th,
+  .patients-page #patientsTable td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .patients-page #patientsTable th:nth-child(5),
+  .patients-page #patientsTable td:nth-child(5) {
+    width: 108px;
+  }
+
+  .patients-page .actions {
+    gap: 6px;
+  }
+
+  .patients-page .actions button {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+}
