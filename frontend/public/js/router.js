@@ -65,6 +65,7 @@ export function router() {
     else if (path === "/ayuda") document.body.classList.add("is-help-page");
     else if (path === "/contact") document.body.classList.add("is-contact");
     else if (path === "/feedback") document.body.classList.add("is-feedback");
+    else if (path === "/treatments") document.body.classList.add("is-treatments");
   };
 
   setBodyViewClass();

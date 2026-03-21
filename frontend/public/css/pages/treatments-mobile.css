@@ -1,0 +1,609 @@
+/* ==========================================================
+   TuGabinete — Treatments Mobile Fix Pack
+   Crear como archivo aparte o pegar al final de treatments.css
+   ========================================================== */
+
+/* ==========================================================
+   AJUSTES DEFENSIVOS / CONFLICTOS REALES DEL CÓDIGO ACTUAL
+   ========================================================== */
+
+.treatments-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.treatments-page .treatments-main,
+.treatments-page .treatments-container,
+.treatments-page .treatments-grid,
+.treatments-page .treatments-left,
+.treatments-page .treatments-right,
+.treatments-page .tg-card,
+.treatments-page .tg-form-grid,
+.treatments-page .tg-form-col,
+.treatments-page .filters,
+.treatments-page .table-card,
+.treatments-page .table-scroll,
+.treatments-page .tg-results-list,
+.treatments-page .treat-card,
+.treatments-page .modal-box,
+.treatments-page .modal-grid,
+.treatments-page .edit-grid,
+.treatments-page .detail-grid {
+  min-width: 0;
+}
+
+/* Corrige conflicto: el drawer usa .close-btn, pero treatments.css lo trataba como botón de modal */
+.treatments-page .drawer-header .close-btn {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  line-height: 1;
+}
+
+/* Columnas reales de la página */
+.treatments-page .treatments-left,
+.treatments-page .treatments-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Clase real usada en el render y no resuelta del todo */
+.treatments-page .treat-patient-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 173, 173, 0.14);
+  border: 1px solid rgba(255, 173, 173, 0.24);
+  color: #d67d7d;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Mejor anclaje del dropdown respecto al input */
+.treatments-page .searchable-select {
+  min-width: 0;
+}
+
+.treatments-page .options {
+  top: calc(100% + 6px);
+}
+
+.treatments-page .filters > *,
+.treatments-page .tg-form-grid > *,
+.treatments-page .tg-inline-2 > *,
+.treatments-page .tg-photos-row > *,
+.treatments-page .modal-grid > *,
+.treatments-page .edit-grid > * {
+  min-width: 0;
+}
+
+/* El modal nuevo paciente hoy no está bien conectado con el CSS actual */
+.treatments-page #newPatientModal .modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+}
+
+.treatments-page #newPatientModal .form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.treatments-page #newPatientModal .modal-actions {
+  margin-top: 22px;
+}
+
+/* ==========================================================
+   TABLET CHICA / MÓVIL GENERAL
+   ========================================================== */
+
+@media (max-width: 768px) {
+  /* ----- Top bar / shell ----- */
+  .treatments-page .top-bar {
+    height: 60px;
+    padding: 0 14px;
+    gap: 12px;
+  }
+
+  .treatments-page .menu-btn,
+  .treatments-page .drawer-header .close-btn,
+  .treatments-page .tg-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+  }
+
+  .treatments-page .app-title {
+    min-width: 0;
+    font-size: 18px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .treatments-page .drawer {
+    width: min(320px, 88vw);
+  }
+
+  .treatments-page .drawer-header {
+    padding: 16px;
+  }
+
+  .treatments-page .drawer-nav {
+    padding: 16px;
+    gap: 6px;
+  }
+
+  .treatments-page .drawer-nav a,
+  .treatments-page .drawer-feedback-link {
+    min-height: 44px;
+  }
+
+  /* ----- Contenedor principal ----- */
+  .treatments-page main.treatments-main {
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 76px auto 18px;
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .treatments-page .treatments-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .treatments-page h1 {
+    margin: 0 0 6px;
+    text-align: left;
+    font-size: 24px;
+    line-height: 1.15;
+  }
+
+  .treatments-page .treatments-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .treatments-page .treatments-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .treatments-page .treatments-left {
+    order: 1;
+  }
+
+  .treatments-page .treatments-right {
+    order: 2;
+  }
+
+  .treatments-page .tg-card {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .treatments-page .tg-card-head {
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .treatments-page .tg-card h2,
+  .treatments-page .table-title h2 {
+    font-size: 16px;
+    padding-left: 8px;
+    border-left-width: 4px;
+  }
+
+  .treatments-page .muted {
+    font-size: 12.5px;
+  }
+
+  /* ----- Formularios ----- */
+  .treatments-page .tg-form-grid,
+  .treatments-page .filters,
+  .treatments-page .tg-inline-2,
+  .treatments-page .tg-photos-row,
+  .treatments-page #editTreatmentModal .edit-grid,
+  .treatments-page #editTreatmentModal .edit-photo-section,
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid,
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos,
+  .treatments-page #newPatientModal .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .treatments-page label {
+    font-size: 13.5px;
+  }
+
+  .treatments-page input,
+  .treatments-page select,
+  .treatments-page textarea {
+    min-height: 44px;
+    padding: 12px 12px;
+    font-size: 16px;
+  }
+
+  .treatments-page textarea {
+    min-height: 110px;
+  }
+
+  .treatments-page .register-options,
+  .treatments-page .sale-head-actions,
+  .treatments-page .action-buttons,
+  .treatments-page .modal-actions,
+  .treatments-page #editTreatmentModal .edit-treatment-actions,
+  .treatments-page #editSaleModal .edit-sale-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .register-options .btn-patient,
+  .treatments-page .sale-head-actions .btn-patient,
+  .treatments-page .action-buttons .btn-save-treatment,
+  .treatments-page .action-buttons .btn-cancel-treatment,
+  .treatments-page #editTreatmentModal .btn-edit-treatment-save,
+  .treatments-page #editTreatmentModal .btn-edit-treatment-cancel,
+  .treatments-page #editSaleModal .btn-edit-sale-save,
+  .treatments-page #editSaleModal .btn-edit-sale-cancel,
+  .treatments-page .modal-actions .btn-save,
+  .treatments-page .modal-actions .btn-cancel {
+    min-width: 140px;
+    max-width: 100%;
+    height: auto;
+    padding: 12px 16px;
+    font-size: 14.5px;
+  }
+
+  /* ----- Fotos / archivos ----- */
+  .treatments-page .file-input-wrapper {
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .treatments-page .file-name {
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
+    line-height: 1.4;
+  }
+
+  .treatments-page .photo-mini-preview {
+    width: 100%;
+    max-width: 140px;
+    height: 100px;
+  }
+
+  /* ----- Filtros ----- */
+  .treatments-page .active-filters--sticky {
+    padding: 8px 0 12px;
+  }
+
+  .treatments-page .active-filters {
+    gap: 8px;
+  }
+
+  .treatments-page .tg-chip {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  /* ----- Resultados ----- */
+  .treatments-page .table-card {
+    padding: 0;
+  }
+
+  .treatments-page .table-head {
+    padding: 14px;
+  }
+
+  .treatments-page .table-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* Saca scroll interno en móvil */
+  .treatments-page .table-scroll {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .treatments-page .tg-results-list {
+    gap: 10px;
+  }
+
+  .treatments-page .treat-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .treatments-page .treat-card-main {
+    gap: 12px;
+  }
+
+  .treatments-page .treat-left,
+  .treatments-page .treat-right {
+    width: 100%;
+  }
+
+  .treatments-page .treat-amount {
+    font-size: 18px;
+  }
+
+  .treatments-page .treat-sub--stack {
+    gap: 6px;
+  }
+
+  .treatments-page .treat-sub-line {
+    gap: 6px;
+  }
+
+  .treatments-page .treat-sub-line .lbl {
+    min-width: 78px;
+    font-size: 11.5px;
+  }
+
+  .treatments-page .treat-sub-line .val {
+    font-size: 13.5px;
+    overflow-wrap: anywhere;
+  }
+
+  .treatments-page .treat-badges {
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .treat-card-actions {
+    margin-top: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .actions button {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    border-radius: 12px;
+    background: rgba(255, 173, 173, 0.08);
+  }
+
+  /* ----- Modales ----- */
+  .treatments-page .modal-overlay {
+    padding: 12px;
+  }
+
+  .treatments-page .modal-box {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+
+  .treatments-page .modal-box h2 {
+    font-size: 20px;
+    line-height: 1.2;
+    padding-right: 42px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    padding: 18px 14px 16px;
+    border-radius: 18px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p {
+    grid-template-columns: 82px 1fr;
+    font-size: 13px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-notes p {
+    max-height: none;
+  }
+
+  .treatments-page #editTreatmentModal .photo-preview {
+    height: 190px;
+  }
+
+  .treatments-page #viewTreatmentModal .detail-photos .photo-frame,
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame,
+  .treatments-page #viewTreatmentModal .detail-photos img {
+    height: 190px;
+    max-height: 190px;
+  }
+}
+
+/* ==========================================================
+   CELULAR REAL
+   ========================================================== */
+
+@media (max-width: 480px) {
+  .treatments-page .top-bar {
+    padding: 0 12px;
+  }
+
+  .treatments-page .app-title {
+    font-size: 17px;
+  }
+
+  .treatments-page .drawer {
+    width: min(300px, 86vw);
+  }
+
+  .treatments-page main.treatments-main {
+    width: calc(100% - 20px);
+    margin: 72px auto 14px;
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .treatments-page h1 {
+    font-size: 22px;
+  }
+
+  .treatments-page .treatments-subtitle {
+    font-size: 12.5px;
+  }
+
+  .treatments-page .tg-card {
+    padding: 12px;
+  }
+
+  .treatments-page .treat-card-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .treatments-page .treat-right {
+    text-align: left;
+  }
+
+  .treatments-page .treat-badges {
+    justify-content: flex-start;
+  }
+
+  .treatments-page .treat-card-actions {
+    justify-content: flex-start;
+  }
+
+  .treatments-page .treat-sub-line {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    align-items: start;
+  }
+
+  .treatments-page .treat-sub-line .lbl {
+    min-width: 0;
+  }
+
+  .treatments-page .options {
+    max-height: 210px;
+  }
+
+  .treatments-page .modal-overlay {
+    padding: 10px;
+  }
+
+  .treatments-page .modal-box,
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro {
+    max-height: calc(100dvh - 20px);
+    padding: 16px 12px 14px;
+    border-radius: 16px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p {
+    grid-template-columns: 74px 1fr;
+    column-gap: 8px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame,
+  .treatments-page #viewTreatmentModal .detail-photos img,
+  .treatments-page #editTreatmentModal .photo-preview {
+    height: 180px;
+    max-height: 180px;
+  }
+
+  /* En modales muy chicos, apilar acciones mejora usabilidad */
+  .treatments-page #newPatientModal .modal-actions,
+  .treatments-page #editTreatmentModal .edit-treatment-actions,
+  .treatments-page #editSaleModal .edit-sale-actions,
+  .treatments-page #viewTreatmentModal .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .treatments-page #newPatientModal .modal-actions .btn-save,
+  .treatments-page #newPatientModal .modal-actions .btn-cancel,
+  .treatments-page #editTreatmentModal .btn-edit-treatment-save,
+  .treatments-page #editTreatmentModal .btn-edit-treatment-cancel,
+  .treatments-page #editSaleModal .btn-edit-sale-save,
+  .treatments-page #editSaleModal .btn-edit-sale-cancel,
+  .treatments-page #viewTreatmentModal .modal-actions .btn-save {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Override mínimo al preview ampliado: hoy depende de inline styles */
+  #imagePreviewModal {
+    padding: 12px !important;
+  }
+
+  #imagePreviewContainer {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  #closeImageBtn {
+    top: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 24px !important;
+  }
+
+  #previewImage {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ==========================================================
+   PANTALLAS MUY ANGOSTAS
+   ========================================================== */
+
+@media (max-width: 360px) {
+  .treatments-page main.treatments-main {
+    width: calc(100% - 16px);
+    padding: 12px 10px;
+  }
+
+  .treatments-page h1 {
+    font-size: 20px;
+  }
+
+  .treatments-page .app-title {
+    font-size: 16px;
+  }
+
+  .treatments-page .treat-sub-line {
+    grid-template-columns: 66px 1fr;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-card p {
+    grid-template-columns: 68px 1fr;
+  }
+}
