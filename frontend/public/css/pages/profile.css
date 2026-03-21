@@ -465,415 +465,568 @@
   position: relative;
 }
 
-/* =====================================================
-   PROFILE MOBILE
-   Ajustes específicos mobile-first sin romper desktop
-   Pegar al FINAL de profile.css
-===================================================== */
-
-/* Seguridad básica contra desbordes horizontales */
-.profile-page,
-.profile-page .profile-main,
-.profile-page .profile-container,
-.profile-page .profile-grid,
-.profile-page .profile-col,
-.profile-page .profile-card,
-.profile-page .profile-header,
-.profile-page .profile-info,
-.profile-page .profile-contact,
-.profile-page .turnos,
-.profile-page .turnos-list,
-.profile-page .turno-card,
-.profile-page .income-card,
-.profile-page .income-head,
-.profile-page .income-controls,
-.profile-page .income-kpis,
-.profile-page .income-chart-wrap {
-  min-width: 0;
-}
-
-/* -------------------------------
-   Hasta 768px
--------------------------------- */
+/* =========================================================
+   PROFILE MOBILE — pegar al final de profile.css
+   Base móvil/tablet chica
+========================================================= */
 @media (max-width: 768px) {
-  .profile-page {
+  html,
+  body {
     overflow-x: hidden;
   }
 
-  .profile-page .profile-main,
-  .profile-page main.profile-main {
-    padding: 84px 14px 28px !important;
+  body.is-profile {
+    background-attachment: scroll;
   }
 
-  .profile-page .profile-container {
-    max-width: 100% !important;
+  body.is-profile .profile-page,
+  body.is-profile .profile-page * {
+    min-width: 0;
   }
 
-  .profile-page .profile-grid,
-  .profile-page .profile-grid {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
+  /* ===== Top bar / drawer: ajustes mínimos y seguros ===== */
+  body.is-profile .top-bar {
+    height: 64px;
+    padding: 0 14px;
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 173, 173, 0.22);
   }
 
-  .profile-page .profile-card {
-    padding: 14px;
-    border-radius: 14px;
-  }
-
-  /* HEADER PERFIL */
-  .profile-page .profile-header {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    justify-items: center;
-    align-items: start !important;
-  }
-
-  .profile-page .profile-pic {
-    width: 84px;
-    height: 84px;
-  }
-
-  .profile-page .profile-info {
-    width: 100%;
-    text-align: left !important;
-  }
-
-  .profile-page .profile-info h2 {
-    margin: 0 0 4px;
-    font-size: 20px;
-    line-height: 1.2;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-  }
-
-  .profile-page .subtitle {
-    margin: 0 0 10px;
-    font-size: 13px;
-    line-height: 1.4;
-    white-space: normal;
-  }
-
-  .profile-page .profile-contact {
-    width: 100%;
-  }
-
-  .profile-page .profile-contact p {
-    margin: 7px 0;
-    font-size: 13.5px;
-    line-height: 1.45;
-    white-space: normal;
-    align-items: flex-start;
-  }
-
-  .profile-page .profile-contact i {
-    flex: 0 0 18px;
-    margin-top: 2px;
-  }
-
-  .profile-page .profile-contact span {
-    display: block;
-    max-width: 100%;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-
-  .profile-page .btn-edit {
-    width: 100% !important;
-    min-height: 44px;
-    justify-content: center !important;
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-
-  /* STATS */
-  .profile-page .stats {
-    grid-template-columns: 1fr !important;
-    gap: 10px;
-  }
-
-  .profile-page .stat {
-    padding: 13px 14px;
+  body.is-profile .menu-btn,
+  body.is-profile .close-btn {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
     border-radius: 12px;
+    color: #ffadad;
+    font-size: 22px;
+    cursor: pointer;
   }
 
-  .profile-page .stat-top {
-    gap: 12px;
-  }
-
-  .profile-page .stat i {
-    font-size: 18px;
-  }
-
-  .profile-page .stat span {
-    font-size: 20px;
+  body.is-profile .app-title {
+    justify-self: center;
+    max-width: calc(100vw - 120px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(1.45rem, 4.6vw, 1.9rem);
+    font-weight: 700;
     line-height: 1;
   }
 
-  .profile-page .stat small {
-    margin-top: 7px;
-    font-size: 12.5px;
-    line-height: 1.35;
+  body.is-profile .drawer {
+    width: min(84vw, 320px);
+    max-width: 320px;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 3001;
   }
 
-  /* BLOQUE INGRESOS */
-  .profile-page .income-card {
-    margin-top: 12px;
-    padding: 14px;
+  body.is-profile .drawer-overlay {
+    z-index: 3000;
   }
 
-  .profile-page .income-head {
-    flex-direction: column;
-    align-items: stretch;
+  body.is-profile .drawer-nav a {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
   }
 
-  .profile-page .income-head h3 {
-    font-size: 17px;
-    line-height: 1.2;
-    padding-left: 9px;
-    border-left-width: 4px;
-  }
-
-  .profile-page .income-head .muted {
-    margin-top: 4px;
-    line-height: 1.4;
-  }
-
-  .profile-page .income-controls {
+  /* ===== Main: neutraliza layout global de layout.css ===== */
+  body.is-profile .profile-page main.profile-main {
     width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 88px 16px 24px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  body.is-profile .profile-page .profile-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  body.is-profile .profile-page .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  body.is-profile .profile-page .profile-col,
+  body.is-profile .profile-page .profile-left,
+  body.is-profile .profile-page .profile-right {
+    min-width: 0;
+  }
+
+  body.is-profile .profile-page .profile-left,
+  body.is-profile .profile-page .profile-right {
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
+    gap: 18px;
+  }
+
+  /* ===== Card base ===== */
+  body.is-profile .profile-page .profile-card {
+    width: 100%;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(255, 173, 173, 0.14);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+  }
+
+  /* ===== Header perfil ===== */
+  body.is-profile .profile-page .profile-header-card {
+    padding: 20px;
+  }
+
+  /* neutraliza el header viejo desktop */
+  body.is-profile .profile-page .profile-header-card .profile-header {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    gap: 16px;
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: flex-start;
-    gap: 10px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
   }
 
-  .profile-page .income-controls select {
+  body.is-profile .profile-page .profile-pic {
+    width: 104px;
+    height: 104px;
+    flex-shrink: 0;
+    border-width: 3px;
+  }
+
+  body.is-profile .profile-page .profile-info {
     width: 100%;
-    min-height: 44px;
-    padding: 10px 12px;
-    font-size: 14px;
-    line-height: 1.2;
-  }
-
-  .profile-page .income-kpis {
+    display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 12px 0;
+    align-items: flex-start;
+    gap: 6px;
+    text-align: left;
   }
 
-  .profile-page .income-kpi {
+  body.is-profile .profile-page .profile-info h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 6vw, 2.15rem);
+    line-height: 1.12;
+    color: #20232a;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  body.is-profile .profile-page .profile-info .subtitle {
+    margin: 0;
+    font-size: 1.03rem;
+    line-height: 1.35;
+    font-weight: 600;
+    color: #666;
+  }
+
+  body.is-profile .profile-page .profile-contact {
     width: 100%;
-    padding: 12px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
   }
 
-  .profile-page .income-kpi .lbl {
-    font-size: 12px;
-    line-height: 1.3;
+  body.is-profile .profile-page .profile-contact p {
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: #4f4f4f;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
-  .profile-page .income-kpi .val {
-    font-size: 18px;
-    line-height: 1.15;
+  body.is-profile .profile-page .profile-contact i {
+    flex: 0 0 18px;
+    margin-top: 4px;
+    font-size: 16px;
+    color: #ffadad;
   }
 
-  .profile-page .income-chart-wrap {
-    height: 240px;
+  body.is-profile .profile-page .btn-edit {
+    position: static;
+    right: auto;
+    top: auto;
     width: 100%;
+    min-height: 50px;
+    margin-top: 2px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1rem;
+    box-shadow: 0 5px 15px rgba(255, 173, 173, 0.18);
+  }
+
+  /* ===== Stats ===== */
+  body.is-profile .profile-page .profile-stats-card {
+    padding: 16px;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stats {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    justify-content: stretch;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stat {
+    width: 100%;
+    height: auto;
+    min-height: 118px;
+    padding: 16px 14px;
+    border-radius: 18px;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-shadow: none;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stat-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stat i {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stat span {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  body.is-profile .profile-page .profile-stats-card .stat small {
+    display: block;
+    margin-top: 10px;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    color: #666;
+  }
+
+  /* ===== Ingresos ===== */
+  body.is-profile .profile-page .income-card {
+    padding: 20px;
+  }
+
+  body.is-profile .profile-page .income-head {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+
+  body.is-profile .profile-page .income-head h3 {
+    margin: 0;
+    padding-left: 10px;
+    border-left: 5px solid #ffadad;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    color: #333;
+  }
+
+  body.is-profile .profile-page .muted {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: #6b7280;
+  }
+
+  body.is-profile .profile-page .income-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  body.is-profile .profile-page .income-controls select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1.5px solid rgba(255, 173, 173, 0.45);
+    border-radius: 14px;
+    background: #fffdf9;
+    font: inherit;
+    color: #333;
+    box-shadow: none;
+  }
+
+  body.is-profile .profile-page .income-kpis {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  body.is-profile .profile-page .income-kpi {
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #fffdf9;
+    border: 1px solid rgba(255, 173, 173, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  body.is-profile .profile-page .income-kpi .lbl {
+    font-size: 0.88rem;
+    line-height: 1.2;
+    color: #6b7280;
+  }
+
+  body.is-profile .profile-page .income-kpi .val {
+    font-size: 1.12rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #222;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  body.is-profile .profile-page .income-chart-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 240px;
+    margin-top: 16px;
+    padding: 14px 10px 8px;
+    border-radius: 18px;
+    background: rgba(255, 253, 249, 0.88);
+    border: 1px solid rgba(255, 173, 173, 0.16);
     overflow: hidden;
   }
 
-  .profile-page #incomeChart {
-    width: 100% !important;
-    max-width: 100%;
+  body.is-profile .profile-page #incomeChart {
     display: block;
+    width: 100% !important;
+    height: 220px !important;
+    max-width: 100%;
   }
 
-  .profile-page #incomeChartFallback {
-    padding: 12px 8px;
-    font-size: 13px;
+  body.is-profile .profile-page #incomeChartFallback {
+    padding: 18px 8px;
+    font-size: 0.95rem;
     line-height: 1.4;
   }
 
-  /* TURNOS */
-  .profile-page .turnos h3 {
-    font-size: 16px;
-    margin-bottom: 10px;
+  /* ===== Próximos turnos ===== */
+  body.is-profile .profile-page .profile-right .turnos {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 20px;
   }
 
-  .profile-page .muted {
-    font-size: 13px;
-    line-height: 1.45;
+  body.is-profile .profile-page .turnos h3 {
+    margin-bottom: 14px;
+    padding-left: 10px;
+    border-left-width: 5px;
+    font-size: 1.35rem;
+    line-height: 1.2;
   }
 
-  .profile-page .turnos-list {
-    gap: 10px;
+  body.is-profile .profile-page .turnos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
   }
 
-  .profile-page .turno-card {
-    padding: 12px;
-    gap: 10px;
-    border-radius: 12px;
-    align-items: flex-start;
+  body.is-profile .profile-page .turno-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 16px;
+    background: #fffdf7;
+    border: 1px solid rgba(255, 173, 173, 0.22);
+    box-shadow: none;
   }
 
-  .profile-page .turno-main {
+  body.is-profile .profile-page .turno-main {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .profile-page .turno-name {
-    margin-bottom: 5px;
-    font-size: 14px;
+  body.is-profile .profile-page .turno-name {
+    font-size: 1rem;
     line-height: 1.3;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
+    font-weight: 600;
+    color: #333;
     word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
-  .profile-page .turno-meta {
-    gap: 6px 8px;
-    font-size: 12.5px;
+  body.is-profile .profile-page .turno-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.92rem;
     line-height: 1.35;
+    color: #6b7280;
   }
 
-  .profile-page .turno-icon {
-    flex: 0 0 auto;
-    padding-top: 2px;
+  body.is-profile .profile-page .turno-time {
+    font-weight: 600;
+    color: #e68c8c;
   }
 
-  .profile-page .turno-icon i {
-    font-size: 15px;
+  body.is-profile .profile-page .turno-dot {
+    color: #d6a3a3;
   }
 
-  /* Top bar: blindaje por si el global no alcanza */
-  .profile-page .top-bar {
-    min-height: 60px;
+  body.is-profile .profile-page .turno-date {
+    text-transform: capitalize;
   }
 
-  .profile-page .top-bar .app-title,
-  .profile-page .app-title {
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  body.is-profile .profile-page .turno-icon {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 173, 173, 0.12);
+    color: #ffadad;
+    font-size: 18px;
   }
 
-  .profile-page .menu-btn,
-  .profile-page .close-btn {
-    min-width: 44px;
-    min-height: 44px;
+  /* ===== Interacción touch / accesibilidad ===== */
+  body.is-profile .profile-page .stat.clickable,
+  body.is-profile .profile-page .turno-card.clickable {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body.is-profile .profile-page .stat.clickable:active,
+  body.is-profile .profile-page .turno-card.clickable:active,
+  body.is-profile .profile-page .btn-edit:active {
+    transform: scale(0.985);
+  }
+
+  body.is-profile .profile-page .btn-edit:focus-visible,
+  body.is-profile .profile-page .income-controls select:focus-visible,
+  body.is-profile .menu-btn:focus-visible,
+  body.is-profile .close-btn:focus-visible {
+    outline: 3px solid rgba(255, 173, 173, 0.35);
+    outline-offset: 2px;
+  }
+
+  /* En touch, anulá hover agresivo heredado de desktop */
+  body.is-profile .profile-page .stat:hover,
+  body.is-profile .profile-page .stat.clickable:hover,
+  body.is-profile .profile-page .btn-edit:hover,
+  body.is-profile .profile-page .turno:hover {
+    transform: none;
+    box-shadow: none;
   }
 }
 
-/* -------------------------------
-   Hasta 480px
--------------------------------- */
+/* =========================================================
+   Móvil chico
+========================================================= */
 @media (max-width: 480px) {
-  .profile-page .profile-main,
-  .profile-page main.profile-main {
-    padding: 80px 12px 24px !important;
+  body.is-profile .profile-page main.profile-main {
+    padding: 84px 14px 20px;
   }
 
-  .profile-page .profile-card {
-    padding: 12px;
-    border-radius: 13px;
+  body.is-profile .profile-page .profile-card,
+  body.is-profile .profile-page .profile-header-card,
+  body.is-profile .profile-page .income-card,
+  body.is-profile .profile-page .profile-right .turnos {
+    padding: 18px;
+    border-radius: 18px;
   }
 
-  .profile-page .profile-header {
-    gap: 10px !important;
+  body.is-profile .profile-page .profile-pic {
+    width: 96px;
+    height: 96px;
   }
 
-  .profile-page .profile-pic {
-    width: 76px;
-    height: 76px;
+  body.is-profile .profile-page .profile-info h2 {
+    font-size: 1.95rem;
   }
 
-  .profile-page .profile-info h2 {
-    font-size: 18px;
+  body.is-profile .profile-page .profile-stats-card .stats {
+    grid-template-columns: 1fr;
   }
 
-  .profile-page .subtitle {
-    font-size: 12.5px;
-    margin-bottom: 8px;
+  body.is-profile .profile-page .income-kpis {
+    grid-template-columns: 1fr;
   }
 
-  .profile-page .profile-contact p {
-    gap: 8px;
-    font-size: 13px;
-    margin: 6px 0;
+  body.is-profile .profile-page .turno-card {
+    align-items: flex-start;
+    padding: 14px;
   }
 
-  .profile-page .btn-edit {
-    min-height: 44px;
-    padding: 11px 12px;
-    font-size: 13.5px;
-    border-radius: 10px;
+  body.is-profile .profile-page .turno-icon {
+    margin-top: 2px;
   }
 
-  .profile-page .stat {
-    padding: 12px;
+  body.is-profile .profile-page #incomeChart {
+    height: 210px !important;
+  }
+}
+
+/* =========================================================
+   Muy angosto: evita filtros apretados
+   Este corte extra está solo para equipos muy chicos
+========================================================= */
+@media (max-width: 380px) {
+  body.is-profile .top-bar {
+    padding: 0 12px;
   }
 
-  .profile-page .stat span {
-    font-size: 18px;
+  body.is-profile .app-title {
+    font-size: 1.35rem;
   }
 
-  .profile-page .stat small {
-    font-size: 12px;
+  body.is-profile .profile-page .income-controls {
+    grid-template-columns: 1fr;
   }
 
-  .profile-page .income-card {
-    padding: 12px;
-  }
-
-  .profile-page .income-head h3 {
-    font-size: 16px;
-    padding-left: 8px;
-  }
-
-  .profile-page .income-controls select {
-    min-height: 42px;
-    padding: 9px 11px;
-    font-size: 13.5px;
-    border-radius: 10px;
-  }
-
-  .profile-page .income-kpi {
-    padding: 11px 12px;
-    border-radius: 12px;
-  }
-
-  .profile-page .income-kpi .val {
-    font-size: 17px;
-  }
-
-  .profile-page .income-chart-wrap {
-    height: 220px;
-  }
-
-  .profile-page .turnos h3 {
-    font-size: 15px;
-  }
-
-  .profile-page .turno-card {
-    padding: 11px;
-  }
-
-  .profile-page .turno-name {
-    font-size: 13.5px;
-  }
-
-  .profile-page .turno-meta {
-    font-size: 12px;
-  }
-
-  .profile-page .turno-dot {
-    display: none;
+  body.is-profile .profile-page .profile-info h2 {
+    font-size: 1.75rem;
   }
 }
