@@ -84,6 +84,60 @@
   top: calc(100% + 6px);
 }
 
+.treatments-page input[type="date"],
+.treatments-page input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  height: 44px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #ffd6d6;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  font-family: "Poppins", sans-serif;
+  line-height: 1.2;
+  box-shadow: none;
+}
+
+.treatments-page input[type="date"]:focus,
+.treatments-page input[type="time"]:focus {
+  outline: none;
+  border-color: #ffadad;
+  box-shadow: 0 0 8px rgba(255, 173, 173, 0.25);
+  background-color: #fff;
+}
+
+/* Safari / iPhone */
+.treatments-page input[type="date"]::-webkit-date-and-time-value,
+.treatments-page input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  color: #333;
+}
+
+.treatments-page input[type="date"]::-webkit-calendar-picker-indicator,
+.treatments-page input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+/* evita fondos raros internos en iOS */
+.treatments-page input[type="date"]::-webkit-datetime-edit,
+.treatments-page input[type="time"]::-webkit-datetime-edit,
+.treatments-page input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+.treatments-page input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+  color: #333;
+  padding: 0;
+}
+
+/* cuando el campo está vacío, que no se vea más oscuro/extraño */
+.treatments-page input[type="date"]:invalid,
+.treatments-page input[type="time"]:invalid {
+  color: #999;
+}
+
 .treatments-page .filters > *,
 .treatments-page .tg-form-grid > *,
 .treatments-page .tg-inline-2 > *,
@@ -248,6 +302,14 @@
     font-size: 16px;
   }
 
+  .treatments-page input[type="date"],
+  .treatments-page input[type="time"] {
+    min-height: 44px;
+    height: 44px;
+    padding: 12px 12px;
+    font-size: 16px;
+  }
+
   .treatments-page textarea {
     min-height: 110px;
   }
@@ -263,6 +325,21 @@
     gap: 10px;
     flex-wrap: wrap;
   }
+
+  .treatments-page .register-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+    }
+
+    .treatments-page .register-options .btn-patient {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 12px 10px;
+    font-size: 14px;
+    }
 
   .treatments-page .register-options .btn-patient,
   .treatments-page .sale-head-actions .btn-patient,
@@ -535,25 +612,40 @@
     max-height: 180px;
   }
 
+  .treatments-page .register-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    }
+
+    .treatments-page .register-options .btn-patient {
+    padding: 11px 8px;
+    font-size: 13px;
+    }
+
   /* En modales muy chicos, apilar acciones mejora usabilidad */
   .treatments-page #newPatientModal .modal-actions,
-  .treatments-page #editTreatmentModal .edit-treatment-actions,
-  .treatments-page #editSaleModal .edit-sale-actions,
-  .treatments-page #viewTreatmentModal .modal-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
+    .treatments-page #editTreatmentModal .edit-treatment-actions,
+    .treatments-page #editSaleModal .edit-sale-actions,
+    .treatments-page #viewTreatmentModal .modal-actions {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 10px;
+    }
 
-  .treatments-page #newPatientModal .modal-actions .btn-save,
-  .treatments-page #newPatientModal .modal-actions .btn-cancel,
-  .treatments-page #editTreatmentModal .btn-edit-treatment-save,
-  .treatments-page #editTreatmentModal .btn-edit-treatment-cancel,
-  .treatments-page #editSaleModal .btn-edit-sale-save,
-  .treatments-page #editSaleModal .btn-edit-sale-cancel,
-  .treatments-page #viewTreatmentModal .modal-actions .btn-save {
-    width: 100%;
-    min-width: 0;
-  }
+    .treatments-page #newPatientModal .modal-actions .btn-save,
+    .treatments-page #newPatientModal .modal-actions .btn-cancel,
+    .treatments-page #editTreatmentModal .btn-edit-treatment-save,
+    .treatments-page #editTreatmentModal .btn-edit-treatment-cancel,
+    .treatments-page #editSaleModal .btn-edit-sale-save,
+    .treatments-page #editSaleModal .btn-edit-sale-cancel,
+    .treatments-page #viewTreatmentModal .modal-actions .btn-save {
+    width: auto;
+    min-width: 140px;
+    max-width: 190px;
+    flex: 0 1 auto;
+    }
 
   /* Override mínimo al preview ampliado: hoy depende de inline styles */
   #imagePreviewModal {
