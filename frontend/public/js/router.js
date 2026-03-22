@@ -25,11 +25,11 @@ import { About, initAbout } from "./views/about.js";
 import { Contact, initContact } from "./views/contact.js";
 import { Plans, initPlans } from "./views/plans.js";
 import { Feedback, initFeedback } from "./views/feedback.js";
+import { isAuthenticated } from "./core/session.js";
 
 export function router() {
   const app = document.getElementById("app");
   const path = window.location.pathname;
-  const token = localStorage.getItem("token");
 
   const setBodyViewClass = () => {
     document.body.classList.remove(
@@ -70,8 +70,13 @@ export function router() {
 
   setBodyViewClass();
 
+  if (path === "/" && isAuthenticated()) {
+    history.replaceState(null, "", "/dashboard");
+    return router();
+  }
+
   const requireAuth = () => {
-    if (!token) {
+    if (!isAuthenticated()) {
       history.replaceState(null, "", "/login");
       app.innerHTML = Login();
       initLogin();
@@ -81,6 +86,11 @@ export function router() {
   };
 
   if (path === "/login") {
+    if (isAuthenticated()) {
+      history.replaceState(null, "", "/dashboard");
+      return router();
+    }
+
     app.innerHTML = Login();
     initLogin();
     return;

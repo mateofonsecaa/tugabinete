@@ -1,4 +1,5 @@
 import { API_URL } from "../core/config.js";
+import { loginSession } from "../core/session.js";
 
 export function Login() {
   return `
@@ -80,30 +81,17 @@ async function loginUser(event) {
   btn.style.cursor = "not-allowed";
 
   try {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const data = await loginSession(email, password);
 
-    const data = await res.json();
+    showNotification("Bienvenid@ nuevamente, " + data.user.name, "success");
 
-    if (res.ok) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("userName", data.user.name);
-      showNotification("Bienvenid@ nuevamente, " + data.user.name, "success");
-      setTimeout(() => {
-        history.pushState(null, "", "/dashboard");
-        window.dispatchEvent(new PopStateEvent("popstate"));
-        }, 1500);
-
-    } else {
-      showNotification(data.error || "Credenciales incorrectas.", "error");
-    }
+    setTimeout(() => {
+      history.pushState(null, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }, 800);
   } catch (error) {
-    console.error("Error de conexión:", error);
-    showNotification("No se pudo conectar con el servidor.", "error");
+    console.error("Login error:", error);
+    showNotification(error.message || "No se pudo iniciar sesión.", "error");
   } finally {
     btn.disabled = false;
     btn.style.opacity = "1";
