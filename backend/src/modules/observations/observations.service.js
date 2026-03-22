@@ -1,4 +1,4 @@
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 /**
  * Obtener observaciones de un paciente

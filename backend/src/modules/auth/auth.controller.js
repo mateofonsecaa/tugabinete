@@ -1,6 +1,19 @@
 import * as service from "./auth.service.js";
 import * as repo from "./auth.repository.js";
 import { uploadToSupabase } from "../../core/utils/upload.js";
+import { clearRefreshCookie, setRefreshCookie } from "./auth.cookies.js";
+
+function setNoStore(res) {
+  res.setHeader("Cache-Control", "no-store");
+}
+
+const REFRESH_FATAL_CODES = new Set([
+  "NO_REFRESH_COOKIE",
+  "INVALID_REFRESH_TOKEN",
+  "REFRESH_TOKEN_EXPIRED",
+  "REFRESH_TOKEN_REVOKED",
+  "REFRESH_TOKEN_REUSED",
+]);
 
 export const register = async (req, res, next) => {
   try {
@@ -24,8 +37,56 @@ export const resendVerification = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const result = await service.login(req.body);
-    res.json(result);
+    const result = await service.login(req.body, req);
+
+    setNoStore(res);
+    setRefreshCookie(res, result.refreshToken, result.refreshExpiresAt);
+
+    return res.status(200).json({
+      message: result.message,
+      accessToken: result.accessToken,
+      user: result.user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const refresh = async (req, res, next) => {
+  try {
+    const result = await service.refreshSession(req);
+
+    setNoStore(res);
+    setRefreshCookie(res, result.refreshToken, result.refreshExpiresAt);
+
+    return res.status(200).json({
+      accessToken: result.accessToken,
+    });
+  } catch (err) {
+    if (REFRESH_FATAL_CODES.has(err.code)) {
+      clearRefreshCookie(res);
+    }
+
+    next(err);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    await service.logout(req);
+    clearRefreshCookie(res);
+    return res.status(204).end();
+  } catch (err) {
+    clearRefreshCookie(res);
+    next(err);
+  }
+};
+
+export const logoutAll = async (req, res, next) => {
+  try {
+    await service.logoutAll(req.user.id);
+    clearRefreshCookie(res);
+    return res.status(204).end();
   } catch (err) {
     next(err);
   }
@@ -70,10 +131,15 @@ export const resetPassword = async (req, res, next) => {
 
 export const me = async (req, res) => {
   try {
+    setNoStore(res);
+
     const user = await repo.findUserById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+      return res.status(404).json({
+        message: "Usuario no encontrado",
+        code: "USER_NOT_FOUND",
+      });
     }
 
     return res.json({
@@ -84,8 +150,11 @@ export const me = async (req, res) => {
       phone: user.phone,
       profileImage: user.profileImage,
     });
-  } catch (err) {
-    return res.status(500).json({ message: "Error obteniendo usuario actual" });
+  } catch {
+    return res.status(500).json({
+      message: "Error obteniendo usuario actual",
+      code: "ME_FETCH_FAILED",
+    });
   }
 };
 
@@ -116,13 +185,21 @@ export const updateProfile = async (req, res) => {
 
     return res.json({
       message: "Perfil actualizado correctamente",
-      user: updated,
+      user: {
+        id: updated.id,
+        name: updated.name,
+        email: updated.email,
+        profession: updated.profession,
+        phone: updated.phone,
+        profileImage: updated.profileImage,
+      },
     });
   } catch (err) {
-    console.error("❌ updateProfile error:", err);
+    console.error("updateProfile error:", err);
     return res.status(500).json({
       message: "No se pudo actualizar el perfil",
       error: err.message,
+      code: "PROFILE_UPDATE_FAILED",
     });
   }
 };

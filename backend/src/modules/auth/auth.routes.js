@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as controller from "./auth.controller.js";
-import verifyToken from "./verifyToken.js";
+import { authenticate } from "../../core/middlewares/authenticate.js";
 import upload from "../../core/middlewares/upload.js";
 import { createRateLimit } from "../../core/middlewares/rateLimit.js";
 import { normalizeEmail } from "./auth.validation.js";
@@ -43,6 +43,9 @@ const resetPasswordSubmitRateLimit = createRateLimit({
 router.post("/register", controller.register);
 router.post("/resend-verification", controller.resendVerification);
 router.post("/login", controller.login);
+router.post("/refresh", controller.refresh);
+router.post("/logout", controller.logout);
+router.post("/logout-all", authenticate, controller.logoutAll);
 router.get("/verify/:token", controller.verifyEmail);
 
 router.post(
@@ -64,11 +67,11 @@ router.post(
   controller.resetPassword
 );
 
-router.get("/me", verifyToken, controller.me);
+router.get("/me", authenticate, controller.me);
 
 router.put(
   "/edit-profile",
-  verifyToken,
+  authenticate,
   upload.single("profileImage"),
   controller.updateProfile
 );

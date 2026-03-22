@@ -1,4 +1,4 @@
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 export const getByPatient = async (userId, patientId) => {
   const patient = await prisma.patient.findFirst({

@@ -1,5 +1,5 @@
 import { uploadToBucket } from "./upload.service.js";
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 export const uploadProfileImage = async (req, res) => {
   try {

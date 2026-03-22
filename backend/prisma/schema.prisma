@@ -25,8 +25,31 @@ model User {
   verificationTokens  VerificationToken[]
   reminders           Reminder[]
   sales               Sale[]
-  feedbackItems        FeedbackItem[]
-  feedbackVotes        FeedbackVote[]
+  feedbackItems       FeedbackItem[]
+  feedbackVotes       FeedbackVote[]
+  sessions            AuthSession[]
+}
+
+model AuthSession {
+  id                  String    @id
+  userId              Int
+  familyId            String
+  tokenHash           String    @unique
+  createdAt           DateTime  @default(now())
+  lastUsedAt          DateTime?
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  revokeReason        String?
+  replacedBySessionId String?   @unique
+  ip                  String?
+  userAgent           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@index([userId, revokedAt])
 }
 
 model Patient {

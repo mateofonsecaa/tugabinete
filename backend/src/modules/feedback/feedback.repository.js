@@ -1,4 +1,4 @@
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 export function findRecentDuplicate({ userId, descriptionHash, afterDate }) {
   return prisma.feedbackItem.findFirst({

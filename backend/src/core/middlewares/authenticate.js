@@ -1,24 +1,38 @@
-import jwt from "jsonwebtoken";
 import prisma from "../../config/prisma.js";
+import { verifyAccessToken } from "../../modules/auth/auth.tokens.js";
 
 export const authenticate = async (req, res, next) => {
   const header = req.headers.authorization;
 
   if (!header) {
-    return res.status(401).json({ error: "Token requerido" });
+    return res.status(401).json({
+      error: "Access token requerido.",
+      code: "ACCESS_TOKEN_REQUIRED",
+    });
   }
 
   const [scheme, token] = header.split(" ");
 
   if (scheme !== "Bearer" || !token) {
-    return res.status(401).json({ error: "Token inválido" });
+    return res.status(401).json({
+      error: "Access token inválido.",
+      code: "ACCESS_TOKEN_INVALID",
+    });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyAccessToken(token);
+    const userId = Number(decoded.sub);
+
+    if (!Number.isInteger(userId)) {
+      return res.status(401).json({
+        error: "Token inválido.",
+        code: "ACCESS_TOKEN_INVALID",
+      });
+    }
 
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
+      where: { id: userId },
       select: {
         id: true,
         email: true,
@@ -27,26 +41,34 @@ export const authenticate = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Usuario no válido" });
+      return res.status(401).json({
+        error: "Usuario no válido.",
+        code: "USER_NOT_FOUND",
+      });
     }
 
-    const tokenVersion = Number.isInteger(decoded.tokenVersion)
-      ? decoded.tokenVersion
-      : 0;
+    const tokenVersion = Number.isInteger(decoded.tv) ? decoded.tv : 0;
 
-    if (tokenVersion !== (user.authTokenVersion ?? 0)) {
+    if ((user.authTokenVersion ?? 0) !== tokenVersion) {
       return res.status(401).json({
-        error: "Tu sesión dejó de ser válida. Iniciá sesión nuevamente.",
+        error: "Tu sesión fue invalidada. Iniciá sesión nuevamente.",
+        code: "SESSION_VERSION_MISMATCH",
       });
     }
 
     req.user = {
       id: user.id,
       email: user.email,
+      sessionId: decoded.sid ?? null,
     };
 
     return next();
   } catch {
-    return res.status(403).json({ error: "Token inválido o expirado" });
+    return res.status(401).json({
+      error: "Access token inválido o expirado.",
+      code: "ACCESS_TOKEN_EXPIRED_OR_INVALID",
+    });
   }
 };
+
+export default authenticate;

@@ -15,6 +15,15 @@ import {
   normalizeEmail,
   validatePasswordPolicy,
 } from "./auth.validation.js";
+import {
+  generateRefreshToken,
+  getInitialRefreshExpiresAt,
+  hashRefreshToken,
+  newSessionFamilyId,
+  newSessionId,
+  signAccessToken,
+} from "./auth.tokens.js";
+import { readRefreshCookie } from "./auth.cookies.js";
 
 const GENERIC_FORGOT_PASSWORD_RESPONSE = {
   status: 200,
@@ -117,6 +126,72 @@ async function inspectPasswordResetToken(rawToken) {
   return {
     ok: true,
     record,
+  };
+}
+
+const REFRESH_ROTATION_GRACE_MS = 10_000;
+
+function createAppError(status, code, message) {
+  const err = new Error(message);
+  err.status = status;
+  err.code = code;
+  return err;
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+
+  if (typeof forwarded === "string" && forwarded.trim()) {
+    return forwarded.split(",")[0].trim();
+  }
+
+  return req.ip || null;
+}
+
+function getClientUserAgent(req) {
+  return req.headers["user-agent"] || null;
+}
+
+function toPublicUser(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    profession: user.profession,
+    phone: user.phone,
+    profileImage: user.profileImage,
+  };
+}
+
+async function createSessionForUser(user, req) {
+  const sessionId = newSessionId();
+  const familyId = newSessionFamilyId();
+  const refreshToken = generateRefreshToken();
+  const tokenHash = hashRefreshToken(refreshToken);
+  const expiresAt = getInitialRefreshExpiresAt();
+
+  await repo.createAuthSession({
+    id: sessionId,
+    userId: user.id,
+    familyId,
+    tokenHash,
+    expiresAt,
+    ip: getClientIp(req),
+    userAgent: getClientUserAgent(req),
+    lastUsedAt: new Date(),
+  });
+
+  const accessToken = signAccessToken({
+    userId: user.id,
+    email: user.email,
+    sessionId,
+    tokenVersion: user.authTokenVersion ?? 0,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    refreshExpiresAt: expiresAt,
   };
 }
 
@@ -252,31 +327,34 @@ export const resendVerification = async (data) => {
   };
 };
 
-export const login = async (data) => {
+export const login = async (data, req) => {
   const email = normalizeEmail(data.email);
-  const { password } = data;
+  const password = String(data.password ?? "");
 
   const user = await repo.findUserByEmail(email);
-  if (!user) throw new Error("Usuario no encontrado");
-  if (!user.isVerified) throw new Error("Cuenta no verificada");
+
+  if (!user) {
+    throw createAppError(401, "INVALID_CREDENTIALS", "Credenciales inválidas.");
+  }
+
+  if (!user.isVerified) {
+    throw createAppError(403, "EMAIL_NOT_VERIFIED", "Cuenta no verificada.");
+  }
 
   const valid = await bcrypt.compare(password, user.password);
-  if (!valid) throw new Error("Contraseña incorrecta");
 
-  const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      tokenVersion: user.authTokenVersion ?? 0,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "2h" }
-  );
+  if (!valid) {
+    throw createAppError(401, "INVALID_CREDENTIALS", "Credenciales inválidas.");
+  }
+
+  const session = await createSessionForUser(user, req);
 
   return {
     message: `Bienvenida, ${user.name}!`,
-    token,
-    user,
+    accessToken: session.accessToken,
+    refreshToken: session.refreshToken,
+    refreshExpiresAt: session.refreshExpiresAt,
+    user: toPublicUser(user),
   };
 };
 
@@ -405,4 +483,147 @@ export const resetPassword = async (data, req) => {
     message:
       "Tu contraseña fue actualizada correctamente. Ya podés iniciar sesión.",
   };
+};
+
+export const refreshSession = async (req) => {
+  const rawRefreshToken = readRefreshCookie(req);
+
+  if (!rawRefreshToken) {
+    throw createAppError(
+      401,
+      "NO_REFRESH_COOKIE",
+      "No hay una sesión activa para restaurar."
+    );
+  }
+
+  const tokenHash = hashRefreshToken(rawRefreshToken);
+  const session = await repo.findAuthSessionByTokenHash(tokenHash);
+
+  if (!session) {
+    throw createAppError(
+      401,
+      "INVALID_REFRESH_TOKEN",
+      "La sesión no es válida."
+    );
+  }
+
+  const now = new Date();
+
+  if (!session.user) {
+    throw createAppError(401, "USER_NOT_FOUND", "Usuario no válido.");
+  }
+
+  if (session.revokedAt) {
+    if (
+      session.revokeReason === "ROTATED" &&
+      session.replacedBySessionId
+    ) {
+      const replacement = await repo.findAuthSessionById(
+        session.replacedBySessionId
+      );
+
+      const rotatedRecently =
+        replacement &&
+        Date.now() - new Date(replacement.createdAt).getTime() <=
+          REFRESH_ROTATION_GRACE_MS;
+
+      const sameUserAgent =
+        replacement?.userAgent === getClientUserAgent(req);
+
+      if (rotatedRecently && sameUserAgent) {
+        throw createAppError(
+          409,
+          "REFRESH_RACE",
+          "Otra pestaña ya renovó la sesión. Reintentá."
+        );
+      }
+
+      await repo.revokeAuthSessionFamily(
+        session.familyId,
+        "REFRESH_TOKEN_REUSED"
+      );
+      await repo.bumpUserAuthTokenVersion(session.userId);
+
+      throw createAppError(
+        401,
+        "REFRESH_TOKEN_REUSED",
+        "Se detectó reutilización de refresh token. Cerramos tus sesiones por seguridad."
+      );
+    }
+
+    throw createAppError(
+      401,
+      "REFRESH_TOKEN_REVOKED",
+      "La sesión fue revocada. Iniciá sesión nuevamente."
+    );
+  }
+
+  if (new Date(session.expiresAt) <= now) {
+    await repo.revokeAuthSessionById(session.id, "EXPIRED");
+
+    throw createAppError(
+      401,
+      "REFRESH_TOKEN_EXPIRED",
+      "La sesión venció. Iniciá sesión nuevamente."
+    );
+  }
+
+  const newSessionIdValue = newSessionId();
+  const newRefreshToken = generateRefreshToken();
+  const newTokenHash = hashRefreshToken(newRefreshToken);
+
+  const rotated = await repo.rotateAuthSession({
+    currentSessionId: session.id,
+    newSessionId: newSessionIdValue,
+    newTokenHash,
+    expiresAt: session.expiresAt,
+    ip: getClientIp(req),
+    userAgent: getClientUserAgent(req),
+  });
+
+  if (!rotated) {
+    throw createAppError(
+      409,
+      "REFRESH_RACE",
+      "Otra pestaña ya renovó la sesión. Reintentá."
+    );
+  }
+
+  const accessToken = signAccessToken({
+    userId: session.user.id,
+    email: session.user.email,
+    sessionId: newSessionIdValue,
+    tokenVersion: session.user.authTokenVersion ?? 0,
+  });
+
+  return {
+    accessToken,
+    refreshToken: newRefreshToken,
+    refreshExpiresAt: session.expiresAt,
+  };
+};
+
+export const logout = async (req) => {
+  const rawRefreshToken = readRefreshCookie(req);
+
+  if (!rawRefreshToken) {
+    return true;
+  }
+
+  const tokenHash = hashRefreshToken(rawRefreshToken);
+  const session = await repo.findAuthSessionByTokenHash(tokenHash);
+
+  if (!session || session.revokedAt) {
+    return true;
+  }
+
+  await repo.revokeAuthSessionById(session.id, "LOGOUT_CURRENT");
+
+  return true;
+};
+
+export const logoutAll = async (userId) => {
+  await repo.revokeAllUserAuthSessions(userId, "LOGOUT_ALL");
+  await repo.bumpUserAuthTokenVersion(userId);
+  return true;
 };

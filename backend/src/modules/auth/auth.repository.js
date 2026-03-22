@@ -134,6 +134,149 @@ export const consumePasswordResetTokenAndUpdatePassword = ({
       },
     });
 
+    await tx.authSession.updateMany({
+      where: {
+        userId,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: now,
+        revokeReason: "PASSWORD_RESET",
+      },
+    });
+
     return true;
+  });
+};
+
+export const createAuthSession = (data) => {
+  return prisma.authSession.create({ data });
+};
+
+export const findAuthSessionByTokenHash = (tokenHash) => {
+  return prisma.authSession.findUnique({
+    where: { tokenHash },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profession: true,
+          phone: true,
+          profileImage: true,
+          isVerified: true,
+          authTokenVersion: true,
+        },
+      },
+    },
+  });
+};
+
+export const findAuthSessionById = (id) => {
+  return prisma.authSession.findUnique({
+    where: { id },
+  });
+};
+
+export const rotateAuthSession = ({
+  currentSessionId,
+  newSessionId,
+  newTokenHash,
+  expiresAt,
+  ip,
+  userAgent,
+}) => {
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
+    const current = await tx.authSession.findUnique({
+      where: { id: currentSessionId },
+    });
+
+    if (!current) {
+      return null;
+    }
+
+    const updated = await tx.authSession.updateMany({
+      where: {
+        id: currentSessionId,
+        revokedAt: null,
+        expiresAt: { gt: now },
+      },
+      data: {
+        revokedAt: now,
+        revokeReason: "ROTATED",
+        replacedBySessionId: newSessionId,
+        lastUsedAt: now,
+      },
+    });
+
+    if (updated.count !== 1) {
+      return null;
+    }
+
+    return tx.authSession.create({
+      data: {
+        id: newSessionId,
+        userId: current.userId,
+        familyId: current.familyId,
+        tokenHash: newTokenHash,
+        expiresAt,
+        ip,
+        userAgent,
+        lastUsedAt: now,
+      },
+    });
+  });
+};
+
+export const revokeAuthSessionById = (id, reason) => {
+  return prisma.authSession.updateMany({
+    where: {
+      id,
+      revokedAt: null,
+    },
+    data: {
+      revokedAt: new Date(),
+      revokeReason: reason,
+    },
+  });
+};
+
+export const revokeAuthSessionFamily = (familyId, reason) => {
+  return prisma.authSession.updateMany({
+    where: {
+      familyId,
+      revokedAt: null,
+    },
+    data: {
+      revokedAt: new Date(),
+      revokeReason: reason,
+    },
+  });
+};
+
+export const revokeAllUserAuthSessions = (userId, reason) => {
+  return prisma.authSession.updateMany({
+    where: {
+      userId,
+      revokedAt: null,
+    },
+    data: {
+      revokedAt: new Date(),
+      revokeReason: reason,
+    },
+  });
+};
+
+export const bumpUserAuthTokenVersion = (userId) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      authTokenVersion: {
+        increment: 1,
+      },
+    },
   });
 };

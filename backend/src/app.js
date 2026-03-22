@@ -1,6 +1,8 @@
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import routes from "./routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,32 +16,34 @@ app.set("trust proxy", 1);
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:4000",
   "http://localhost:5500",
   "http://127.0.0.1:5500",
-  "https://gleeful-moxie-181612.netlify.app",
+  "http://localhost:5501",
+  "http://127.0.0.1:5501",
   "https://tugabinete.com",
   "https://www.tugabinete.com",
+  "https://api.tugabinete.com",
   "https://tugabinete.pages.dev",
+  "https://gleeful-moxie-181612.netlify.app",
 ];
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
 
-  if (origin && allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
 
-  res.header("Vary", "Origin");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
-
-  return next();
-});
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+  })
+);
 
 app.use(
   helmet({
@@ -48,7 +52,7 @@ app.use(
 );
 
 app.use(morgan("dev"));
-
+app.use(cookieParser());
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
@@ -62,18 +66,21 @@ app.use("/api", routes);
 
 app.use((err, req, res, next) => {
   if (err?.code === "LIMIT_FILE_SIZE") {
-    return res
-      .status(413)
-      .json({ error: "La imagen supera el tamaño máximo permitido." });
+    return res.status(413).json({
+      error: "La imagen supera el tamaño máximo permitido.",
+      code: "FILE_TOO_LARGE",
+    });
   }
 
   return next(err);
 });
 
 app.use((err, req, res, next) => {
-  console.error("🔥 Error:", err);
+  console.error("Error:", err);
+
   res.status(err.status || 500).json({
     error: err.message || "Error inesperado",
+    code: err.code || "INTERNAL_ERROR",
   });
 });
 

@@ -1,4 +1,4 @@
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 /**
  * Convertir "hoy a las 00:00 LOCAL" → "hoy en UTC"

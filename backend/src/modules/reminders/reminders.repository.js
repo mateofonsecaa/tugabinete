@@ -1,4 +1,4 @@
-import prisma from "../../core/prismaClient.js";
+import prisma from "../../config/prisma.js";
 
 export const countByUser = (userId) => {
     return prisma.reminder.count({
