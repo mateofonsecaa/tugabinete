@@ -336,15 +336,31 @@ if (dateStr) {
       dropdown.appendChild(item);
     });
 
-    dropdown.style.display = filtered.length ? "block" : "none";
+    dropdown.style.display = filtered.length > 0 ? "block" : "none";
   }
 
   // cuando escribís en el input
-  document.addEventListener("input", (e) => {
-    if (e.target?.id === "simplePatientInput") {
-      updatePatientDropdown(e.target.value);
-    }
-  });
+ // cuando escribís en el input
+document.addEventListener("input", (e) => {
+  if (e.target?.id === "simplePatientInput") {
+    const dropdown = document.getElementById("simplePatientDropdown");
+    if (dropdown) dropdown.dataset.selectedId = "";
+    updatePatientDropdown(e.target.value);
+  }
+});
+
+// mostrar lista completa apenas hacés foco o click en el campo
+document.addEventListener("focusin", (e) => {
+  if (e.target?.id === "simplePatientInput") {
+    updatePatientDropdown(e.target.value.trim());
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target?.id === "simplePatientInput") {
+    updatePatientDropdown(e.target.value.trim());
+  }
+});
 
   // cerrar dropdown si clic afuera
   document.addEventListener("click", (e) => {

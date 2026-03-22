@@ -1,0 +1,594 @@
+/* public/css/pages/agenda-mobile.css */
+
+/* =========================
+   AGENDA MOBILE
+   Breakpoints:
+   - hasta 768px: móvil general / tablets chicas
+   - hasta 480px: celulares chicos
+========================= */
+
+@media (max-width: 768px) {
+  /* ===== CONTENEDOR GENERAL ===== */
+  .agenda-page {
+    width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  .agenda-page main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 12px 0 0;
+    padding: 12px 12px 18px;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .agenda-page .calendar-container,
+  .agenda-page .side-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ===== TOP BAR ===== */
+  .agenda-page .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 60px;
+    padding: 0 14px;
+  }
+
+  .agenda-page .app-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 120px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(18px, 5vw, 22px);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .agenda-page .menu-btn {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ===== DRAWER ===== */
+  .agenda-page .drawer {
+    width: min(320px, 86vw);
+    max-width: 320px;
+  }
+
+  .agenda-page .drawer-header {
+    padding: 18px 16px;
+  }
+
+  .agenda-page .drawer-nav {
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .agenda-page .drawer-nav a {
+    min-height: 46px;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  /* Reset del close-btn dentro del drawer
+     porque agenda.css hoy lo contamina */
+  .agenda-page .drawer .close-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: none;
+    color: #ffadad;
+    box-shadow: none;
+    font-size: 22px;
+  }
+
+  .agenda-page .drawer .close-btn:hover {
+    background: rgba(255, 173, 173, 0.12);
+    color: #ff8f8f;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ===== CALENDARIO ===== */
+  .agenda-page .calendar-container {
+    padding: 14px 12px 14px;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .agenda-page .calendar-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .agenda-page .calendar-header h2 {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(22px, 7vw, 34px);
+    line-height: 1.1;
+  }
+
+  .agenda-page .calendar-header button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .agenda-page .calendar-header button:hover {
+    transform: none;
+  }
+
+  .agenda-page .weekdays {
+    width: 100%;
+    gap: 6px;
+    margin: 0 0 8px;
+  }
+
+  .agenda-page .weekdays div {
+    min-height: 40px;
+    padding: 7px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .agenda-page .calendar {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .agenda-page .day {
+    min-height: 78px;
+    padding: 8px 6px 6px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: hidden;
+    transform: none;
+  }
+
+  .agenda-page .day:hover {
+    transform: none;
+  }
+
+  .agenda-page .day-number {
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  .agenda-page .day.today {
+    background: #fff8fb;
+    border-width: 2px;
+  }
+
+  .agenda-page .day.selected {
+    background: #fff0f0;
+    border: 2px solid #ffadad;
+    box-shadow: 0 0 0 3px rgba(255, 173, 173, 0.18);
+  }
+
+  .agenda-page .day.is-outside-month {
+    opacity: 0.62;
+  }
+
+  .agenda-page .day-content {
+    width: 100%;
+    min-height: 8px;
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+  }
+
+  /* Los turnos pasan a ser indicadores visuales */
+  .agenda-page .appointment {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #ffadad;
+    box-shadow: none;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+  }
+
+  .agenda-page .appointment strong {
+    display: none;
+  }
+
+  .agenda-page .day.is-outside-month .appointment {
+    background: #cfcfcf;
+    opacity: 0.75;
+  }
+
+  /* ===== RECORDATORIOS ===== */
+  .agenda-page .side-panel {
+    order: 2;
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .agenda-page .side-panel h3 {
+    margin-bottom: 12px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .agenda-page .reminder-list {
+    margin-top: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden !important;
+  }
+
+  .agenda-page .reminder-list li {
+    padding: 12px 42px 12px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .agenda-page .reminder-list li button {
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .agenda-page .add-reminder {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .agenda-page .add-reminder input {
+    min-height: 46px;
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+
+  .agenda-page .add-reminder button {
+    min-width: 48px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .agenda-page #charCounter,
+  .agenda-page #charLimitMsg {
+    padding-left: 2px;
+  }
+
+  /* ===== MODALES: BASE ===== */
+  .agenda-page .modal {
+    align-items: flex-end;
+    padding: 16px 12px max(16px, env(safe-area-inset-bottom));
+  }
+
+  .agenda-page .day-modal-content,
+  .agenda-page .new-simple-content {
+    width: 100%;
+    max-width: none;
+    max-height: min(86vh, 760px);
+    overflow-y: auto;
+    border-radius: 20px;
+    animation: fadeInUp 0.22s ease-out;
+  }
+
+  /* ===== MODAL DEL DÍA ===== */
+  .agenda-page .day-modal-content {
+    padding: 18px 16px 16px;
+  }
+
+  .agenda-page .day-modal-header {
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .agenda-page #dayModalTitle {
+    font-size: 20px;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  .agenda-page .day-modal-header .close-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .agenda-page .total-appointments {
+    margin: 8px 0 14px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .agenda-page .appointments-list .item {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .agenda-page .appointments-list .item > div:first-child {
+    flex: 1;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .agenda-page .app-buttons {
+    flex-shrink: 0;
+  }
+
+  .agenda-page .app-buttons button {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #fff6f6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .agenda-page .day-modal-actions {
+    margin-top: 14px;
+  }
+
+  .agenda-page .day-modal-actions .primary-btn {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 14px;
+    justify-content: center;
+  }
+
+  /* ===== SUBMODAL NUEVO TURNO ===== */
+  .agenda-page .new-simple-content {
+    padding: 18px 16px 16px;
+  }
+
+  .agenda-page .modal-title {
+    margin-bottom: 16px;
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .agenda-page .field {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .agenda-page .field label {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .agenda-page .patient-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .agenda-page .patient-input-wrapper {
+    width: 100%;
+  }
+
+  .agenda-page #simplePatientInput,
+  .agenda-page #simpleTimeInput,
+  .agenda-page .new-simple-content input {
+    width: 100%;
+    min-height: 46px;
+    margin-bottom: 0;
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+
+  .agenda-page .dropdown-list {
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 220px;
+    border-radius: 14px;
+  }
+
+  .agenda-page .dropdown-item {
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .agenda-page .small-btn {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .agenda-page .modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .agenda-page .modal-buttons button,
+  .agenda-page .primary-btn,
+  .agenda-page .secondary-btn {
+    width: 100%;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* ===== CONTENEDOR GENERAL ===== */
+  .agenda-page .top-bar {
+    padding: 0 12px;
+  }
+
+  .agenda-page .app-title {
+    max-width: calc(100% - 110px);
+    font-size: 18px;
+  }
+
+  .agenda-page main {
+    padding: 10px 10px 16px;
+    gap: 10px;
+  }
+
+  /* ===== CALENDARIO ===== */
+  .agenda-page .calendar-container {
+    padding: 12px 10px 12px;
+    border-radius: 16px;
+  }
+
+  .agenda-page .calendar-header h2 {
+    font-size: clamp(18px, 7.5vw, 28px);
+  }
+
+  .agenda-page .calendar-header button {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .agenda-page .weekdays,
+  .agenda-page .calendar {
+    gap: 5px;
+  }
+
+  .agenda-page .weekdays div {
+    min-height: 36px;
+    padding: 6px 0;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+
+  .agenda-page .day {
+    min-height: 64px;
+    padding: 7px 5px 5px;
+    border-radius: 14px;
+  }
+
+  .agenda-page .day-number {
+    font-size: 14px;
+  }
+
+  .agenda-page .appointment {
+    width: 6px;
+    height: 6px;
+    flex-basis: 6px;
+  }
+
+  /* ===== RECORDATORIOS ===== */
+  .agenda-page .side-panel {
+    padding: 12px 10px;
+    border-radius: 16px;
+  }
+
+  .agenda-page .side-panel h3 {
+    font-size: 18px;
+  }
+
+  .agenda-page .add-reminder {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .agenda-page .add-reminder button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ===== MODALES ===== */
+  .agenda-page .modal {
+    padding: 12px 10px max(12px, env(safe-area-inset-bottom));
+  }
+
+  .agenda-page .day-modal-content,
+  .agenda-page .new-simple-content {
+    border-radius: 18px;
+  }
+
+  .agenda-page .day-modal-content {
+    padding: 16px 14px 14px;
+  }
+
+  .agenda-page .new-simple-content {
+    padding: 16px 14px 14px;
+  }
+
+  .agenda-page #dayModalTitle,
+  .agenda-page .modal-title {
+    font-size: 18px;
+  }
+
+  .agenda-page .appointments-list .item {
+    padding: 10px;
+  }
+
+  .agenda-page .day-modal-header .close-btn,
+  .agenda-page .app-buttons button {
+    width: 38px;
+    height: 38px;
+  }
+}

@@ -27,7 +27,7 @@ function isSameDay(a, b) {
 
 function buildDayCell({ dayNumber, dateStr, isOtherMonth, isToday }) {
   const classes = ["day"];
-  if (isOtherMonth) classes.push("other-month");
+  if (isOtherMonth) classes.push("is-outside-month");
   if (isToday) classes.push("today");
 
   return `
@@ -134,6 +134,11 @@ function onDayClick(e) {
   const dayEl = e.target.closest(".day");
   if (!dayEl) return;
 
+  const isOtherMonth = dayEl.dataset.other === "1";
+
+  // no seleccionar ni abrir modal en días fuera del mes actual
+  if (isOtherMonth) return;
+
   // quitar selección previa
   if (selectedDayEl) {
     selectedDayEl.classList.remove("selected");
@@ -144,9 +149,7 @@ function onDayClick(e) {
   dayEl.classList.add("selected");
 
   const dateStr = dayEl.dataset.date;
-  const isOtherMonth = dayEl.dataset.other === "1";
-
-  openDayModal(dateStr, isOtherMonth);
+  openDayModal(dateStr, false);
 }
 
 function openDayModal(dateStr, isOtherMonth) {
