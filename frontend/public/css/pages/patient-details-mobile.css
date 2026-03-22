@@ -1,648 +1,704 @@
 /* =========================================================
-   PATIENT DETAILS MOBILE — TuGabinete
-   Crear como archivo aparte y cargarlo DESPUÉS de patient-details.css
-   ========================================================= */
+   AJUSTES FINOS REALES CON APP-SHELL.CSS
+   Agregar en patient-details-mobile.css
+========================================================= */
 
+.patient-details-page {
+  overflow-x: clip;
+}
+
+.patient-details-page main,
+.patient-details-page .pd-content,
+.patient-details-page .table-container,
+.patient-details-page .table-scroll,
+.patient-details-page .modal-box,
+.patient-details-page .edit-column,
+.patient-details-page .homecare-step-card {
+  min-width: 0;
+}
+
+/* Evita desbordes de texto largos */
+.patient-details-page h1#patient-name,
+.patient-details-page td,
+.patient-details-page th,
+.patient-details-page .btn-back,
+.patient-details-page .btn-add,
+.patient-details-page .btn-edit-treatment-save,
+.patient-details-page .btn-edit-treatment-cancel {
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
 @media (max-width: 768px) {
-  /* ========================================
-     BASE / AISLAMIENTO DEL LAYOUT GLOBAL
-  ======================================== */
+  /* ===== Fondo ===== */
   body.is-patient-details {
-    overflow-x: hidden;
+    background-attachment: scroll;
   }
 
-  body.is-patient-details .patient-details-page {
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
-
-  body.is-patient-details .patient-details-page main {
-    max-width: none;
+  /* ===== Main ===== */
+  .patient-details-page main {
     width: 100%;
-    margin: 0;
-    padding: 14px 12px 24px;
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
+    padding: 16px 12px 24px;
+    box-sizing: border-box;
   }
 
-  body.is-patient-details .patient-details-page .pd-content,
-  body.is-patient-details .patient-details-page .pd-loading {
+  .patient-details-page .pd-content,
+  .patient-details-page .pd-loading {
     width: 100%;
     max-width: none;
-    margin: 0;
   }
 
-  /* ========================================
-     TOP BAR / DRAWER
-  ======================================== */
-  body.is-patient-details .top-bar {
-    height: 58px;
-    padding: 0 14px;
+  .patient-details-page h1#patient-name {
+    margin: 0 0 14px;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+
+  .patient-details-page h2 {
+    margin: 20px 0 10px !important;
+    font-size: 1.08rem;
+    line-height: 1.25;
+  }
+
+  /* ===== TOP BAR real con app-shell ===== */
+  .patient-details-page .top-bar {
+    height: 60px;
     gap: 10px;
+    padding: 0 14px;
   }
 
-  body.is-patient-details .menu-btn,
-  body.is-patient-details .top-bar .close-btn {
-    width: 44px;
-    height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-  }
-
-  body.is-patient-details .app-title {
+  .patient-details-page .app-title {
+    flex: 1;
     min-width: 0;
-    font-size: 18px;
+    font-size: 1rem;
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  body.is-patient-details .drawer {
-    width: min(320px, 88vw);
-    max-width: 88vw;
+  .patient-details-page .menu-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
   }
 
-  body.is-patient-details .drawer-header {
+  /* ===== DRAWER real con app-shell ===== */
+  .patient-details-page .drawer {
+    width: min(86vw, 320px);
+    max-width: 320px;
+  }
+
+  .patient-details-page .drawer-header {
     padding: 18px 16px;
   }
 
-  body.is-patient-details .drawer-nav {
+  .patient-details-page .drawer-nav {
     padding: 16px;
-    gap: 6px;
-  }
-
-  body.is-patient-details .drawer-nav a {
-    min-height: 44px;
-    padding: 11px 12px;
-    font-size: 14px;
-  }
-
-  /* ========================================
-     LOADER
-  ======================================== */
-  body.is-patient-details .patient-details-page .pd-loading-card {
-    min-height: 180px;
-    padding: 18px;
-    border-radius: 18px;
-    gap: 12px;
-  }
-
-  body.is-patient-details .patient-details-page .pd-spinner {
-    width: 38px;
-    height: 38px;
-  }
-
-  /* ========================================
-     TIPOGRAFÍA GENERAL
-  ======================================== */
-  body.is-patient-details .patient-details-page h1#patient-name {
-    margin: 0 0 14px;
-    font-size: 1.62rem;
-    line-height: 1.15;
-    text-align: left;
-    overflow-wrap: anywhere;
-  }
-
-  body.is-patient-details .patient-details-page h2 {
-    margin: 20px 0 10px;
-    font-size: 1.08rem;
-    line-height: 1.25;
-  }
-
-  /* ========================================
-     TARJETAS / CONTENEDORES
-  ======================================== */
-  body.is-patient-details .patient-details-page .table-container {
-    border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(209, 168, 176, 0.12);
-  }
-
-  body.is-patient-details .patient-details-page #homecare-empty > div {
-    padding: 14px !important;
-  }
-
-  body.is-patient-details .patient-details-page #homecare-empty strong {
-    font-size: 0.96rem;
-  }
-
-  body.is-patient-details .patient-details-page #homecare-empty p:last-child {
-    font-size: 0.92rem;
-    line-height: 1.55;
-  }
-
-  /* ========================================
-     ACCIONES SUPERIORES
-  ======================================== */
-  body.is-patient-details .patient-details-page .main-top-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 14px;
-    padding: 12px 14px;
-    border-radius: 18px;
-  }
-
-  body.is-patient-details .patient-details-page .right-actions {
-    width: auto;
-    max-width: 100%;
-    margin-left: 0;
-    display: flex;
-    flex-wrap: wrap;
     gap: 8px;
   }
 
-  body.is-patient-details .patient-details-page .btn-back,
-  body.is-patient-details .patient-details-page .right-actions .btn-add,
-  body.is-patient-details .patient-details-page .homecare-actions .btn-add,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-save,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-cancel,
-  body.is-patient-details .patient-details-page .homecare-remove-item-btn {
-    width: auto;
-    max-width: 100%;
-    min-height: 44px;
-    padding: 0 14px;
-    font-size: 0.92rem;
-    white-space: nowrap;
+  .patient-details-page .drawer-nav a {
+    min-height: 46px;
+    padding: 12px 14px;
+    font-size: 15px;
   }
 
-  /* ========================================
-     HEADER RUTINA EN CASA
-  ======================================== */
-  body.is-patient-details .patient-details-page .homecare-section {
+  .patient-details-page .drawer-feedback {
+    margin: auto 16px 16px;
+  }
+
+  .patient-details-page .drawer-feedback-link {
+    min-height: 48px;
+  }
+
+  /* ===== Header acciones ===== */
+  .patient-details-page .main-top-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 18px;
+    }
+
+    .patient-details-page .right-actions {
+    display: flex;
+    }
+
+    .patient-details-page .right-actions > * {
+    width: 100%;
+    }
+
+    .patient-details-page .btn-back {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 120px;
+    min-height: 44px;
+    padding: 10px 14px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    }
+
+    .patient-details-page .right-actions {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    }
+
+    .patient-details-page .right-actions > * {
+    width: 100%;
+    }
+
+    .patient-details-page .btn-add {
+    min-height: 44px;
+    padding: 10px 14px;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    white-space: normal;
+    }
+
+  /* ===== Rutina header ===== */
+  .patient-details-page .homecare-section {
     margin-top: 20px !important;
   }
 
-  body.is-patient-details .patient-details-page .homecare-header {
+  .patient-details-page .homecare-header {
     position: static;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: stretch;
     gap: 10px;
-    min-height: 0;
+    min-height: auto;
     margin-bottom: 10px;
   }
 
-  body.is-patient-details .patient-details-page .homecare-header h2 {
+  .patient-details-page .homecare-header h2 {
     position: static;
-    left: auto;
     transform: none;
-    width: 100%;
     text-align: left;
     white-space: normal;
+    margin: 0 !important;
   }
 
-  body.is-patient-details .patient-details-page .homecare-actions {
-    width: auto;
+  .patient-details-page .homecare-actions {
+    width: 100%;
     margin-left: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
   }
 
-  /* ========================================
-     TABLA INFO PACIENTE -> BLOQUES
-  ======================================== */
-  body.is-patient-details .patient-details-page #patient-info,
-  body.is-patient-details .patient-details-page #patient-info tr,
-  body.is-patient-details .patient-details-page #patient-info td {
+  .patient-details-page .homecare-actions .btn-add {
+    width: 100%;
+  }
+
+  /* ===== Cards / tablas base ===== */
+  .patient-details-page .table-container {
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .patient-details-page .table-scroll {
+    overflow-x: visible;
+  }
+
+  /* =========================================================
+     DATOS DEL PACIENTE -> BLOQUES
+  ========================================================= */
+  .patient-details-page #patient-info,
+  .patient-details-page #patient-info tbody,
+  .patient-details-page #patient-info tr {
     display: block;
     width: 100%;
   }
 
-  body.is-patient-details .patient-details-page #patient-info tr {
-    padding: 13px 14px;
+  .patient-details-page #patient-info tr {
+    padding: 12px 14px;
   }
 
-  body.is-patient-details .patient-details-page #patient-info td {
-    padding: 0;
+  .patient-details-page #patient-info tr + tr {
+    border-top: 1px solid #f3e4e6;
   }
 
-  body.is-patient-details .patient-details-page #patient-info tr td:first-child {
-    width: auto !important;
-    margin: 0 0 6px;
+  .patient-details-page #patient-info td {
+    display: block;
+    width: 100%;
     padding: 0;
+    border: 0;
     background: transparent;
-    font-size: 0.72rem;
+    text-align: left;
+  }
+
+  .patient-details-page #patient-info tr td:first-child {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
     line-height: 1.2;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--pd-text-soft);
+    background: transparent;
   }
 
-  body.is-patient-details .patient-details-page #patient-info tr td:last-child {
-    font-size: 0.96rem;
-    line-height: 1.5;
-    color: var(--pd-text);
-    overflow-wrap: anywhere;
+  .patient-details-page #patient-info tr td:last-child {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--pd-title);
   }
 
-  /* ========================================
+  /* =========================================================
      RESUMEN RUTINA -> BLOQUES
-  ======================================== */
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child tbody,
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child tr,
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child th,
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child td {
+  ========================================================= */
+  .patient-details-page #homecare-content .table-container:first-child table,
+  .patient-details-page #homecare-content .table-container:first-child tbody,
+  .patient-details-page #homecare-content .table-container:first-child tr {
     display: block;
     width: 100%;
   }
 
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child tr {
-    padding: 13px 14px;
+  .patient-details-page #homecare-content .table-container:first-child tr {
+    padding: 12px 14px;
   }
 
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child th,
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child td {
-    padding: 0 !important;
-    border-bottom: 0;
+  .patient-details-page #homecare-content .table-container:first-child tr + tr {
+    border-top: 1px solid #f3e4e6;
   }
 
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child th {
-    width: auto !important;
-    margin: 0 0 6px;
+  .patient-details-page #homecare-content .table-container:first-child th,
+  .patient-details-page #homecare-content .table-container:first-child td {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
     background: transparent;
-    font-size: 0.72rem;
+    text-align: left;
+  }
+
+  .patient-details-page #homecare-content .table-container:first-child th {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
     line-height: 1.2;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--pd-text-soft);
+    background: transparent;
   }
 
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child td {
-    font-size: 0.96rem;
-    line-height: 1.5;
-    color: var(--pd-text);
-    overflow-wrap: anywhere;
+  .patient-details-page #homecare-content .table-container:first-child td {
+    font-size: 0.98rem;
+    line-height: 1.45;
+    color: var(--pd-title);
   }
 
-  /* ========================================
-     TABLAS DENSAS -> TARJETAS POR FILA
-     - Pasos de rutina
-     - Últimos turnos
-  ======================================== */
-  body.is-patient-details .patient-details-page #homecare-content .table-scroll,
-  body.is-patient-details .patient-details-page .pd-content > h2 + .table-container.table-scroll {
-    overflow: visible;
+  /* =========================================================
+     PASOS DE RUTINA -> CARDS
+  ========================================================= */
+  .patient-details-page #homecare-content .table-scroll table,
+  .patient-details-page #homecare-content .table-scroll thead,
+  .patient-details-page #homecare-content .table-scroll tbody,
+  .patient-details-page #homecare-content .table-scroll tr,
+  .patient-details-page #homecare-content .table-scroll th,
+  .patient-details-page #homecare-content .table-scroll td {
+    display: block;
+    width: 100%;
   }
 
-  body.is-patient-details .patient-details-page #homecare-content .table-scroll table,
-  body.is-patient-details .patient-details-page .pd-content > h2 + .table-container.table-scroll table {
-    min-width: 0;
-    table-layout: auto;
-  }
-
-  body.is-patient-details .patient-details-page #homecare-content .table-scroll thead,
-  body.is-patient-details .patient-details-page .pd-content > h2 + .table-container.table-scroll thead {
+  .patient-details-page #homecare-content .table-scroll thead {
     display: none;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items,
-  body.is-patient-details .patient-details-page #patient-appointments {
-    display: grid;
-    gap: 12px;
+  .patient-details-page #homecare-content .table-scroll tbody {
     padding: 12px;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items tr,
-  body.is-patient-details .patient-details-page #patient-appointments tr {
-    display: block;
-    padding: 14px;
-    border: 1px solid var(--pd-border);
+  .patient-details-page #homecare-items tr {
+    background: linear-gradient(180deg, #fffdfd 0%, #fff8f8 100%);
+    border: 1px solid #f0dede;
     border-radius: 16px;
-    background: #fff;
     box-shadow: var(--pd-shadow-soft);
+    overflow: hidden;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items tr + tr,
-  body.is-patient-details .patient-details-page #patient-appointments tr + tr {
-    border-top: none;
+  .patient-details-page #homecare-items tr + tr {
+    margin-top: 12px;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items td,
-  body.is-patient-details .patient-details-page #patient-appointments td {
-    display: grid;
-    grid-template-columns: minmax(86px, 104px) 1fr;
-    gap: 10px;
-    align-items: start;
-    width: 100% !important;
-    min-width: 0 !important;
-    padding: 6px 0;
-    border: 0;
+  .patient-details-page #homecare-items td {
+    position: relative;
+    min-height: 44px;
+    padding: 12px 14px 12px 112px;
+    border-top: 1px solid #f5e7e8;
+    font-size: 0.92rem;
+    line-height: 1.4;
     white-space: normal;
     word-break: break-word;
-    line-height: 1.45;
-    font-size: 0.92rem;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items td::before,
-  body.is-patient-details .patient-details-page #patient-appointments td::before {
-    font-size: 0.72rem;
+  .patient-details-page #homecare-items td:first-child {
+    border-top: 0;
+  }
+
+  .patient-details-page #homecare-items td::before {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    width: 86px;
+    font-size: 0.74rem;
+    font-weight: 700;
     line-height: 1.2;
-    font-weight: 700;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--pd-text-soft);
+    content: "";
   }
 
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(1) {
-    color: var(--pd-title);
-    font-weight: 700;
-  }
+  .patient-details-page #homecare-items td:nth-child(1)::before { content: "Paso"; }
+  .patient-details-page #homecare-items td:nth-child(2)::before { content: "Momento"; }
+  .patient-details-page #homecare-items td:nth-child(3)::before { content: "Acción"; }
+  .patient-details-page #homecare-items td:nth-child(4)::before { content: "Producto"; }
+  .patient-details-page #homecare-items td:nth-child(5)::before { content: "Frecuencia"; }
 
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(1)::before {
-    content: "Paso";
-  }
-
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(2)::before {
-    content: "Momento";
-  }
-
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(3)::before {
-    content: "Acción";
-  }
-
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(4)::before {
-    content: "Producto";
-  }
-
-  body.is-patient-details .patient-details-page #homecare-items td:nth-child(5)::before {
-    content: "Frecuencia";
-  }
-
-  body.is-patient-details .patient-details-page #patient-appointments td:nth-child(1)::before {
-    content: "Fecha";
-  }
-
-  body.is-patient-details .patient-details-page #patient-appointments td:nth-child(2)::before {
-    content: "Tratamiento";
-  }
-
-  body.is-patient-details .patient-details-page #patient-appointments td:nth-child(3)::before {
-    content: "Estado";
-  }
-
-  body.is-patient-details .patient-details-page #homecare-items td[colspan],
-  body.is-patient-details .patient-details-page #patient-appointments td[colspan] {
-    display: block;
-    padding: 0;
+  .patient-details-page #homecare-items td[colspan] {
+    padding: 14px;
+    min-height: 0;
     text-align: center;
-    color: #999;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items td[colspan]::before,
-  body.is-patient-details .patient-details-page #patient-appointments td[colspan]::before {
+  .patient-details-page #homecare-items td[colspan]::before {
     content: none;
   }
 
-  /* ========================================
-     MODAL MOBILE
-  ======================================== */
-  body.is-patient-details .patient-details-page .modal-overlay {
-    padding: 0;
+  /* =========================================================
+     ÚLTIMOS TURNOS -> CARDS
+  ========================================================= */
+  .patient-details-page #patient-appointments,
+  .patient-details-page #patient-appointments thead,
+  .patient-details-page #patient-appointments tbody,
+  .patient-details-page #patient-appointments tr,
+  .patient-details-page #patient-appointments th,
+  .patient-details-page #patient-appointments td {
+    display: block;
+    width: 100%;
+  }
+
+  .patient-details-page #patient-appointments thead {
+    display: none;
+  }
+
+  .patient-details-page #patient-appointments tbody {
+    padding: 12px;
+  }
+
+  .patient-details-page #patient-appointments tr {
+    background: linear-gradient(180deg, #fffdfd 0%, #fff8f8 100%);
+    border: 1px solid #f0dede;
+    border-radius: 16px;
+    box-shadow: var(--pd-shadow-soft);
+    overflow: hidden;
+  }
+
+  .patient-details-page #patient-appointments tr + tr {
+    margin-top: 12px;
+  }
+
+  .patient-details-page #patient-appointments td {
+    position: relative;
+    min-height: 44px;
+    padding: 12px 14px 12px 108px;
+    border-top: 1px solid #f5e7e8;
+    font-size: 0.94rem;
+    line-height: 1.4;
+    white-space: normal;
+  }
+
+  .patient-details-page #patient-appointments td:first-child {
+    border-top: 0;
+  }
+
+  .patient-details-page #patient-appointments td::before {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    width: 82px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pd-text-soft);
+    content: "";
+  }
+
+  .patient-details-page #patient-appointments td:nth-child(1)::before { content: "Fecha"; }
+  .patient-details-page #patient-appointments td:nth-child(2)::before { content: "Tratamiento"; }
+  .patient-details-page #patient-appointments td:nth-child(3)::before { content: "Estado"; }
+
+  .patient-details-page #patient-appointments td[colspan] {
+    padding: 14px;
+    min-height: 0;
+    text-align: center;
+  }
+
+  .patient-details-page #patient-appointments td[colspan]::before {
+    content: none;
+  }
+
+  /* ===== Estado vacío ===== */
+  .patient-details-page #homecare-empty > div {
+    padding: 16px !important;
+  }
+
+  .patient-details-page #homecare-empty strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .patient-details-page #homecare-empty p:last-child {
+    line-height: 1.5;
+  }
+
+  /* ===== Modal ===== */
+  .patient-details-page .modal-overlay {
     align-items: flex-end;
-    background: rgba(64, 52, 59, 0.42);
-  }
-
-  body.is-patient-details .patient-details-page .modal-overlay.active {
+    justify-content: center;
     padding: 0;
   }
 
-  body.is-patient-details .patient-details-page .modal-overlay.active .modal-box,
-  body.is-patient-details .patient-details-page .modal-overlay.active .modal-content {
-    transform: none;
-  }
-
-  body.is-patient-details .patient-details-page .modal-box,
-  body.is-patient-details .patient-details-page .modal-edit-pro {
+  .patient-details-page .modal-box,
+  .patient-details-page .modal-edit-pro {
     width: 100%;
     max-width: none;
     max-height: 92dvh;
     margin: 0;
-    padding: 18px 14px 16px;
-    border-radius: 22px 22px 0 0;
-    overflow-x: hidden;
+    border-radius: 24px 24px 0 0;
+    padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  body.is-patient-details .patient-details-page .modal-box h2 {
+  .patient-details-page .modal-box h2 {
     margin: 0 0 16px;
-    padding-right: 46px;
-    font-size: 1.18rem;
+    padding-right: 52px;
+    font-size: 1.16rem;
     line-height: 1.25;
   }
 
-  body.is-patient-details .patient-details-page .modal-box .close-btn {
+  .patient-details-page .modal-box .close-btn {
     top: 12px;
     right: 12px;
-    width: 40px;
-    height: 40px;
-    font-size: 1.35rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.45rem;
   }
 
-  /* ========================================
-     FORMULARIO DEL MODAL
-  ======================================== */
-  body.is-patient-details .patient-details-page .homecare-form-stack {
+  .patient-details-page .homecare-form-stack {
     gap: 14px;
   }
 
-  body.is-patient-details .patient-details-page .edit-column {
+  .patient-details-page .edit-column {
     padding: 16px;
     border-radius: 18px;
   }
 
-  body.is-patient-details .patient-details-page .homecare-card-title {
-    margin-bottom: 14px;
+  .patient-details-page .homecare-card-title {
+    margin: 0 0 14px;
     font-size: 1rem;
-    line-height: 1.3;
+    line-height: 1.25;
   }
 
-  body.is-patient-details .patient-details-page .edit-column label {
-    margin-bottom: 7px;
+  .patient-details-page .homecare-steps-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .patient-details-page #homecare-add-item-btn {
+    width: 100%;
+  }
+
+  .patient-details-page .edit-column label {
+    display: block;
+    margin: 0 0 7px;
     font-size: 0.9rem;
+    line-height: 1.25;
   }
 
-  body.is-patient-details .patient-details-page .edit-column label:not(:first-child) {
+  .patient-details-page .edit-column label:not(:first-child) {
     margin-top: 12px;
   }
 
-  body.is-patient-details .patient-details-page .edit-column input,
-  body.is-patient-details .patient-details-page .edit-column select,
-  body.is-patient-details .patient-details-page .edit-column textarea {
-    min-height: 46px;
-    padding: 12px 13px;
+  .patient-details-page .edit-column input,
+  .patient-details-page .edit-column select,
+  .patient-details-page .edit-column textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
     font-size: 16px;
-    border-radius: 12px;
+    line-height: 1.35;
+    border-radius: 14px;
   }
 
-  body.is-patient-details .patient-details-page .edit-column textarea {
-    min-height: 96px;
+  .patient-details-page .edit-column textarea {
+    min-height: 120px;
   }
 
-  body.is-patient-details .patient-details-page .edit-column input[type="date"],
-  body.is-patient-details .patient-details-page .edit-column select {
+  /* Normalización date/select */
+  .patient-details-page .edit-column input[type="date"],
+  .patient-details-page .edit-column select {
     -webkit-appearance: none;
     appearance: none;
-    background: #fff;
-    color: var(--pd-text);
+    background-clip: padding-box;
   }
 
-  body.is-patient-details .patient-details-page .homecare-steps-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .patient-details-page .edit-column input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+  }
+
+  .patient-details-page .edit-column input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.75;
+  }
+
+  .patient-details-page .homecare-form-items {
     gap: 10px;
   }
 
-  body.is-patient-details .patient-details-page .homecare-form-items {
-    gap: 10px;
-  }
-
-  body.is-patient-details .patient-details-page .homecare-step-card {
+  .patient-details-page .homecare-step-card {
     padding: 14px !important;
     border-radius: 16px !important;
   }
 
-  body.is-patient-details .patient-details-page .homecare-step-card-header {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  body.is-patient-details .patient-details-page .homecare-step-card strong {
-    font-size: 0.96rem;
-  }
-
-  body.is-patient-details .patient-details-page .homecare-steps-empty {
-    padding: 12px;
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-
-  /* ========================================
-     ACCIONES DEL MODAL
-  ======================================== */
-  body.is-patient-details .patient-details-page .modal-actions {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 18px;
-  }
-
-  body.is-patient-details .patient-details-page .btn-edit-treatment-save,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-cancel {
-    flex: 0 1 auto;
-    min-width: 148px;
-  }
-}
-
-@media (max-width: 480px) {
-  /* ========================================
-     AJUSTES FINOS PARA CELULAR CHICO
-  ======================================== */
-  body.is-patient-details .top-bar {
-    padding: 0 12px;
-  }
-
-  body.is-patient-details .app-title {
-    font-size: 17px;
-  }
-
-  body.is-patient-details .drawer {
-    width: 90vw;
-    max-width: 90vw;
-  }
-
-  body.is-patient-details .patient-details-page main {
-    padding: 12px 10px 20px;
-  }
-
-  body.is-patient-details .patient-details-page h1#patient-name {
-    font-size: 1.44rem;
+  .patient-details-page .homecare-step-card-header {
     margin-bottom: 12px;
   }
 
-  body.is-patient-details .patient-details-page h2 {
-    font-size: 1rem;
-    margin: 18px 0 10px;
+  .patient-details-page .homecare-remove-item-btn {
+    min-height: 44px;
   }
 
-  body.is-patient-details .patient-details-page .main-top-actions {
-    padding: 11px 12px;
+  .patient-details-page .modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+}
+
+/* =========================================================
+   MOBILE CHICO
+========================================================= */
+@media (max-width: 480px) {
+  .patient-details-page main {
+    padding: 14px 10px 20px;
+  }
+
+  .patient-details-page .top-bar {
+    padding: 0 12px;
     gap: 8px;
   }
 
-  body.is-patient-details .patient-details-page .table-container {
+  .patient-details-page .app-title {
+    font-size: 0.96rem;
+  }
+
+  .patient-details-page h1#patient-name {
+    font-size: 1.4rem;
+  }
+
+  .patient-details-page h2 {
+    font-size: 1.02rem;
+  }
+
+  .patient-details-page .main-top-actions {
+    padding: 12px;
     border-radius: 16px;
   }
 
-  body.is-patient-details .patient-details-page #patient-info tr,
-  body.is-patient-details .patient-details-page #homecare-content > .table-container:first-child tr,
-  body.is-patient-details .patient-details-page #homecare-items tr,
-  body.is-patient-details .patient-details-page #patient-appointments tr {
+  .patient-details-page .table-container {
+    border-radius: 16px;
+  }
+
+  .patient-details-page #patient-info tr,
+  .patient-details-page #homecare-content .table-container:first-child tr {
     padding: 12px;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items,
-  body.is-patient-details .patient-details-page #patient-appointments {
+  .patient-details-page #patient-appointments tbody,
+  .patient-details-page #homecare-content .table-scroll tbody {
     padding: 10px;
-    gap: 10px;
   }
 
-  body.is-patient-details .patient-details-page #homecare-items td,
-  body.is-patient-details .patient-details-page #patient-appointments td {
-    grid-template-columns: 78px 1fr;
-    gap: 8px;
-    font-size: 0.88rem;
+  .patient-details-page #patient-appointments td {
+    padding: 11px 12px 11px 98px;
   }
 
-  body.is-patient-details .patient-details-page .btn-back,
-  body.is-patient-details .patient-details-page .right-actions .btn-add,
-  body.is-patient-details .patient-details-page .homecare-actions .btn-add,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-save,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-cancel,
-  body.is-patient-details .patient-details-page .homecare-remove-item-btn {
-    min-height: 42px;
-    padding: 0 12px;
-    font-size: 0.88rem;
+  .patient-details-page #homecare-items td {
+    padding: 11px 12px 11px 102px;
   }
 
-  body.is-patient-details .patient-details-page .modal-box,
-  body.is-patient-details .patient-details-page .modal-edit-pro {
-    padding: 16px 12px 14px;
-    border-radius: 20px 20px 0 0;
+  .patient-details-page #patient-appointments td::before,
+  .patient-details-page #homecare-items td::before {
+    left: 12px;
+    width: 76px;
+    font-size: 0.72rem;
   }
 
-  body.is-patient-details .patient-details-page .modal-box h2 {
+  .patient-details-page .modal-box,
+  .patient-details-page .modal-edit-pro {
+    max-height: 94dvh;
+    border-radius: 22px 22px 0 0;
+    padding: 16px 14px calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .patient-details-page .modal-box h2 {
     font-size: 1.08rem;
-    padding-right: 42px;
+    padding-right: 48px;
   }
 
-  body.is-patient-details .patient-details-page .modal-box .close-btn {
-    top: 10px;
-    right: 10px;
-    width: 38px;
-    height: 38px;
-  }
-
-  body.is-patient-details .patient-details-page .edit-column {
+  .patient-details-page .edit-column {
     padding: 14px;
     border-radius: 16px;
   }
 
-  body.is-patient-details .patient-details-page .homecare-card-title {
-    font-size: 0.96rem;
+  .patient-details-page .homecare-step-card {
+    padding: 12px !important;
   }
 
-  body.is-patient-details .patient-details-page .modal-actions {
+  .patient-details-page .homecare-step-card-header {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
   }
 
-  body.is-patient-details .patient-details-page .btn-edit-treatment-save,
-  body.is-patient-details .patient-details-page .btn-edit-treatment-cancel {
-    min-width: 136px;
+  .patient-details-page .homecare-remove-item-btn {
+    width: 100%;
   }
+
+  .patient-details-page .modal-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.patient-details-page .btn-back {
+  min-width: 108px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.patient-details-page .btn-add {
+  padding: 10px 12px;
+  font-size: 0.9rem;
 }
