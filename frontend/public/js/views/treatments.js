@@ -1648,7 +1648,10 @@ async function onCreateTreatment(e) {
       return;
     }
 
-    const treatmentNorm = normalizeText(document.getElementById("treatmentInput")?.value || "");
+    const treatmentNorm = normalizeText(
+      document.getElementById("treatmentInput")?.value || ""
+    );
+
     if (!allowedTreatments.includes(treatmentNorm)) {
       await Swal.fire({
         icon: "error",
@@ -1660,31 +1663,58 @@ async function onCreateTreatment(e) {
       return;
     }
 
-    const beforePhoto = await inputFileToDataURL(document.getElementById("beforePhoto"));
-    const afterPhoto  = await inputFileToDataURL(document.getElementById("afterPhoto"));
-    const newTreatment = {
-      patientId: parseInt(patientId, 10),
-      treatment: document.getElementById("treatmentInput").value,
-      date: document.getElementById("date").value,
-      time: document.getElementById("time").value,
-      amount: parseFloat(document.getElementById("amount").value) || 0,
-      notes: document.getElementById("notes").value,
-      status: document.getElementById("paymentStatus").value,
-      method: document.getElementById("paymentMethod").value,
-      beforePhoto,
-      afterPhoto,
-    };
+    const formData = new FormData();
+
+    appendFormValue(formData, "patientId", patientId);
+    appendFormValue(
+      formData,
+      "treatment",
+      document.getElementById("treatmentInput")?.value || ""
+    );
+    appendFormValue(formData, "date", document.getElementById("date")?.value || "");
+    appendFormValue(formData, "time", document.getElementById("time")?.value || "");
+    appendFormValue(
+      formData,
+      "amount",
+      parseFloat(document.getElementById("amount")?.value || "") || 0
+    );
+    appendFormValue(
+      formData,
+      "notes",
+      document.getElementById("notes")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "status",
+      document.getElementById("paymentStatus")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "method",
+      document.getElementById("paymentMethod")?.value || ""
+    );
+
+    const beforeFile = document.getElementById("beforePhoto")?.files?.[0];
+    const afterFile = document.getElementById("afterPhoto")?.files?.[0];
+
+    if (beforeFile) {
+      formData.append("beforePhoto", beforeFile);
+    }
+
+    if (afterFile) {
+      formData.append("afterPhoto", afterFile);
+    }
 
     const res = await authFetch(`${API_URL}/appointments`, {
       method: "POST",
-      body: JSON.stringify(newTreatment),
+      body: formData,
     });
 
     const saved = await res.json().catch(() => null);
     if (!res.ok) throw new Error(saved?.error || "Error al registrar");
 
     allTreatments.unshift(saved);
-    applyFilters(); // respeta filtros si están activos
+    applyFilters();
 
     await Swal.fire({
       icon: "success",
@@ -1694,12 +1724,14 @@ async function onCreateTreatment(e) {
       showConfirmButton: false,
     });
 
-    // limpiar + cerrar
     resetTreatmentForm();
     cancelTreatmentForm();
-
   } catch (err) {
-    await Swal.fire("Error", err.message || "No se pudo guardar el tratamiento", "error");
+    await Swal.fire(
+      "Error",
+      err.message || "No se pudo guardar el tratamiento",
+      "error"
+    );
   } finally {
     isSavingTreatment = false;
     if (btnSave) {
@@ -2066,7 +2098,9 @@ async function onSaveEditTreatment(e) {
 
   if (!editingTreatment) return;
 
-  const btnSave = document.querySelector('button[type="submit"][form="editTreatmentForm"]');
+  const btnSave = document.querySelector(
+    'button[type="submit"][form="editTreatmentForm"]'
+  );
 
   if (btnSave) {
     btnSave.disabled = true;
@@ -2075,7 +2109,9 @@ async function onSaveEditTreatment(e) {
   }
 
   try {
-    const editValue = normalizeText(document.getElementById("editTreatmentInput")?.value || "");
+    const editValue = normalizeText(
+      document.getElementById("editTreatmentInput")?.value || ""
+    );
 
     if (!allowedTreatments.includes(editValue)) {
       await Swal.fire({
@@ -2089,45 +2125,71 @@ async function onSaveEditTreatment(e) {
       return;
     }
 
-    const updated = {
-      ...editingTreatment,
-      treatment: document.getElementById("editTreatmentInput").value,
-      date: document.getElementById("editTreatmentDate").value,
-      time: document.getElementById("editTreatmentTime").value,
-      amount: parseFloat(document.getElementById("editTreatmentAmount").value) || 0,
-      status: document.getElementById("editTreatmentStatus").value,
-      method: document.getElementById("editTreatmentMethod").value,
-      notes: document.getElementById("editTreatmentNotes").value,
-    };
+    const formData = new FormData();
 
-    // normalizar imágenes inválidas
-    if (
-      !updated.beforePhoto ||
-      updated.beforePhoto === "null" ||
-      updated.beforePhoto === "undefined" ||
-      String(updated.beforePhoto).length < 100
-    ) {
-      updated.beforePhoto = null;
+    appendFormValue(
+      formData,
+      "patientId",
+      editingTreatment.patientId ?? editingTreatment.patient?.id ?? ""
+    );
+    appendFormValue(
+      formData,
+      "treatment",
+      document.getElementById("editTreatmentInput")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "date",
+      document.getElementById("editTreatmentDate")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "time",
+      document.getElementById("editTreatmentTime")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "amount",
+      parseFloat(document.getElementById("editTreatmentAmount")?.value || "") || 0
+    );
+    appendFormValue(
+      formData,
+      "status",
+      document.getElementById("editTreatmentStatus")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "method",
+      document.getElementById("editTreatmentMethod")?.value || ""
+    );
+    appendFormValue(
+      formData,
+      "notes",
+      document.getElementById("editTreatmentNotes")?.value || ""
+    );
+
+    const beforeFile = document.getElementById("editBeforePhoto")?.files?.[0];
+    const afterFile = document.getElementById("editAfterPhoto")?.files?.[0];
+
+    if (beforeFile) {
+      formData.append("beforePhoto", beforeFile);
     }
 
-    if (
-      !updated.afterPhoto ||
-      updated.afterPhoto === "null" ||
-      updated.afterPhoto === "undefined" ||
-      String(updated.afterPhoto).length < 100
-    ) {
-      updated.afterPhoto = null;
+    if (afterFile) {
+      formData.append("afterPhoto", afterFile);
     }
 
-    const res = await authFetch(`${API_URL}/appointments/${updated.id}`, {
+    const res = await authFetch(`${API_URL}/appointments/${editingTreatment.id}`, {
       method: "PUT",
-      body: JSON.stringify(updated),
+      body: formData,
     });
 
     const saved = await res.json().catch(() => null);
     if (!res.ok) throw new Error(saved?.error || "No se pudo actualizar");
 
-    const i = allTreatments.findIndex((t) => String(t.id) === String(updated.id));
+    const i = allTreatments.findIndex(
+      (t) => String(t.id) === String(editingTreatment.id)
+    );
     if (i !== -1) allTreatments[i] = saved;
 
     applyFilters();
@@ -2142,7 +2204,11 @@ async function onSaveEditTreatment(e) {
     });
   } catch (err) {
     console.error(err);
-    await Swal.fire("Error", err.message || "No se pudo actualizar el tratamiento", "error");
+    await Swal.fire(
+      "Error",
+      err.message || "No se pudo actualizar el tratamiento",
+      "error"
+    );
   } finally {
     if (btnSave) {
       btnSave.disabled = false;
@@ -2687,16 +2753,9 @@ function loadImageFile(input, previewId, callback = null) {
   reader.readAsDataURL(file);
 }
 
-function inputFileToDataURL(inputEl) {
-  const file = inputEl?.files?.[0];
-  if (!file) return Promise.resolve(null);
-
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-    r.readAsDataURL(file);
-  });
+function appendFormValue(formData, key, value) {
+  if (value === undefined || value === null) return;
+  formData.append(key, String(value));
 }
 
 /* ======================

@@ -1,7 +1,7 @@
 import * as service from "./auth.service.js";
 import * as repo from "./auth.repository.js";
-import { uploadToSupabase } from "../../core/utils/upload.js";
 import { clearRefreshCookie, setRefreshCookie } from "./auth.cookies.js";
+import { buildUserAvatarUrl } from "../../core/storage/storage.service.js";
 
 function setNoStore(res) {
   res.setHeader("Cache-Control", "no-store");
@@ -154,56 +154,10 @@ export const me = async (req, res, next) => {
       profession: user.profession ?? null,
       phone: user.phone ?? null,
       bio: user.bio ?? null,
-      profileImage: user.profileImage ?? null,
+      profileImage: buildUserAvatarUrl(user),
       emailVerified: user.isVerified,
     });
   } catch (err) {
     return next(err);
-  }
-};
-
-export const updateProfile = async (req, res) => {
-  try {
-    const { firstName, lastName, profession, phone } = req.body;
-
-    const data = {
-      name: `${firstName} ${lastName}`.trim(),
-      profession,
-      phone,
-    };
-
-    if (req.file) {
-      const buffer = req.file.buffer;
-      const originalName = req.file.originalname;
-
-      const publicUrl = await uploadToSupabase(
-        buffer,
-        originalName,
-        "profile"
-      );
-
-      data.profileImage = publicUrl;
-    }
-
-    const updated = await repo.updateUser(req.user.id, data);
-
-    return res.json({
-      message: "Perfil actualizado correctamente",
-      user: {
-        id: updated.id,
-        name: updated.name,
-        email: updated.email,
-        profession: updated.profession,
-        phone: updated.phone,
-        profileImage: updated.profileImage,
-      },
-    });
-  } catch (err) {
-    console.error("updateProfile error:", err);
-    return res.status(500).json({
-      message: "No se pudo actualizar el perfil",
-      error: err.message,
-      code: "PROFILE_UPDATE_FAILED",
-    });
   }
 };

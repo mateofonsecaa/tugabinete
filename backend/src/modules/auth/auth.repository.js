@@ -1,5 +1,14 @@
 import prisma from "../../config/prisma.js";
 
+const AUTH_STORED_FILE_SELECT = {
+  id: true,
+  bucket: true,
+  objectPath: true,
+  visibility: true,
+  status: true,
+  deletedAt: true,
+};
+
 export const createUser = (data) => {
   return prisma.user.create({
     data: { ...data, isVerified: false },
@@ -7,7 +16,14 @@ export const createUser = (data) => {
 };
 
 export const findUserByEmail = (email) => {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({
+    where: { email },
+    include: {
+      avatarFile: {
+        select: AUTH_STORED_FILE_SELECT,
+      },
+    },
+  });
 };
 
 export const createVerificationToken = (userId, token, expiresAt) => {
@@ -169,7 +185,10 @@ export const findAuthSessionByTokenHash = (tokenHash) => {
           profession: true,
           phone: true,
           bio: true,
-          profileImage: true,
+          avatarFileId: true,
+          avatarFile: {
+            select: AUTH_STORED_FILE_SELECT,
+          },
           isVerified: true,
           authTokenVersion: true,
         },
@@ -300,7 +319,10 @@ export const findPublicUserById = (id) => {
       profession: true,
       phone: true,
       bio: true,
-      profileImage: true,
+      avatarFileId: true,
+      avatarFile: {
+        select: AUTH_STORED_FILE_SELECT,
+      },
       isVerified: true,
       authTokenVersion: true,
     },

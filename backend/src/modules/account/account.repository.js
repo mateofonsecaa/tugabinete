@@ -1,5 +1,14 @@
 import prisma from "../../config/prisma.js";
 
+export const STORED_FILE_PUBLIC_SELECT = {
+  id: true,
+  bucket: true,
+  objectPath: true,
+  visibility: true,
+  status: true,
+  deletedAt: true,
+};
+
 export const PUBLIC_USER_SELECT = {
   id: true,
   name: true,
@@ -11,10 +20,12 @@ export const PUBLIC_USER_SELECT = {
   profession: true,
   phone: true,
   bio: true,
-  profileImage: true,
-  profileImagePath: true,
+  avatarFileId: true,
   isVerified: true,
   authTokenVersion: true,
+  avatarFile: {
+    select: STORED_FILE_PUBLIC_SELECT,
+  },
 };
 
 export const findPublicUserById = (userId) => {
@@ -161,23 +172,21 @@ export const clearPendingEmailState = (userId) => {
   });
 };
 
-export const updateAvatarFields = (userId, profileImage, profileImagePath) => {
+export const setAvatarFile = (userId, avatarFileId) => {
   return prisma.user.update({
     where: { id: userId },
     data: {
-      profileImage,
-      profileImagePath,
+      avatarFileId,
     },
     select: PUBLIC_USER_SELECT,
   });
 };
 
-export const clearAvatarFields = (userId) => {
+export const clearAvatarFile = (userId) => {
   return prisma.user.update({
     where: { id: userId },
     data: {
-      profileImage: null,
-      profileImagePath: null,
+      avatarFileId: null,
     },
     select: PUBLIC_USER_SELECT,
   });

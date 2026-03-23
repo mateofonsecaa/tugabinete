@@ -1,41 +1,28 @@
-import path from "path";
-import { randomUUID } from "crypto";
-import supabase from "../../core/supabaseClient.js";
+import { uploadManagedFile } from "../../core/storage/storage.service.js";
 
-const STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "migabinete";
-
-export async function uploadFeedbackAttachment(file) {
-  const extension = normalizeExtension(file);
-  const objectPath = `feedback/${randomUUID()}${extension}`;
-
-  const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(objectPath, file.buffer, {
-    contentType: file.mimetype,
-    upsert: false,
-    cacheControl: "3600",
-  });
-
-  if (error) {
-    console.error("Feedback upload error:", error);
-    throw new Error("No se pudo subir la captura.");
-  }
-
-  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(objectPath);
-
-  return {
-    url: data.publicUrl,
-    path: objectPath,
-    mime: file.mimetype,
-    size: file.size,
-  };
+function resolveFeedbackPurpose(category) {
+  return category === "ERROR_PROBLEMA"
+    ? "FEEDBACK_PRIVATE_ATTACHMENT"
+    : "FEEDBACK_PUBLIC_ATTACHMENT";
 }
 
-function normalizeExtension(file) {
-  const originalExtension = path.extname(file.originalname || "").toLowerCase();
-  if (originalExtension) return originalExtension;
+export async function uploadFeedbackAttachment({
+  userId,
+  feedbackId,
+  category,
+  file,
+}) {
+  const purpose = resolveFeedbackPurpose(category);
 
-  if (file.mimetype === "image/jpeg") return ".jpg";
-  if (file.mimetype === "image/png") return ".png";
-  if (file.mimetype === "image/webp") return ".webp";
-
-  return "";
+  return uploadManagedFile({
+    ownerUserId: userId,
+    purpose,
+    resourceType: "FEEDBACK",
+    resourceId: String(feedbackId),
+    file,
+    metadata: {
+      source: "feedback",
+      category,
+    },
+  });
 }

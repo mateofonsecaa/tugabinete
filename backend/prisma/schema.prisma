@@ -8,35 +8,36 @@ datasource db {
 }
 
 model User {
-  id                    Int                  @id @default(autoincrement())
-  name                  String
-  firstName             String?
-  lastName              String?
-  displayName           String?
-  email                 String               @unique
-  pendingEmail          String?              @unique
+  id                      Int                  @id @default(autoincrement())
+  name                    String
+  firstName               String?
+  lastName                String?
+  displayName             String?
+  email                   String               @unique
+  pendingEmail            String?              @unique
   pendingEmailRequestedAt DateTime?
-  password              String
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-  isVerified            Boolean              @default(false)
-  profileImage          String?
-  profileImagePath      String?
-  phone                 String?
-  profession            String?
-  bio                   String?
-  authTokenVersion      Int                  @default(0)
-  appointments          Appointment[]
-  passwordResetTokens   PasswordResetToken[]
-  patients              Patient[]
-  simpleAppointments    SimpleAppointment[]
-  verificationTokens    VerificationToken[]
-  reminders             Reminder[]
-  sales                 Sale[]
-  feedbackItems         FeedbackItem[]
-  feedbackVotes         FeedbackVote[]
-  sessions              AuthSession[]
-  emailChangeTokens     EmailChangeToken[]
+  password                String
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  isVerified              Boolean              @default(false)
+  phone                   String?
+  profession              String?
+  bio                     String?
+  authTokenVersion        Int                  @default(0)
+  appointments            Appointment[]
+  passwordResetTokens     PasswordResetToken[]
+  patients                Patient[]
+  simpleAppointments      SimpleAppointment[]
+  verificationTokens      VerificationToken[]
+  reminders               Reminder[]
+  sales                   Sale[]
+  feedbackItems           FeedbackItem[]
+  feedbackVotes           FeedbackVote[]
+  sessions                AuthSession[]
+  emailChangeTokens       EmailChangeToken[]
+  avatarFileId            String?              @unique
+  avatarFile              StoredFile?          @relation("UserAvatarFile", fields: [avatarFileId], references: [id], onDelete: SetNull)
+  storedFiles             StoredFile[]         @relation("UserOwnedFiles")
 }
 
 model EmailChangeToken {
@@ -99,22 +100,25 @@ model Patient {
 }
 
 model Appointment {
-  id          Int      @id @default(autoincrement())
-  date        DateTime
-  treatment   String?
-  patientId   Int?
-  notes       String?
-  completed   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  amount      Float?
-  time        String?
-  afterPhoto  String?
-  beforePhoto String?
-  method      String?
-  status      String?
-  userId      Int
-  patient     Patient? @relation(fields: [patientId], references: [id])
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  date              DateTime
+  treatment         String?
+  patientId         Int?
+  notes             String?
+  completed         Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  amount            Float?
+  time              String?
+  beforePhotoFileId String?
+  afterPhotoFileId  String?
+  method            String?
+  status            String?
+  userId            Int
+
+  patient         Patient?    @relation(fields: [patientId], references: [id])
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  beforePhotoFile StoredFile? @relation("AppointmentBeforePhoto", fields: [beforePhotoFileId], references: [id], onDelete: SetNull)
+  afterPhotoFile  StoredFile? @relation("AppointmentAfterPhoto", fields: [afterPhotoFileId], references: [id], onDelete: SetNull)
 }
 
 model SimpleAppointment {
@@ -312,24 +316,24 @@ enum FeedbackStatus {
 }
 
 model FeedbackItem {
-  id              Int                @id @default(autoincrement())
-  userId          Int
-  category        FeedbackCategory
-  description     String
-  descriptionHash String
-  visibility      FeedbackVisibility @default(PUBLIC)
-  status          FeedbackStatus     @default(OPEN)
-  contactAllowed  Boolean            @default(false)
-  attachmentUrl   String?
-  attachmentPath  String?
-  attachmentMime  String?
-  attachmentSize  Int?
-  votesCount      Int                @default(0)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id               Int                @id @default(autoincrement())
+  userId           Int
+  category         FeedbackCategory
+  description      String
+  descriptionHash  String
+  visibility       FeedbackVisibility @default(PUBLIC)
+  status           FeedbackStatus     @default(OPEN)
+  contactAllowed   Boolean            @default(false)
+  attachmentMime   String?
+  attachmentSize   Int?
+  attachmentFileId String?
+  votesCount       Int                @default(0)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
-  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  votes FeedbackVote[]
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes          FeedbackVote[]
+  attachmentFile StoredFile?    @relation("FeedbackAttachmentFile", fields: [attachmentFileId], references: [id], onDelete: SetNull)
 
   @@index([userId, createdAt])
   @@index([descriptionHash])
@@ -348,4 +352,53 @@ model FeedbackVote {
 
   @@unique([feedbackId, userId])
   @@index([userId, createdAt])
+}
+
+enum FileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum StoredFileStatus {
+  UPLOAD_PENDING
+  ACTIVE
+  DELETE_PENDING
+  DELETED
+  UPLOAD_FAILED
+}
+
+model StoredFile {
+  id             String           @id @default(uuid())
+  ownerUserId    Int
+  bucket         String
+  objectPath     String
+  visibility     FileVisibility
+  purpose        String
+  resourceType   String
+  resourceId     String?
+  originalName   String
+  storedName     String
+  extension      String
+  mimeType       String
+  sizeBytes      Int
+  checksumSha256 String
+  metadata       Json?
+  status         StoredFileStatus @default(UPLOAD_PENDING)
+  deleteReason   String?
+  deleteAttempts Int              @default(0)
+  lastError      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  ownerUser               User           @relation("UserOwnedFiles", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  avatarForUser           User?          @relation("UserAvatarFile")
+  beforePhotoAppointments Appointment[]  @relation("AppointmentBeforePhoto")
+  afterPhotoAppointments  Appointment[]  @relation("AppointmentAfterPhoto")
+  feedbackAttachments     FeedbackItem[] @relation("FeedbackAttachmentFile")
+
+  @@unique([bucket, objectPath])
+  @@index([ownerUserId, status])
+  @@index([resourceType, resourceId])
+  @@index([purpose, status])
 }
