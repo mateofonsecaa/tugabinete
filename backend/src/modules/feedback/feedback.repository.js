@@ -48,8 +48,6 @@ export function attachFileToItem({
     data: {
       userId,
       attachmentFileId,
-      attachmentUrl: null,
-      attachmentPath: null,
       attachmentMime,
       attachmentSize,
     },

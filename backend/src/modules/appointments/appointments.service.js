@@ -91,8 +91,6 @@ async function findOwnedAppointment(id, userId) {
       notes: true,
       status: true,
       method: true,
-      beforePhoto: true,
-      afterPhoto: true,
       beforePhotoFileId: true,
       afterPhotoFileId: true,
     },
@@ -167,8 +165,6 @@ export const getPhotos = async (id, userId) => {
     } catch {
       beforePhoto = null;
     }
-  } else if (appointment.beforePhoto) {
-    beforePhoto = appointment.beforePhoto;
   }
 
   if (appointment.afterPhotoFileId) {
@@ -181,8 +177,6 @@ export const getPhotos = async (id, userId) => {
     } catch {
       afterPhoto = null;
     }
-  } else if (appointment.afterPhoto) {
-    afterPhoto = appointment.afterPhoto;
   }
 
   return {
@@ -214,8 +208,6 @@ export const create = async (userId, data, files) => {
         status: data.status ? String(data.status).trim() : null,
         method: data.method ? String(data.method).trim() : null,
         completed: String(data.status || "").toLowerCase() === "pagado",
-        beforePhoto: null,
-        afterPhoto: null,
       },
       select: {
         id: true,
@@ -384,8 +376,6 @@ export const update = async (userId, id, data, files) => {
           String(
             data.status !== undefined ? data.status : existing.status || ""
           ).toLowerCase() === "pagado",
-        beforePhoto: null,
-        afterPhoto: null,
         beforePhotoFileId: uploadedBefore?.id || existing.beforePhotoFileId || null,
         afterPhotoFileId: uploadedAfter?.id || existing.afterPhotoFileId || null,
       },

@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma.js";
 
-const FEEDBACK_ATTACHMENT_FILE_SELECT = {
+export const STORED_FILE_PUBLIC_SELECT = {
   id: true,
   bucket: true,
   objectPath: true,
@@ -9,182 +9,236 @@ const FEEDBACK_ATTACHMENT_FILE_SELECT = {
   deletedAt: true,
 };
 
-export function findRecentDuplicate({ userId, descriptionHash, afterDate }) {
-  return prisma.feedbackItem.findFirst({
-    where: {
-      userId,
-      descriptionHash,
-      createdAt: {
-        gte: afterDate,
-      },
-    },
+export const PUBLIC_USER_SELECT = {
+  id: true,
+  name: true,
+  firstName: true,
+  lastName: true,
+  displayName: true,
+  email: true,
+  pendingEmail: true,
+  profession: true,
+  phone: true,
+  bio: true,
+  avatarFileId: true,
+  isVerified: true,
+  authTokenVersion: true,
+  avatarFile: {
+    select: STORED_FILE_PUBLIC_SELECT,
+  },
+};
+
+export const findPublicUserById = (userId) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const findSensitiveUserById = (userId) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
     select: {
-      id: true,
-      createdAt: true,
+      ...PUBLIC_USER_SELECT,
+      password: true,
     },
   });
-}
+};
 
-export function createItem(data) {
-  return prisma.feedbackItem.create({
+export const updateProfileFields = (userId, data) => {
+  return prisma.user.update({
+    where: { id: userId },
     data,
-    include: {
-      attachmentFile: {
-        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
-      },
-    },
+    select: PUBLIC_USER_SELECT,
   });
-}
+};
 
-export function attachFileToItem({
-  feedbackId,
+export const findUserByEmailOrPendingEmail = (email, excludeUserId) => {
+  return prisma.user.findFirst({
+    where: {
+      id: excludeUserId ? { not: excludeUserId } : undefined,
+      OR: [{ email }, { pendingEmail: email }],
+    },
+    select: { id: true },
+  });
+};
+
+export const createEmailChangeRequest = ({
   userId,
-  attachmentFileId,
-  attachmentMime,
-  attachmentSize,
-}) {
-  return prisma.feedbackItem.update({
-    where: { id: feedbackId },
-    data: {
-      userId,
-      attachmentFileId,
-      attachmentUrl: null,
-      attachmentPath: null,
-      attachmentMime,
-      attachmentSize,
-    },
-    include: {
-      attachmentFile: {
-        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
-      },
-    },
-  });
-}
-
-export function deleteItem({ feedbackId, userId }) {
-  return prisma.feedbackItem.deleteMany({
-    where: {
-      id: feedbackId,
-      userId,
-    },
-  });
-}
-
-export function listPublic({ userId, category, sort }) {
-  return prisma.feedbackItem.findMany({
-    where: {
-      visibility: "PUBLIC",
-      ...(category ? { category } : {}),
-    },
-    select: {
-      id: true,
-      category: true,
-      description: true,
-      votesCount: true,
-      createdAt: true,
-      status: true,
-      attachmentFile: {
-        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
-      },
-      votes: {
-        where: { userId },
-        select: { id: true },
-        take: 1,
-      },
-    },
-    orderBy:
-      sort === "new"
-        ? [{ createdAt: "desc" }]
-        : [{ votesCount: "desc" }, { createdAt: "desc" }],
-    take: 50,
-  });
-}
-
-export function findPublicById(id) {
-  return prisma.feedbackItem.findFirst({
-    where: {
-      id,
-      visibility: "PUBLIC",
-    },
-    select: {
-      id: true,
-      votesCount: true,
-    },
-  });
-}
-
-export async function createVoteAndIncrement({ feedbackId, userId }) {
+  newEmail,
+  tokenHash,
+  expiresAt,
+  requestedIp,
+  requestedUserAgent,
+}) => {
   return prisma.$transaction(async (tx) => {
-    const existingVote = await tx.feedbackVote.findUnique({
+    await tx.emailChangeToken.deleteMany({
       where: {
-        feedbackId_userId: {
-          feedbackId,
-          userId,
+        userId,
+        usedAt: null,
+      },
+    });
+
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        pendingEmail: newEmail,
+        pendingEmailRequestedAt: new Date(),
+      },
+    });
+
+    await tx.emailChangeToken.create({
+      data: {
+        userId,
+        newEmail,
+        tokenHash,
+        expiresAt,
+        requestedIp,
+        requestedUserAgent,
+      },
+    });
+
+    return true;
+  });
+};
+
+export const findEmailChangeTokenByHash = (tokenHash) => {
+  return prisma.emailChangeToken.findUnique({
+    where: { tokenHash },
+    include: {
+      user: {
+        select: {
+          ...PUBLIC_USER_SELECT,
+          password: true,
         },
       },
-      select: {
-        id: true,
+    },
+  });
+};
+
+export const consumeEmailChangeToken = ({
+  emailChangeTokenId,
+  userId,
+  newEmail,
+}) => {
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
+    const claimed = await tx.emailChangeToken.updateMany({
+      where: {
+        id: emailChangeTokenId,
+        userId,
+        newEmail,
+        usedAt: null,
+        expiresAt: { gt: now },
+      },
+      data: {
+        usedAt: now,
       },
     });
 
-    if (existingVote) {
-      return null;
+    if (claimed.count !== 1) {
+      const err = new Error("El cambio de correo ya no es válido.");
+      err.code = "EMAIL_CHANGE_NOT_USABLE";
+      throw err;
     }
 
-    await tx.feedbackVote.create({
+    const updatedUser = await tx.user.update({
+      where: { id: userId },
       data: {
-        feedbackId,
-        userId,
+        email: newEmail,
+        pendingEmail: null,
+        pendingEmailRequestedAt: null,
       },
+      select: PUBLIC_USER_SELECT,
     });
 
-    return tx.feedbackItem.update({
-      where: { id: feedbackId },
+    await tx.emailChangeToken.deleteMany({
+      where: { userId },
+    });
+
+    return updatedUser;
+  });
+};
+
+export const clearPendingEmailState = (userId) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      pendingEmail: null,
+      pendingEmailRequestedAt: null,
+    },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const setAvatarFile = (userId, avatarFileId) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      avatarFileId,
+    },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const clearAvatarFile = (userId) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      avatarFileId: null,
+    },
+    select: PUBLIC_USER_SELECT,
+  });
+};
+
+export const updatePasswordAndInvalidateSessions = async ({
+  userId,
+  passwordHash,
+}) => {
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+
+    const updatedUser = await tx.user.update({
+      where: { id: userId },
       data: {
-        votesCount: {
+        password: passwordHash,
+        authTokenVersion: {
           increment: 1,
         },
       },
-      select: {
-        id: true,
-        votesCount: true,
-      },
+      select: PUBLIC_USER_SELECT,
     });
-  });
-}
 
-export async function deleteVoteAndDecrement({ feedbackId, userId }) {
-  return prisma.$transaction(async (tx) => {
-    const deleted = await tx.feedbackVote.deleteMany({
+    await tx.authSession.updateMany({
       where: {
-        feedbackId,
         userId,
+        revokedAt: null,
       },
-    });
-
-    if (deleted.count === 0) {
-      return null;
-    }
-
-    const currentItem = await tx.feedbackItem.findUnique({
-      where: { id: feedbackId },
-      select: { votesCount: true },
-    });
-
-    const nextVotesCount = Math.max(
-      0,
-      (currentItem?.votesCount || 0) - deleted.count
-    );
-
-    return tx.feedbackItem.update({
-      where: { id: feedbackId },
       data: {
-        votesCount: nextVotesCount,
-      },
-      select: {
-        id: true,
-        votesCount: true,
+        revokedAt: now,
+        revokeReason: "PASSWORD_CHANGED",
       },
     });
+
+    return updatedUser;
   });
-}
+};
+
+export const revokeOtherSessions = ({
+  userId,
+  currentSessionId,
+  reason = "LOGOUT_OTHERS",
+}) => {
+  return prisma.authSession.updateMany({
+    where: {
+      userId,
+      revokedAt: null,
+      id: { not: currentSessionId || undefined },
+    },
+    data: {
+      revokedAt: new Date(),
+      revokeReason: reason,
+    },
+  });
+};

@@ -20,8 +20,6 @@ model User {
   createdAt               DateTime             @default(now())
   updatedAt               DateTime             @updatedAt
   isVerified              Boolean              @default(false)
-  profileImage            String?
-  profileImagePath        String?
   phone                   String?
   profession              String?
   bio                     String?
@@ -111,8 +109,6 @@ model Appointment {
   createdAt         DateTime @default(now())
   amount            Float?
   time              String?
-  afterPhoto        String?
-  beforePhoto       String?
   beforePhotoFileId String?
   afterPhotoFileId  String?
   method            String?
@@ -328,8 +324,6 @@ model FeedbackItem {
   visibility       FeedbackVisibility @default(PUBLIC)
   status           FeedbackStatus     @default(OPEN)
   contactAllowed   Boolean            @default(false)
-  attachmentUrl    String?
-  attachmentPath   String?
   attachmentMime   String?
   attachmentSize   Int?
   attachmentFileId String?

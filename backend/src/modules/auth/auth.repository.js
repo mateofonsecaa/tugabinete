@@ -16,7 +16,14 @@ export const createUser = (data) => {
 };
 
 export const findUserByEmail = (email) => {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({
+    where: { email },
+    include: {
+      avatarFile: {
+        select: AUTH_STORED_FILE_SELECT,
+      },
+    },
+  });
 };
 
 export const createVerificationToken = (userId, token, expiresAt) => {
@@ -178,7 +185,10 @@ export const findAuthSessionByTokenHash = (tokenHash) => {
           profession: true,
           phone: true,
           bio: true,
-          profileImage: true,
+          avatarFileId: true,
+          avatarFile: {
+            select: AUTH_STORED_FILE_SELECT,
+          },
           isVerified: true,
           authTokenVersion: true,
         },
@@ -309,8 +319,6 @@ export const findPublicUserById = (id) => {
       profession: true,
       phone: true,
       bio: true,
-      profileImage: true,
-      profileImagePath: true,
       avatarFileId: true,
       avatarFile: {
         select: AUTH_STORED_FILE_SELECT,

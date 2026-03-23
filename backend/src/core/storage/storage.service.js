@@ -80,7 +80,7 @@ export function buildStoredFilePublicUrl(storedFile) {
 }
 
 export function buildUserAvatarUrl(user) {
-  return buildStoredFilePublicUrl(user?.avatarFile) || user?.profileImage || null;
+  return buildStoredFilePublicUrl(user?.avatarFile) || null;
 }
 
 export function serializeStoredFile(storedFile) {

@@ -42,19 +42,17 @@ export async function createFeedback({ userId, body, file }) {
     );
   }
 
-  let created = await repository.createItem({
-    userId,
-    category,
-    description,
-    descriptionHash,
-    visibility,
-    contactAllowed,
-    attachmentUrl: null,
-    attachmentPath: null,
-    attachmentMime: null,
-    attachmentSize: null,
-    attachmentFileId: null,
-  });
+    let created = await repository.createItem({
+        userId,
+        category,
+        description,
+        descriptionHash,
+        visibility,
+        contactAllowed,
+        attachmentMime: null,
+        attachmentSize: null,
+        attachmentFileId: null,
+    });
 
   if (file) {
     let uploadedFile = null;

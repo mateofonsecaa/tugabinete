@@ -11,6 +11,7 @@ import {
   PASSWORD_RESET_TTL_MINUTES,
   VERIFICATION_TTL_MINUTES,
 } from "./auth.security.js";
+import { buildUserAvatarUrl } from "../../core/storage/storage.service.js";
 import {
   normalizeEmail,
   validatePasswordPolicy,
@@ -164,7 +165,7 @@ function toPublicUser(user) {
     profession: user.profession ?? null,
     phone: user.phone ?? null,
     bio: user.bio ?? null,
-    profileImage: user.profileImage ?? null,
+    profileImage: buildUserAvatarUrl(user),
     emailVerified: user.isVerified,
   };
 }
