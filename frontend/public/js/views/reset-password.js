@@ -151,7 +151,7 @@ function getFormMarkup() {
           </button>
         </div>
         <p class="tg-reset-password-hint">
-          Mínimo 10 caracteres. Máximo 72 bytes UTF-8 por compatibilidad con el sistema actual.
+          Mínimo 10 caracteres.
         </p>
         <p id="tg-reset-password-error-password" class="tg-reset-password-field-error" hidden></p>
       </div>
