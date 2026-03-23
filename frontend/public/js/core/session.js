@@ -280,3 +280,16 @@ export async function logoutAllSessions() {
     clearSession();
   }
 }
+
+export function updateCurrentUser(updates = {}) {
+  state.user = {
+    ...(state.user || {}),
+    ...updates,
+  };
+  return state.user;
+}
+
+export function replaceCurrentUser(user) {
+  state.user = user || null;
+  return state.user;
+}

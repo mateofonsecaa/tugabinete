@@ -1,6 +1,6 @@
 // views/profile.js
-import { API_URL } from "../core/config.js";
 import { authFetch } from "../core/authFetch.js";
+import { getCurrentUser, updateCurrentUser } from "../core/session.js";
 import { initDrawer } from "../components/drawer.js";
 
 let incomeChartInstance = null;
@@ -156,51 +156,27 @@ export function Profile() {
 }
 
 export function initProfile() {
-
   initDrawer();
 
-  // 1) Render instantáneo con cache (si existe)
-  const cachedUser = getCachedUser();
-  if (cachedUser) renderUser(cachedUser);
+  const currentUser = getCurrentUser();
+  if (currentUser) renderUser(currentUser);
 
-  // 2) Traer datos reales
   fetchUserFromServer().then((freshUser) => {
     if (freshUser) renderUser(freshUser);
   });
 
-  // 3) Cargar datos secundarios
   loadStats();
   loadAppointments();
   initIncome();
-
-  // 4) Bind navegación SPA (evita window.location.href)
   bindNav();
 
-  // 5) Bind editar perfil (ruta futura)
   const editBtn = document.getElementById("editProfileBtn");
   if (editBtn && !editBtn.dataset.bound) {
     editBtn.dataset.bound = "1";
     editBtn.addEventListener("click", () => {
-      // cuando migres el edit: /profile/edit
       history.pushState(null, "", "/profile/edit");
       window.dispatchEvent(new PopStateEvent("popstate"));
     });
-  }
-}
-
-// =====================================================
-// 🧠 Manejo local de usuario
-// =====================================================
-
-function saveUserLocally(user) {
-  localStorage.setItem("user", JSON.stringify(user));
-}
-
-function getCachedUser() {
-  try {
-    return JSON.parse(localStorage.getItem("user"));
-  } catch {
-    return null;
   }
 }
 
@@ -210,10 +186,10 @@ function getCachedUser() {
 
 async function fetchUserFromServer() {
   try {
-    const res = await authFetch(`${API_URL}/auth/me`);
+    const res = await authFetch(`/account`);
     const user = await res.json();
-    if (!res.ok) throw new Error(user.error || "Error al obtener usuario");
-    saveUserLocally(user);
+    if (!res.ok) throw new Error(user.message || "Error al obtener usuario");
+    updateCurrentUser(user);
     return user;
   } catch (err) {
     console.warn("No se pudo obtener usuario desde backend", err);
@@ -228,17 +204,36 @@ async function fetchUserFromServer() {
 function renderUser(user) {
   const $ = (id) => document.getElementById(id);
 
+  const fullName =
+    user.displayName ||
+    [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
+    user.name ||
+    "Sin nombre";
+
+  const drawerName =
+    user.displayName ||
+    user.firstName ||
+    user.name ||
+    "Profesional";
+
+  const profession = user.profession || "Sin profesión";
+  const email = user.email || "Sin correo";
+  const phone = user.phone || "—";
+
+  const imgSrc = user.profileImage || "../../images/personaejemplo.png";
+
   const du = document.getElementById("drawer-username");
-  if (du) du.textContent = user.name || "Profesional";
-  if ($("userName")) $("userName").textContent = user.name || "Sin nombre";
-  if ($("professionLabel")) $("professionLabel").textContent = user.profession || "Sin profesión";
-  if ($("userEmail")) $("userEmail").textContent = user.email || "Sin correo";
-  if ($("userPhone")) $("userPhone").textContent = user.phone || "—";
+  if (du) du.textContent = drawerName;
+
+  if ($("userName")) $("userName").textContent = fullName;
+  if ($("professionLabel")) $("professionLabel").textContent = profession;
+  if ($("userEmail")) $("userEmail").textContent = email;
+  if ($("userPhone")) $("userPhone").textContent = phone;
 
   const img = document.querySelector(".profile-pic");
   if (img) {
     img.loading = "lazy";
-    img.src = user.profileImage || "../../images/personaejemplo.png";
+    img.src = imgSrc;
   }
 }
 
@@ -248,7 +243,7 @@ function renderUser(user) {
 
 async function loadStats() {
   try {
-    const res = await authFetch(`${API_URL}/stats`);
+    const res = await authFetch(`/stats`);
     if (!res.ok) return;
 
     const stats = await res.json();
@@ -273,7 +268,7 @@ async function loadStats() {
 
 async function loadAppointments() {
   try {
-    const res = await authFetch(`${API_URL}/simple`);
+    const res = await authFetch(`/simple`);
     if (!res.ok) return;
 
     const data = await res.json();
@@ -401,7 +396,7 @@ async function fetchAppointmentsForIncome(fromDate, neededMonths) {
   let all = [];
 
   while (true) {
-    const res = await authFetch(`${API_URL}/appointments?offset=${offset}&limit=${limit}`);
+    const res = await authFetch(`/appointments?offset=${offset}&limit=${limit}`);
     if (!res.ok) break;
 
     const json = await res.json().catch(() => null);
@@ -436,7 +431,7 @@ async function fetchSalesForIncome(fromDate) {
   let all = [];
 
   while (true) {
-    const res = await authFetch(`${API_URL}/sales?offset=${offset}&limit=${limit}`);
+    const res = await authFetch(`/sales?offset=${offset}&limit=${limit}`);
     if (!res.ok) break;
 
     const items = await res.json().catch(() => []);
