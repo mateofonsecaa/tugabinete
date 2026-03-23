@@ -29,6 +29,11 @@ export function InterviewEdit2() {
 
     <main class="interview-edit-main">
       <section class="interview-edit-card">
+        <div id="interview-loading" class="interview-edit-loading" aria-live="polite">
+          <div class="interview-edit-spinner" aria-hidden="true"></div>
+          <p class="interview-edit-loading-text">Cargando entrevista...</p>
+        </div>
+        
         <div class="interview-edit-toolbar">
           <button id="back-btn" type="button" class="interview-edit-back-btn">
             <i class="fa-solid fa-arrow-left"></i> Volver
@@ -70,7 +75,7 @@ export function InterviewEdit2() {
             <div class="interview-edit-options">
               <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Acné/Granitos"> Acné / Granitos</label>
               <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Poros dilatados"> Poros dilatados</label>
-              <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Manchas/Hipergmentación"> Manchas / Hipergmentación</label>
+              <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Manchas/Hiperpigmentación"> Manchas / Hiperpigmentación</label>
               <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Arrugas/Finas líneas"> Arrugas / Finas líneas</label>
               <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Flacidez"> Flacidez</label>
               <label class="interview-edit-choice"><input type="checkbox" name="concerns" value="Deshidratación/Piel seca"> Deshidratación / Piel seca</label>

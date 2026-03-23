@@ -10,6 +10,47 @@
   border-radius: 22px;
   padding: 24px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.interview-edit-page .interview-edit-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.interview-edit-page .interview-edit-loading.is-hidden {
+  display: none;
+}
+
+.interview-edit-page .interview-edit-spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 173, 173, 0.28);
+  border-top-color: #ffadad;
+  animation: interviewEditSpin 0.8s linear infinite;
+}
+
+.interview-edit-page .interview-edit-loading-text {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@keyframes interviewEditSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .interview-edit-page .interview-edit-toolbar {
@@ -280,6 +321,24 @@
 .interview-edit-page .interview-edit-primary-btn:hover {
   background: #ff9d9d;
   border-color: #ff9d9d;
+}
+
+.interview-edit-page .interview-edit-secondary-btn:disabled,
+.interview-edit-page .interview-edit-secondary-btn:disabled:hover {
+  border-color: #ffadad;
+  background: #fff;
+  color: #ffadad;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.interview-edit-page .interview-edit-primary-btn:disabled,
+.interview-edit-page .interview-edit-primary-btn:disabled:hover {
+  border-color: #ffadad;
+  background: #ffadad;
+  color: #fff;
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 @media (max-width: 900px) {

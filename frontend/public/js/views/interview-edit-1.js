@@ -29,6 +29,11 @@ export function InterviewEdit1() {
 
     <main class="interview-edit-main">
       <section class="interview-edit-card">
+        <div id="interview-loading" class="interview-edit-loading" aria-live="polite">
+          <div class="interview-edit-spinner" aria-hidden="true"></div>
+          <p class="interview-edit-loading-text">Cargando entrevista...</p>
+        </div>
+
         <div class="interview-edit-toolbar">
           <button id="back-btn" type="button" class="interview-edit-back-btn">
             <i class="fa-solid fa-arrow-left"></i> Volver
@@ -178,12 +183,28 @@ export function InterviewEdit1() {
 
             <div class="interview-edit-block">
               <label class="interview-edit-label">¿Cuántas horas pasa frente a pantallas diariamente?</label>
-              <input type="number" id="screenTime" class="interview-edit-input" placeholder="Ej: 6">
+              <input
+                type="text"
+                id="screenTime"
+                class="interview-edit-input"
+                placeholder="Ej: 6"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="off"
+              />
             </div>
 
             <div class="interview-edit-block">
               <label class="interview-edit-label">¿Cuántas horas de sueño tiene por noche?</label>
-              <input type="number" id="sleep" class="interview-edit-input" placeholder="Ej: 8">
+              <input
+                type="text"
+                id="sleep"
+                class="interview-edit-input"
+                placeholder="Ej: 8"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="off"
+              />
             </div>
 
             <div class="interview-edit-block">
