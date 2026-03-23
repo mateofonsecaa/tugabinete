@@ -16,12 +16,17 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "file-type": "^21.3.4",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "libphonenumber-js": "^1.12.40",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
-    "resend": "^6.9.4"
+    "nodemailer": "^8.0.3",
+    "resend": "^6.9.4",
+    "sharp": "^0.34.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "prisma": "^6.17.1"

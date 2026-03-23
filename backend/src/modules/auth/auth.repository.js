@@ -161,9 +161,14 @@ export const findAuthSessionByTokenHash = (tokenHash) => {
         select: {
           id: true,
           name: true,
+          firstName: true,
+          lastName: true,
+          displayName: true,
           email: true,
+          pendingEmail: true,
           profession: true,
           phone: true,
+          bio: true,
           profileImage: true,
           isVerified: true,
           authTokenVersion: true,
@@ -277,6 +282,27 @@ export const bumpUserAuthTokenVersion = (userId) => {
       authTokenVersion: {
         increment: 1,
       },
+    },
+  });
+};
+
+export const findPublicUserById = (id) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      firstName: true,
+      lastName: true,
+      displayName: true,
+      email: true,
+      pendingEmail: true,
+      profession: true,
+      phone: true,
+      bio: true,
+      profileImage: true,
+      isVerified: true,
+      authTokenVersion: true,
     },
   });
 };

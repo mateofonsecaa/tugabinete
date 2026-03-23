@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import authRoutes from "./modules/auth/auth.routes.js";
+import accountRoutes from "./modules/account/account.routes.js";
 import patientRoutes from "./modules/patients/patients.routes.js";
 import appointmentsRoutes from "./modules/appointments/appointments.routes.js";
 import interviewRoutes from "./modules/interviews/interview.routes.js";
@@ -14,6 +15,7 @@ import feedbackRoutes from "./modules/feedback/feedback.routes.js";
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/account", accountRoutes);
 router.use("/patients", patientRoutes);
 router.use("/appointments", appointmentsRoutes);
 router.use("/interviews", interviewRoutes);

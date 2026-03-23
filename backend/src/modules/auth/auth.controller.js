@@ -129,32 +129,36 @@ export const resetPassword = async (req, res, next) => {
   }
 };
 
-export const me = async (req, res) => {
+export const me = async (req, res, next) => {
   try {
     setNoStore(res);
 
-    const user = await repo.findUserById(req.user.id);
+    const user = await repo.findPublicUserById(req.user.id);
 
     if (!user) {
       return res.status(404).json({
-        message: "Usuario no encontrado",
+        ok: false,
         code: "USER_NOT_FOUND",
+        message: "Usuario no encontrado.",
       });
     }
 
-    return res.json({
+    return res.status(200).json({
       id: user.id,
       name: user.name,
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      displayName: user.displayName ?? null,
       email: user.email,
-      profession: user.profession,
-      phone: user.phone,
-      profileImage: user.profileImage,
+      pendingEmail: user.pendingEmail ?? null,
+      profession: user.profession ?? null,
+      phone: user.phone ?? null,
+      bio: user.bio ?? null,
+      profileImage: user.profileImage ?? null,
+      emailVerified: user.isVerified,
     });
-  } catch {
-    return res.status(500).json({
-      message: "Error obteniendo usuario actual",
-      code: "ME_FETCH_FAILED",
-    });
+  } catch (err) {
+    return next(err);
   }
 };
 

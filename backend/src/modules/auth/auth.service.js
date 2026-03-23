@@ -156,10 +156,31 @@ function toPublicUser(user) {
   return {
     id: user.id,
     name: user.name,
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    displayName: user.displayName ?? null,
     email: user.email,
-    profession: user.profession,
-    phone: user.phone,
-    profileImage: user.profileImage,
+    pendingEmail: user.pendingEmail ?? null,
+    profession: user.profession ?? null,
+    phone: user.phone ?? null,
+    bio: user.bio ?? null,
+    profileImage: user.profileImage ?? null,
+    emailVerified: user.isVerified,
+  };
+}
+
+function splitName(fullName = "") {
+  const cleaned = String(fullName).replace(/\s+/g, " ").trim();
+
+  if (!cleaned) {
+    return { firstName: "", lastName: "" };
+  }
+
+  const parts = cleaned.split(" ");
+
+  return {
+    firstName: parts[0] || "",
+    lastName: parts.slice(1).join(" ") || "",
   };
 }
 
@@ -199,6 +220,7 @@ export const register = async (data) => {
   const name = String(data.name ?? "").trim();
   const email = normalizeEmail(data.email);
   const password = String(data.password ?? "");
+  const { firstName, lastName } = splitName(name);
 
   const existingUser = await repo.findUserByEmail(email);
 
@@ -221,6 +243,8 @@ export const register = async (data) => {
   if (existingUser) {
     user = await repo.updateUser(existingUser.id, {
       name,
+      firstName,
+      lastName,
       email,
       password: hashed,
       isVerified: false,
@@ -233,6 +257,8 @@ export const register = async (data) => {
   } else {
     user = await repo.createUser({
       name,
+      firstName,
+      lastName,
       email,
       password: hashed,
     });

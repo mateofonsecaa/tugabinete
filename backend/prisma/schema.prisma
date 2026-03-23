@@ -8,26 +8,53 @@ datasource db {
 }
 
 model User {
-  id                  Int                  @id @default(autoincrement())
-  name                String
-  email               String               @unique
-  password            String
-  createdAt           DateTime             @default(now())
-  isVerified          Boolean              @default(false)
-  profileImage        String?
-  phone               String?
-  profession          String?
-  authTokenVersion    Int                  @default(0)
-  appointments        Appointment[]
-  passwordResetTokens PasswordResetToken[]
-  patients            Patient[]
-  simpleAppointments  SimpleAppointment[]
-  verificationTokens  VerificationToken[]
-  reminders           Reminder[]
-  sales               Sale[]
-  feedbackItems       FeedbackItem[]
-  feedbackVotes       FeedbackVote[]
-  sessions            AuthSession[]
+  id                    Int                  @id @default(autoincrement())
+  name                  String
+  firstName             String?
+  lastName              String?
+  displayName           String?
+  email                 String               @unique
+  pendingEmail          String?              @unique
+  pendingEmailRequestedAt DateTime?
+  password              String
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  isVerified            Boolean              @default(false)
+  profileImage          String?
+  profileImagePath      String?
+  phone                 String?
+  profession            String?
+  bio                   String?
+  authTokenVersion      Int                  @default(0)
+  appointments          Appointment[]
+  passwordResetTokens   PasswordResetToken[]
+  patients              Patient[]
+  simpleAppointments    SimpleAppointment[]
+  verificationTokens    VerificationToken[]
+  reminders             Reminder[]
+  sales                 Sale[]
+  feedbackItems         FeedbackItem[]
+  feedbackVotes         FeedbackVote[]
+  sessions              AuthSession[]
+  emailChangeTokens     EmailChangeToken[]
+}
+
+model EmailChangeToken {
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  newEmail           String
+  tokenHash          String    @unique
+  createdAt          DateTime  @default(now())
+  expiresAt          DateTime
+  usedAt             DateTime?
+  requestedIp        String?
+  requestedUserAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, usedAt])
 }
 
 model AuthSession {
