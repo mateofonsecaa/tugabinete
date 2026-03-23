@@ -11,6 +11,7 @@ import statsRoutes from "./modules/stats/stats.routes.js";
 import remindersRoutes from "./modules/reminders/reminders.routes.js";
 import salesRoutes from "./modules/sales/sales.routes.js";
 import feedbackRoutes from "./modules/feedback/feedback.routes.js";
+import filesRoutes from "./modules/files/files.routes.js";
 
 const router = Router();
 
@@ -25,5 +26,6 @@ router.use("/stats", statsRoutes);
 router.use("/reminders", remindersRoutes);
 router.use("/sales", salesRoutes);
 router.use("/feedback", feedbackRoutes);
+router.use("/files", filesRoutes);
 
 export default router;

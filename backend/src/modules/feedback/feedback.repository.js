@@ -1,5 +1,14 @@
 import prisma from "../../config/prisma.js";
 
+const FEEDBACK_ATTACHMENT_FILE_SELECT = {
+  id: true,
+  bucket: true,
+  objectPath: true,
+  visibility: true,
+  status: true,
+  deletedAt: true,
+};
+
 export function findRecentDuplicate({ userId, descriptionHash, afterDate }) {
   return prisma.feedbackItem.findFirst({
     where: {
@@ -19,6 +28,45 @@ export function findRecentDuplicate({ userId, descriptionHash, afterDate }) {
 export function createItem(data) {
   return prisma.feedbackItem.create({
     data,
+    include: {
+      attachmentFile: {
+        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
+      },
+    },
+  });
+}
+
+export function attachFileToItem({
+  feedbackId,
+  userId,
+  attachmentFileId,
+  attachmentMime,
+  attachmentSize,
+}) {
+  return prisma.feedbackItem.update({
+    where: { id: feedbackId },
+    data: {
+      userId,
+      attachmentFileId,
+      attachmentUrl: null,
+      attachmentPath: null,
+      attachmentMime,
+      attachmentSize,
+    },
+    include: {
+      attachmentFile: {
+        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
+      },
+    },
+  });
+}
+
+export function deleteItem({ feedbackId, userId }) {
+  return prisma.feedbackItem.deleteMany({
+    where: {
+      id: feedbackId,
+      userId,
+    },
   });
 }
 
@@ -35,7 +83,9 @@ export function listPublic({ userId, category, sort }) {
       votesCount: true,
       createdAt: true,
       status: true,
-      attachmentUrl: true,
+      attachmentFile: {
+        select: FEEDBACK_ATTACHMENT_FILE_SELECT,
+      },
       votes: {
         where: { userId },
         select: { id: true },
@@ -121,7 +171,10 @@ export async function deleteVoteAndDecrement({ feedbackId, userId }) {
       select: { votesCount: true },
     });
 
-    const nextVotesCount = Math.max(0, (currentItem?.votesCount || 0) - deleted.count);
+    const nextVotesCount = Math.max(
+      0,
+      (currentItem?.votesCount || 0) - deleted.count
+    );
 
     return tx.feedbackItem.update({
       where: { id: feedbackId },

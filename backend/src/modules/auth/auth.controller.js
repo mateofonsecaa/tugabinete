@@ -2,6 +2,7 @@ import * as service from "./auth.service.js";
 import * as repo from "./auth.repository.js";
 import { uploadToSupabase } from "../../core/utils/upload.js";
 import { clearRefreshCookie, setRefreshCookie } from "./auth.cookies.js";
+import { buildUserAvatarUrl } from "../../core/storage/storage.service.js";
 
 function setNoStore(res) {
   res.setHeader("Cache-Control", "no-store");
@@ -154,7 +155,7 @@ export const me = async (req, res, next) => {
       profession: user.profession ?? null,
       phone: user.phone ?? null,
       bio: user.bio ?? null,
-      profileImage: user.profileImage ?? null,
+      profileImage: buildUserAvatarUrl(user),
       emailVerified: user.isVerified,
     });
   } catch (err) {

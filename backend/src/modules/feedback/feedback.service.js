@@ -1,6 +1,10 @@
 import * as repository from "./feedback.repository.js";
 import { uploadFeedbackAttachment } from "./feedback.storage.js";
 import {
+  buildStoredFilePublicUrl,
+  queueFileDeletion,
+} from "../../core/storage/storage.service.js";
+import {
   buildDescriptionHash,
   getVisibilityForCategory,
   isPublicCategory,
@@ -27,27 +31,68 @@ export async function createFeedback({ userId, body, file }) {
   const duplicate = await repository.findRecentDuplicate({
     userId,
     descriptionHash,
-    afterDate: new Date(Date.now() - DUPLICATE_WINDOW_IN_HOURS * 60 * 60 * 1000),
+    afterDate: new Date(
+      Date.now() - DUPLICATE_WINDOW_IN_HOURS * 60 * 60 * 1000
+    ),
   });
 
   if (duplicate) {
-    throw new Error("Ya enviaste una sugerencia igual hace poco. Esperá un poco antes de reenviarla.");
+    throw new Error(
+      "Ya enviaste una sugerencia igual hace poco. Esperá un poco antes de reenviarla."
+    );
   }
 
-  const attachment = file ? await uploadFeedbackAttachment(file) : null;
-
-  const created = await repository.createItem({
+  let created = await repository.createItem({
     userId,
     category,
     description,
     descriptionHash,
     visibility,
     contactAllowed,
-    attachmentUrl: attachment?.url,
-    attachmentPath: attachment?.path,
-    attachmentMime: attachment?.mime,
-    attachmentSize: attachment?.size,
+    attachmentUrl: null,
+    attachmentPath: null,
+    attachmentMime: null,
+    attachmentSize: null,
+    attachmentFileId: null,
   });
+
+  if (file) {
+    let uploadedFile = null;
+
+    try {
+      uploadedFile = await uploadFeedbackAttachment({
+        userId,
+        feedbackId: created.id,
+        category,
+        file,
+      });
+
+      created = await repository.attachFileToItem({
+        feedbackId: created.id,
+        userId,
+        attachmentFileId: uploadedFile.id,
+        attachmentMime: uploadedFile.mimeType,
+        attachmentSize: uploadedFile.sizeBytes,
+      });
+    } catch (error) {
+      if (uploadedFile?.id) {
+        await queueFileDeletion({
+          fileId: uploadedFile.id,
+          ownerUserId: userId,
+          reason: "feedback-attachment-rollback",
+        }).catch(() => {});
+      }
+
+      await repository
+        .deleteItem({
+          feedbackId: created.id,
+          userId,
+        })
+        .catch(() => {});
+
+      throw new Error("No se pudo subir la captura.");
+    }
+  }
 
   return serializeCreatedItem(created);
 }
@@ -79,7 +124,7 @@ export async function listPublicFeedback({ userId, query }) {
     votesCount: item.votesCount,
     createdAt: item.createdAt,
     status: item.status,
-    attachmentUrl: item.attachmentUrl,
+    attachmentUrl: buildStoredFilePublicUrl(item.attachmentFile),
     didVote: Array.isArray(item.votes) && item.votes.length > 0,
   }));
 }
@@ -146,7 +191,7 @@ function serializeCreatedItem(item) {
     status: item.status,
     createdAt: item.createdAt,
     votesCount: item.votesCount,
-    attachmentUrl: item.attachmentUrl,
+    attachmentUrl: buildStoredFilePublicUrl(item.attachmentFile),
     isPublic: item.visibility === "PUBLIC",
   };
 }

@@ -1,5 +1,14 @@
 import prisma from "../../config/prisma.js";
 
+const AUTH_STORED_FILE_SELECT = {
+  id: true,
+  bucket: true,
+  objectPath: true,
+  visibility: true,
+  status: true,
+  deletedAt: true,
+};
+
 export const createUser = (data) => {
   return prisma.user.create({
     data: { ...data, isVerified: false },
@@ -301,6 +310,11 @@ export const findPublicUserById = (id) => {
       phone: true,
       bio: true,
       profileImage: true,
+      profileImagePath: true,
+      avatarFileId: true,
+      avatarFile: {
+        select: AUTH_STORED_FILE_SELECT,
+      },
       isVerified: true,
       authTokenVersion: true,
     },

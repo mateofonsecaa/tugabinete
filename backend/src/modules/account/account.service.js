@@ -20,9 +20,10 @@ import {
 } from "../auth/auth.security.js";
 import { normalizeEmail } from "../auth/auth.validation.js";
 import {
-  deleteFromSupabase,
-  uploadToSupabase,
-} from "../../core/utils/upload.js";
+  buildUserAvatarUrl,
+  queueFileDeletion,
+  uploadManagedFile,
+} from "../../core/storage/storage.service.js";
 import {
   generateRefreshToken,
   getInitialRefreshExpiresAt,
@@ -60,7 +61,7 @@ function toPublicUser(user) {
     profession: user.profession ?? null,
     phone: user.phone ?? null,
     bio: user.bio ?? null,
-    profileImage: user.profileImage ?? null,
+    profileImage: buildUserAvatarUrl(user),
     emailVerified: user.isVerified,
   };
 }
@@ -203,30 +204,50 @@ export async function updateAvatar(userId, file) {
     throw createAppError(404, "USER_NOT_FOUND", "Usuario no encontrado.");
   }
 
-  const { publicUrl, objectPath } = await uploadToSupabase(processedBuffer, {
-    folder: `profile-avatars/user-${userId}`,
-    filename: `avatar-${Date.now()}.webp`,
-    contentType: "image/webp",
-  });
+  let uploadedFile = null;
 
-  const updatedUser = await repo.updateAvatarFields(
-    userId,
-    publicUrl,
-    objectPath
-  );
+  try {
+    uploadedFile = await uploadManagedFile({
+      ownerUserId: userId,
+      purpose: "USER_AVATAR",
+      resourceType: "USER",
+      resourceId: String(userId),
+      file,
+      processedBuffer,
+      forcedMimeType: "image/webp",
+      forcedExtension: "webp",
+      metadata: {
+        source: "account-avatar",
+      },
+    });
 
-  if (currentUser.profileImagePath && currentUser.profileImagePath !== objectPath) {
-    try {
-      await deleteFromSupabase(currentUser.profileImagePath);
-    } catch (err) {
-      console.warn("No se pudo borrar el avatar anterior:", err?.message || err);
+    const previousAvatarFileId = currentUser.avatarFileId || null;
+
+    const updatedUser = await repo.setAvatarFile(userId, uploadedFile.id);
+
+    if (previousAvatarFileId && previousAvatarFileId !== uploadedFile.id) {
+      await queueFileDeletion({
+        fileId: previousAvatarFileId,
+        ownerUserId: userId,
+        reason: "avatar-replaced",
+      }).catch(() => {});
     }
-  }
 
-  return {
-    message: "Foto de perfil actualizada correctamente.",
-    user: toPublicUser(updatedUser),
-  };
+    return {
+      message: "Foto de perfil actualizada correctamente.",
+      user: toPublicUser(updatedUser),
+    };
+  } catch (error) {
+    if (uploadedFile?.id) {
+      await queueFileDeletion({
+        fileId: uploadedFile.id,
+        ownerUserId: userId,
+        reason: "avatar-upload-rollback",
+      }).catch(() => {});
+    }
+
+    throw error;
+  }
 }
 
 export async function deleteAvatar(userId) {
@@ -236,15 +257,17 @@ export async function deleteAvatar(userId) {
     throw createAppError(404, "USER_NOT_FOUND", "Usuario no encontrado.");
   }
 
-  if (currentUser.profileImagePath) {
-    try {
-      await deleteFromSupabase(currentUser.profileImagePath);
-    } catch (err) {
-      console.warn("No se pudo borrar el avatar:", err?.message || err);
-    }
-  }
+  const previousAvatarFileId = currentUser.avatarFileId || null;
 
-  const updatedUser = await repo.clearAvatarFields(userId);
+  const updatedUser = await repo.clearAvatarFile(userId);
+
+  if (previousAvatarFileId) {
+    await queueFileDeletion({
+      fileId: previousAvatarFileId,
+      ownerUserId: userId,
+      reason: "avatar-removed",
+    }).catch(() => {});
+  }
 
   return {
     message: "La foto de perfil fue eliminada.",

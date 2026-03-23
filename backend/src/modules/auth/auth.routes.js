@@ -1,7 +1,6 @@
 import { Router } from "express";
 import * as controller from "./auth.controller.js";
 import { authenticate } from "../../core/middlewares/authenticate.js";
-import upload from "../../core/middlewares/upload.js";
 import { createRateLimit } from "../../core/middlewares/rateLimit.js";
 import { normalizeEmail } from "./auth.validation.js";
 
@@ -68,12 +67,5 @@ router.post(
 );
 
 router.get("/me", authenticate, controller.me);
-
-router.put(
-  "/edit-profile",
-  authenticate,
-  upload.single("profileImage"),
-  controller.updateProfile
-);
 
 export default router;
