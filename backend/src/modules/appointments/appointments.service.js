@@ -141,8 +141,6 @@ export const getPhotos = async (id, userId) => {
       userId,
     },
     select: {
-      beforePhoto: true,
-      afterPhoto: true,
       beforePhotoFileId: true,
       afterPhotoFileId: true,
     },
