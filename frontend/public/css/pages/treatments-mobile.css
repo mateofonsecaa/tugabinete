@@ -699,3 +699,64 @@
     grid-template-columns: 68px 1fr;
   }
 }
+
+/* ==========================================================
+   FECHAS MANUALES MOBILE
+   En mobile sí mostramos botón calendario
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .treatments-page .tg-date-control{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 48px;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .treatments-page .tg-date-trigger{
+    display: inline-flex;
+    width: 48px;
+    min-width: 48px;
+    height: 44px;
+    border: 1.5px solid #ffadad;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(255, 173, 173, 0.25);
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  }
+
+  .treatments-page .tg-date-trigger i{
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  .treatments-page .tg-date-trigger:hover{
+    background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
+    color: #333;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(255, 173, 173, 0.32);
+  }
+
+  .treatments-page .tg-date-trigger:focus-visible{
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(255, 173, 173, 0.18),
+      0 8px 18px rgba(255, 173, 173, 0.32);
+  }
+}
+
+@media (max-width: 480px) {
+  .treatments-page .tg-date-control{
+    grid-template-columns: minmax(0, 1fr) 46px;
+  }
+
+  .treatments-page .tg-date-trigger{
+    width: 46px;
+    min-width: 46px;
+    height: 44px;
+  }
+}

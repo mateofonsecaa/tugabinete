@@ -1265,3 +1265,43 @@
     height: 210px;
   }
 }
+
+/* ============================================================
+   FECHAS MANUALES
+   Desktop: solo escritura manual, SIN botón
+   Mobile: escritura manual + botón calendario
+   ============================================================ */
+
+.treatments-page .tg-date-control{
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.treatments-page .tg-date-control > input{
+  width: 100%;
+  min-width: 0;
+}
+
+.treatments-page .tg-date-trigger{
+  display: none;
+}
+
+.treatments-page .tg-date-native{
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 1px !important;
+  min-width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.treatments-page .tg-date-control.is-invalid > input{
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12) !important;
+}

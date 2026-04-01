@@ -8,41 +8,78 @@ import { initDrawer } from "../components/drawer.js";
 ====================== */
 
 const TREATMENTS_LIST = [
+  // Faciales
+  "Diagnóstico facial",
+  "Limpieza facial express",
+  "Limpieza facial profunda",
+  "Higiene facial profesional",
+  "Limpieza de espalda",
+  "Hidratación facial",
+  "Nutrición facial",
+  "Tratamiento calmante/descongestivo",
+  "Tratamiento para piel sensible",
+  "Tratamiento antiacné",
+  "Tratamiento despigmentante",
+  "Tratamiento antiage",
+
+  // Renovación / exfoliación
   "Peeling químico",
   "Peeling enzimático",
-  "Limpieza facial profunda",
-  "Limpieza facial express",
-  "Higiene facial profesional",
+  "Peeling mecánico",
   "Microdermoabrasión",
-  "Punta de diamante",
+  "Microdermoabrasión con punta de diamante",
   "Dermaplaning",
-  "BB Glow",
+  "Espátula ultrasónica",
+
+  // Aparatología facial
+  "Alta frecuencia",
+  "Electroporación",
+  "Corrientes galvánicas",
+  "Ultrasonido facial",
   "Radiofrecuencia facial",
-  "Máscara hidratante",
-  "Máscara calmante",
-  "Tratamiento antiacné",
-  "Rejuvenecimiento facial",
-  "Tratamiento para manchas",
-  "Tratamiento despigmentante",
-  "Masajes descontracturantes",
-  "Masajes relajantes",
-  "Drenaje linfático",
-  "Electrodos",
+  "Fotobiomodulación LED",
+  "HydraFacial / Hidrodermoabrasión",
+  "Microneedling / Dermapen",
+  "BB Glow",
+  "HIFU facial",
+  "IPL acné",
+  "IPL manchas",
+  "Fotorejuvenecimiento IPL",
+
+  // Corporales manuales
+  "Masaje relajante",
+  "Masaje descontracturante",
+  "Drenaje linfático manual",
+  "Masaje modelador/reductor",
+  "Exfoliación corporal",
+  "Hidratación corporal",
+
+  // Corporales con aparatología
   "Radiofrecuencia corporal",
   "Cavitación",
   "Ultracavitación",
-  "Velaslim",
   "Presoterapia",
-  "Reducción de medidas",
-  "Tratamiento anticelulitis",
-  "Tratamiento reafirmante",
+  "Vacumterapia",
+  "Electroestimulación / gimnasia pasiva",
+  "Ondas de choque",
+  "Criolipólisis",
+  "HIFU corporal",
+  "Lipoláser",
+  "Mesoterapia corporal",
+
+  // Capilares
   "Tratamiento capilar nutritivo",
+  "Hidratación capilar",
   "Shock de keratina",
   "Botox capilar",
-  "Reparación del cabello",
-  "Depilación cera",
-  "Depilación roll-on",
-  "Depilación definitiva (láser)",
+  "Reparación capilar",
+  "Mesoterapia capilar",
+
+  // Depilación
+  "Depilación con cera",
+  "Depilación con cera roll-on",
+  "Depilación definitiva láser",
+  "Depilación IPL"
 ];
 
 const TREATMENTS_OPTIONS_HTML = TREATMENTS_LIST.map((t) => `<div>${t}</div>`).join("");
@@ -160,11 +197,11 @@ export function Treatments() {
                     <div class="tg-inline-2">
                       <div>
                         <label for="date">Fecha</label>
-                        <input type="date" id="date" required />
+                        <input type="date" id="date" />
                       </div>
                       <div>
                         <label for="time">Hora</label>
-                        <input type="time" id="time" required />
+                        <input type="time" id="time" />
                       </div>
                     </div>
                   </div>
@@ -172,7 +209,7 @@ export function Treatments() {
                   <!-- Columna 2 -->
                   <div class="tg-form-col">
                     <label for="amount">Monto ($)</label>
-                    <input type="text" id="amount" placeholder="Ej: 2500" maxlength="10" required />
+                    <input type="text" id="amount" placeholder="Ej: 2500" maxlength="10" />
 
                     <div class="tg-inline-2">
                       <div>
@@ -276,7 +313,7 @@ export function Treatments() {
                     <div class="tg-inline-2">
                       <div>
                         <label>Fecha</label>
-                        <input type="date" id="saleDate" required />
+                        <input type="date" id="saleDate" />
                       </div>
                       <div>
                         <label>Cantidad</label>
@@ -288,7 +325,7 @@ export function Treatments() {
                   <!-- Columna 2 -->
                   <div class="tg-form-col">
                     <label>Monto ($)</label>
-                    <input type="number" id="saleAmount" min="0" step="1" inputmode="numeric" required/>
+                    <input type="number" id="saleAmount" min="0" step="1" inputmode="numeric" />
 
                     <div class="tg-inline-2">
                       <div>
@@ -355,6 +392,18 @@ export function Treatments() {
                     <input type="text" id="filterPatient" placeholder="Buscar paciente..." />
                     <input type="date" id="filterDate" placeholder="Seleccionar fecha" />
 
+                    <select id="filterDatePresence">
+                      <option value="">Fecha: todas</option>
+                      <option value="with">Con fecha</option>
+                      <option value="without">Sin fecha</option>
+                    </select>
+
+                    <select id="filterTimePresence">
+                      <option value="">Hora: todas</option>
+                      <option value="with">Con hora</option>
+                      <option value="without">Sin hora</option>
+                    </select>
+
                     <div class="searchable-select">
                       <input
                         type="text"
@@ -412,7 +461,7 @@ export function Treatments() {
               <input type="text" id="newFullName" placeholder="Ej: Ana López" required>
 
               <label>Fecha de nacimiento</label>
-              <input type="date" id="newBirthDate" required onclick="this.showPicker()">
+              <input type="date" id="newBirthDate">
 
               <label>Profesión</label>
               <input type="text" id="newProfession" placeholder="Ej: Diseñadora">
@@ -461,10 +510,10 @@ export function Treatments() {
               </div>
 
               <label>Fecha</label>
-              <input type="date" id="editTreatmentDate" required />
+              <input type="date" id="editTreatmentDate" />
 
               <label>Hora</label>
-              <input type="time" id="editTreatmentTime" required />
+              <input type="time" id="editTreatmentTime" />
 
               <label>Monto ($)</label>
               <input
@@ -474,7 +523,6 @@ export function Treatments() {
                 step="1"
                 inputmode="numeric"
                 max="9999999999"
-                required
               />
             </div>
 
@@ -564,7 +612,6 @@ export function Treatments() {
                 min="0"
                 step="1"
                 inputmode="numeric"
-                required
               />
 
               <label>Notas</label>
@@ -729,6 +776,7 @@ export async function initTreatments() {
 
   // Bind UI (una sola vez por render)
   bindUI();
+  initManualDateFields();
 
   // Inicialización data
 await loadPatients();
@@ -810,6 +858,8 @@ function renderActiveFilterChips() {
   const recordType = (document.getElementById("filterRecordType")?.value || "").trim();
   const patient = (document.getElementById("filterPatient")?.value || "").trim();
   const date = (document.getElementById("filterDate")?.value || "").trim();
+  const datePresence = (document.getElementById("filterDatePresence")?.value || "").trim();
+  const timePresence = (document.getElementById("filterTimePresence")?.value || "").trim();
   const type = (document.getElementById("filterTypeInput")?.value || "").trim();
   const status = (document.getElementById("filterStatus")?.value || "").trim();
 
@@ -823,7 +873,22 @@ function renderActiveFilterChips() {
   }
 
   if (patient) chips.push({ key: "patient", label: `Paciente: ${patient}` });
-  if (date) chips.push({ key: "date", label: `Fecha: ${date}` });
+  if (date) chips.push({ key: "date", label: `Fecha exacta: ${date}` });
+
+  if (datePresence) {
+    chips.push({
+      key: "datePresence",
+      label: `Fecha: ${datePresence === "with" ? "Con fecha" : "Sin fecha"}`
+    });
+  }
+
+  if (timePresence) {
+    chips.push({
+      key: "timePresence",
+      label: `Hora: ${timePresence === "with" ? "Con hora" : "Sin hora"}`
+    });
+  }
+
   if (type) chips.push({ key: "type", label: `Tipo: ${type}` });
   if (status) chips.push({ key: "status", label: `Pago: ${status}` });
 
@@ -849,7 +914,9 @@ function renderActiveFilterChips() {
 
       if (key === "recordType") document.getElementById("filterRecordType").selectedIndex = 0;
       if (key === "patient") document.getElementById("filterPatient").value = "";
-      if (key === "date") document.getElementById("filterDate").value = "";
+      if (key === "date") setDateInputISO("filterDate", "");
+      if (key === "datePresence") document.getElementById("filterDatePresence").selectedIndex = 0;
+      if (key === "timePresence") document.getElementById("filterTimePresence").selectedIndex = 0;
       if (key === "type") document.getElementById("filterTypeInput").value = "";
       if (key === "status") document.getElementById("filterStatus").selectedIndex = 0;
 
@@ -884,33 +951,13 @@ function bindUI() {
     e.target.value = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
   });
 
-  // ✅ Fecha (Registrar tratamiento): abrir calendario al click
-  bindOnce("#date", "click", () => {
-    const el = document.getElementById("date");
-    el?.showPicker?.();
-  });
-
-  // (opcional) también al focus
-  bindOnce("#date", "focus", () => {
-    const el = document.getElementById("date");
-    el?.showPicker?.();
-  });
-
-  // ✅ Fecha filtro: abrir calendario al click
-  bindOnce("#filterDate", "click", () => {
-    const el = document.getElementById("filterDate");
-    el?.showPicker?.();
-  });
-
-  // ✅ también al focus
-  bindOnce("#filterDate", "focus", () => {
-    const el = document.getElementById("filterDate");
-    el?.showPicker?.();
-  });
   // Filtros
   bindOnce("#filterRecordType", "change", () => applyFilters());
   bindOnce("#filterPatient", "input", () => applyFilters());
   bindOnce("#filterDate", "change", () => applyFilters());
+  bindOnce("#filterDate", "input", () => applyFilters());
+  bindOnce("#filterDatePresence", "change", () => applyFilters());
+  bindOnce("#filterTimePresence", "change", () => applyFilters());
   bindOnce("#filterStatus", "change", () => applyFilters());
   bindOnce("#clearAllFilters", "click", () => clearAllFilters());
 
@@ -1088,26 +1135,6 @@ function bindUI() {
 
 bindOnce("#saleForm", "submit", (e) => onCreateSale(e));
 
-/* ✅ Fecha: no permitir futuro (max = hoy) + abrir calendario */
-bindOnce("#saleDate", "focus", () => {
-  const el = document.getElementById("saleDate");
-  if (!el) return;
-
-  const today = new Date();
-  const y = today.getFullYear();
-  const m = String(today.getMonth() + 1).padStart(2, "0");
-  const d = String(today.getDate()).padStart(2, "0");
-
-  el.max = `${y}-${m}-${d}`; // bloquea fechas futuras
-  el.showPicker?.();         // abre el calendario
-});
-
-// ✅ también al click
-bindOnce("#saleDate", "click", () => {
-  const el = document.getElementById("saleDate");
-  el?.showPicker?.();
-});
-
 /* ✅ Cantidad: entero y mínimo 1 */
 bindOnce("#saleQuantity", "input", (e) => {
   let v = String(e.target.value || "").replace(/[^0-9]/g, "").slice(0, 10);
@@ -1187,6 +1214,212 @@ function bindOnce(selector, event, handler) {
   if (el.dataset[key]) return;
   el.dataset[key] = "1";
   el.addEventListener(event, handler);
+}
+
+const MANUAL_DATE_IDS = ["date", "saleDate", "filterDate", "newBirthDate", "editTreatmentDate"];
+
+function getTodayISO() {
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth() + 1).padStart(2, "0");
+  const d = String(today.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function maskDisplayDate(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 8);
+
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+function formatISOToDisplay(iso) {
+  const raw = String(iso || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "";
+
+  const [y, m, d] = raw.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function parseDisplayDateToISO(value) {
+  const raw = String(value || "").trim();
+
+  if (!raw) return "";
+
+  // si por algún motivo ya viene ISO
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const match = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return "";
+
+  const dd = Number(match[1]);
+  const mm = Number(match[2]);
+  const yyyy = Number(match[3]);
+
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return "";
+
+  const iso = `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+  const test = new Date(`${iso}T00:00:00`);
+
+  if (Number.isNaN(test.getTime())) return "";
+  if (test.getFullYear() !== yyyy) return "";
+  if (test.getMonth() + 1 !== mm) return "";
+  if (test.getDate() !== dd) return "";
+
+  return iso;
+}
+
+function setDateFieldErrorState(input, invalid) {
+  const wrap = input?.closest(".tg-date-control");
+  if (!wrap) return;
+  wrap.classList.toggle("is-invalid", Boolean(invalid));
+}
+
+function setDateInputISO(id, isoValue) {
+  const input = document.getElementById(id);
+  if (!input) return;
+
+  const picker = document.getElementById(`${id}__picker`);
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(String(isoValue || "").slice(0, 10))
+    ? String(isoValue).slice(0, 10)
+    : "";
+
+  input.value = iso ? formatISOToDisplay(iso) : "";
+
+  if (picker) {
+    picker.value = iso;
+    if (id === "saleDate") {
+      picker.max = getTodayISO();
+    }
+  }
+
+  setDateFieldErrorState(input, false);
+}
+
+function getDateInputISO(id) {
+  const input = document.getElementById(id);
+  return parseDisplayDateToISO(input?.value || "");
+}
+
+function initManualDateFields() {
+  MANUAL_DATE_IDS.forEach((id) => {
+    const input = document.getElementById(id);
+    if (!input || input.dataset.manualDateReady === "1") return;
+
+    input.dataset.manualDateReady = "1";
+
+    const initialValue = input.value || "";
+
+    input.type = "text";
+    input.inputMode = "numeric";
+    input.autocomplete = "off";
+    input.placeholder = "dd/mm/aaaa";
+    input.maxLength = 10;
+    input.spellcheck = false;
+
+    const wrap = document.createElement("div");
+    wrap.className = "tg-date-control";
+
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    const picker = document.createElement("input");
+    picker.type = "date";
+    picker.id = `${id}__picker`;
+    picker.className = "tg-date-native";
+    picker.tabIndex = -1;
+    picker.setAttribute("aria-hidden", "true");
+
+    if (id === "saleDate") {
+      picker.max = getTodayISO();
+    }
+
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "tg-date-trigger";
+    trigger.setAttribute("aria-label", "Abrir calendario");
+    trigger.innerHTML = `<i class="fa-solid fa-calendar-days"></i>`;
+
+    wrap.appendChild(picker);
+    wrap.appendChild(trigger);
+
+    if (initialValue) {
+      setDateInputISO(id, initialValue);
+    }
+
+    input.addEventListener("input", () => {
+      input.value = maskDisplayDate(input.value);
+
+      const iso = parseDisplayDateToISO(input.value);
+
+      if (!input.value.trim()) {
+        picker.value = "";
+        setDateFieldErrorState(input, false);
+        return;
+      }
+
+      if (iso) {
+        picker.value = iso;
+        setDateFieldErrorState(input, false);
+        return;
+      }
+
+      if (input.value.length === 10) {
+        picker.value = "";
+        setDateFieldErrorState(input, true);
+      } else {
+        picker.value = "";
+        setDateFieldErrorState(input, false);
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      if (!input.value.trim()) {
+        picker.value = "";
+        setDateFieldErrorState(input, false);
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        return;
+      }
+
+      const iso = parseDisplayDateToISO(input.value);
+
+      if (!iso) {
+        setDateFieldErrorState(input, true);
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        return;
+      }
+
+      setDateInputISO(id, iso);
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    trigger.addEventListener("click", () => {
+      if (id === "saleDate") {
+        picker.max = getTodayISO();
+      }
+
+      const iso = parseDisplayDateToISO(input.value);
+      picker.value = iso || picker.value || "";
+
+      picker.focus({ preventScroll: true });
+
+      if (typeof picker.showPicker === "function") {
+        picker.showPicker();
+      } else {
+        picker.click();
+      }
+    });
+
+    picker.addEventListener("change", () => {
+      setDateInputISO(id, picker.value || "");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  });
 }
 
 /* ======================
@@ -1532,7 +1765,9 @@ function renderResults(items) {
 function applyFilters() {
   const recordTypeFilter = document.getElementById("filterRecordType")?.value || "";
   const patientFilter = (document.getElementById("filterPatient")?.value || "").toLowerCase();
-  const dateFilter = document.getElementById("filterDate")?.value || "";
+  const dateFilter = getDateInputISO("filterDate");
+  const datePresenceFilter = document.getElementById("filterDatePresence")?.value || "";
+  const timePresenceFilter = document.getElementById("filterTimePresence")?.value || "";
   const typeFilter = (document.getElementById("filterTypeInput")?.value || "").toLowerCase();
   const statusFilter = document.getElementById("filterStatus")?.value || "";
 
@@ -1543,8 +1778,21 @@ function applyFilters() {
           const matchesPatient =
             !patientFilter || (t.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
+          const hasDate = !!(t.date && String(t.date).trim());
+          const hasTime = !!(t.time && String(t.time).trim());
+
           const matchesDate =
             !dateFilter || (t.date && String(t.date).slice(0, 10) === dateFilter);
+
+          const matchesDatePresence =
+            !datePresenceFilter ||
+            (datePresenceFilter === "with" && hasDate) ||
+            (datePresenceFilter === "without" && !hasDate);
+
+          const matchesTimePresence =
+            !timePresenceFilter ||
+            (timePresenceFilter === "with" && hasTime) ||
+            (timePresenceFilter === "without" && !hasTime);
 
           const matchesType =
             !typeFilter || (t.treatment || "").toLowerCase().includes(typeFilter);
@@ -1552,7 +1800,14 @@ function applyFilters() {
           const matchesStatus =
             !statusFilter || t.status === statusFilter;
 
-          return matchesPatient && matchesDate && matchesType && matchesStatus;
+          return (
+            matchesPatient &&
+            matchesDate &&
+            matchesDatePresence &&
+            matchesTimePresence &&
+            matchesType &&
+            matchesStatus
+          );
         });
 
   const filteredSales =
@@ -1562,8 +1817,21 @@ function applyFilters() {
           const matchesPatient =
             !patientFilter || (s.patient?.fullName || "").toLowerCase().includes(patientFilter);
 
+          const hasDate = !!(s.date && String(s.date).trim());
+          const hasTime = false; // las ventas no manejan hora
+
           const matchesDate =
             !dateFilter || (s.date && String(s.date).slice(0, 10) === dateFilter);
+
+          const matchesDatePresence =
+            !datePresenceFilter ||
+            (datePresenceFilter === "with" && hasDate) ||
+            (datePresenceFilter === "without" && !hasDate);
+
+          const matchesTimePresence =
+            !timePresenceFilter ||
+            (timePresenceFilter === "with" && hasTime) ||
+            (timePresenceFilter === "without" && !hasTime);
 
           const matchesType =
             !typeFilter || (s.product || "").toLowerCase().includes(typeFilter);
@@ -1571,7 +1839,14 @@ function applyFilters() {
           const matchesStatus =
             !statusFilter || s.status === statusFilter;
 
-          return matchesPatient && matchesDate && matchesType && matchesStatus;
+          return (
+            matchesPatient &&
+            matchesDate &&
+            matchesDatePresence &&
+            matchesTimePresence &&
+            matchesType &&
+            matchesStatus
+          );
         });
 
   const t = filteredTreatments.map((x) => ({ ...x, __type: "treatment" }));
@@ -1602,8 +1877,13 @@ function clearAllFilters() {
   const fp = document.getElementById("filterPatient");
   if (fp) fp.value = "";
 
-  const fd = document.getElementById("filterDate");
-  if (fd) fd.value = "";
+  setDateInputISO("filterDate", "");
+
+  const fdp = document.getElementById("filterDatePresence");
+  if (fdp) fdp.selectedIndex = 0;
+
+  const ftp = document.getElementById("filterTimePresence");
+  if (ftp) ftp.selectedIndex = 0;
 
   const ft = document.getElementById("filterTypeInput");
   if (ft) ft.value = "";
@@ -1663,6 +1943,34 @@ async function onCreateTreatment(e) {
       return;
     }
 
+    const dateInputValue = document.getElementById("date")?.value?.trim() || "";
+    const treatmentDate = getDateInputISO("date");
+
+    if (dateInputValue && !treatmentDate) {
+      await Swal.fire({
+        icon: "error",
+        title: "Fecha inválida",
+        text: "Ingresá una fecha válida en formato dd/mm/aaaa.",
+        confirmButtonColor: "#ffadad",
+      });
+      return;
+    }
+
+    const treatmentTime = document.getElementById("time")?.value || "";
+
+    const amountRaw = String(document.getElementById("amount")?.value || "").trim();
+    const amountValue = amountRaw === "" ? undefined : parseFloat(amountRaw);
+
+    if (amountRaw !== "" && (Number.isNaN(amountValue) || amountValue < 0)) {
+      await Swal.fire({
+        icon: "error",
+        title: "Monto inválido",
+        text: "El monto debe ser un número mayor o igual a 0.",
+        confirmButtonColor: "#ffadad",
+      });
+      return;
+    }
+
     const formData = new FormData();
 
     appendFormValue(formData, "patientId", patientId);
@@ -1671,13 +1979,9 @@ async function onCreateTreatment(e) {
       "treatment",
       document.getElementById("treatmentInput")?.value || ""
     );
-    appendFormValue(formData, "date", document.getElementById("date")?.value || "");
-    appendFormValue(formData, "time", document.getElementById("time")?.value || "");
-    appendFormValue(
-      formData,
-      "amount",
-      parseFloat(document.getElementById("amount")?.value || "") || 0
-    );
+    appendFormValue(formData, "date", treatmentDate || undefined);
+    appendFormValue(formData, "time", treatmentTime || undefined);
+    appendFormValue(formData, "amount", amountValue);
     appendFormValue(
       formData,
       "notes",
@@ -1746,7 +2050,7 @@ function resetTreatmentForm() {
   document.getElementById("patientInput").value = "";
   document.getElementById("patientSelect").value = "";
   document.getElementById("treatmentInput").value = "";
-  document.getElementById("date").value = "";
+  setDateInputISO("date", "");
   document.getElementById("time").value = "";
   document.getElementById("paymentStatus").selectedIndex = 0;
   document.getElementById("paymentMethod").selectedIndex = 0;
@@ -1814,25 +2118,29 @@ async function onCreateSale(e) {
       throw new Error("__VALIDATION__");
     }
 
-    const dateStr = document.getElementById("saleDate")?.value || "";
+    const saleDateInputValue = document.getElementById("saleDate")?.value?.trim() || "";
+    const dateStr = getDateInputISO("saleDate");
     const qty = parseInt(document.getElementById("saleQuantity")?.value || "", 10);
 
-    const amountStr = document.getElementById("saleAmount")?.value || "";
-    const amount = parseFloat(amountStr);
+    const amountStr = String(document.getElementById("saleAmount")?.value || "").trim();
+    const amount = amountStr === "" ? undefined : parseFloat(amountStr);
 
     const notes = document.getElementById("saleNotes")?.value || "";
 
-    if (!dateStr) {
-      await Swal.fire("Error", "La fecha es obligatoria.", "error");
+    if (saleDateInputValue && !dateStr) {
+      await Swal.fire("Error", "La fecha ingresada no es válida.", "error");
       throw new Error("__VALIDATION__");
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const chosen = new Date(dateStr + "T00:00:00");
-    if (chosen > today) {
-      await Swal.fire("Error", "La fecha no puede ser futura.", "error");
-      throw new Error("__VALIDATION__");
+    if (dateStr) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const chosen = new Date(dateStr + "T00:00:00");
+
+      if (chosen > today) {
+        await Swal.fire("Error", "La fecha no puede ser futura.", "error");
+        throw new Error("__VALIDATION__");
+      }
     }
 
     if (Number.isNaN(qty) || qty < 1) {
@@ -1840,26 +2148,25 @@ async function onCreateSale(e) {
       throw new Error("__VALIDATION__");
     }
 
-    if (Number.isNaN(amount) || amount < 0) {
+    if (amountStr !== "" && (Number.isNaN(amount) || amount < 0)) {
       await Swal.fire("Error", "El monto total debe ser un número mayor o igual a 0.", "error");
-      throw new Error("__VALIDATION__");
-    }
-
-    if (notes.length > 300) {
-      await Swal.fire("Error", "Las notas no pueden superar los 300 caracteres.", "error");
       throw new Error("__VALIDATION__");
     }
 
     const newSale = {
       patientId: parseInt(patientId, 10),
       product: document.getElementById("saleProduct")?.value || "",
-      date: dateStr,
+      date: dateStr || undefined,
       quantity: qty,
       amount: amount,
       status: document.getElementById("saleStatus")?.value || "",
       method: document.getElementById("saleMethod")?.value || "",
       notes: notes,
     };
+
+    Object.keys(newSale).forEach((k) => {
+      if (newSale[k] === undefined) delete newSale[k];
+    });
 
     const res = await authFetch(`${API_URL}/sales`, {
       method: "POST",
@@ -2017,7 +2324,7 @@ function openEditModal(treatment) {
 
   let rawDate = treatment.date || "";
   if (String(rawDate).includes("T")) rawDate = rawDate.split("T")[0];
-  if (editTreatmentDate) editTreatmentDate.value = rawDate || "";
+  setDateInputISO("editTreatmentDate", rawDate || "");
 
   if (editTreatmentTime) editTreatmentTime.value = treatment.time || "";
   if (editTreatmentAmount) editTreatmentAmount.value = String(treatment.amount ?? "").replace(/[^0-9.]/g, "");
@@ -2076,6 +2383,7 @@ function closeEditModal() {
 
   const form = document.getElementById("editTreatmentForm");
   if (form) form.reset();
+  setDateInputISO("editTreatmentDate", "");
 
   const beforeImg = document.getElementById("editBeforePreview");
   const afterImg = document.getElementById("editAfterPreview");
@@ -2125,6 +2433,34 @@ async function onSaveEditTreatment(e) {
       return;
     }
 
+    const editDateInputValue = document.getElementById("editTreatmentDate")?.value?.trim() || "";
+    const editTreatmentDateIso = getDateInputISO("editTreatmentDate");
+
+    if (editDateInputValue && !editTreatmentDateIso) {
+      await Swal.fire({
+        icon: "error",
+        title: "Fecha inválida",
+        text: "Ingresá una fecha válida en formato dd/mm/aaaa.",
+        confirmButtonColor: "#ffadad",
+      });
+      return;
+    }
+
+    const editTreatmentTime = document.getElementById("editTreatmentTime")?.value || "";
+
+    const editAmountRaw = String(document.getElementById("editTreatmentAmount")?.value || "").trim();
+    const editAmountValue = editAmountRaw === "" ? undefined : parseFloat(editAmountRaw);
+
+    if (editAmountRaw !== "" && (Number.isNaN(editAmountValue) || editAmountValue < 0)) {
+      await Swal.fire({
+        icon: "error",
+        title: "Monto inválido",
+        text: "El monto debe ser un número mayor o igual a 0.",
+        confirmButtonColor: "#ffadad",
+      });
+      return;
+    }
+
     const formData = new FormData();
 
     appendFormValue(
@@ -2137,21 +2473,9 @@ async function onSaveEditTreatment(e) {
       "treatment",
       document.getElementById("editTreatmentInput")?.value || ""
     );
-    appendFormValue(
-      formData,
-      "date",
-      document.getElementById("editTreatmentDate")?.value || ""
-    );
-    appendFormValue(
-      formData,
-      "time",
-      document.getElementById("editTreatmentTime")?.value || ""
-    );
-    appendFormValue(
-      formData,
-      "amount",
-      parseFloat(document.getElementById("editTreatmentAmount")?.value || "") || 0
-    );
+    appendFormValue(formData, "date", editTreatmentDateIso || undefined);
+    appendFormValue(formData, "time", editTreatmentTime || undefined);
+    appendFormValue(formData, "amount", editAmountValue);
     appendFormValue(
       formData,
       "status",
@@ -2266,7 +2590,8 @@ async function onSaveEditSale(e) {
     const qtyStr = qtyRaw.replace(/[^0-9]/g, "").slice(0, 10);
     const qty = parseInt(qtyStr, 10);
 
-    const amount = parseFloat(document.getElementById("editSaleAmount")?.value || "");
+    const amountRaw = String(document.getElementById("editSaleAmount")?.value || "").trim();
+    const amount = amountRaw === "" ? undefined : parseFloat(amountRaw);
     const notes = document.getElementById("editSaleNotes")?.value || "";
 
     if (!product) {
@@ -2284,7 +2609,7 @@ async function onSaveEditSale(e) {
       return;
     }
 
-    if (Number.isNaN(amount) || amount < 0) {
+    if (amountRaw !== "" && (Number.isNaN(amount) || amount < 0)) {
       await Swal.fire("Error", "El monto total debe ser un número >= 0.", "error");
       return;
     }
@@ -2603,25 +2928,48 @@ function closeNewPatientModal() {
 }
 
 async function confirmNewPatient() {
-  const fullName = document.getElementById("newFullName").value.trim();
-  const birthDate = document.getElementById("newBirthDate").value;
-  const address = document.getElementById("newAddress").value.trim();
-  const phone = document.getElementById("newPhone").value.trim();
-  const profession = document.getElementById("newProfession").value.trim();
+    const fullName = document.getElementById("newFullName").value.trim();
+    const birthDateInputValue = document.getElementById("newBirthDate")?.value?.trim() || "";
+    const birthDate = getDateInputISO("newBirthDate");
+    const address = document.getElementById("newAddress").value.trim();
+    const phone = document.getElementById("newPhone").value.trim();
+    const profession = document.getElementById("newProfession").value.trim();
 
-  if (!fullName || !birthDate) {
-    Swal.fire({
-      icon: "warning",
-      title: "Campos incompletos",
-      text: "El nombre y la fecha de nacimiento son obligatorios.",
-      confirmButtonColor: "#ffadad",
-      background: "#fffdf9",
-      color: "#333",
+    if (!fullName) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campo incompleto",
+        text: "El nombre es obligatorio.",
+        confirmButtonColor: "#ffadad",
+        background: "#fffdf9",
+        color: "#333",
+      });
+      return;
+    }
+
+    if (birthDateInputValue && !birthDate) {
+      Swal.fire({
+        icon: "warning",
+        title: "Fecha inválida",
+        text: "Ingresá una fecha válida en formato dd/mm/aaaa.",
+        confirmButtonColor: "#ffadad",
+        background: "#fffdf9",
+        color: "#333",
+      });
+      return;
+    }
+
+    const newPatient = {
+      fullName,
+      birthDate: birthDate || undefined,
+      address,
+      phone,
+      profession,
+    };
+
+    Object.keys(newPatient).forEach((k) => {
+      if (newPatient[k] === undefined) delete newPatient[k];
     });
-    return;
-  }
-
-  const newPatient = { fullName, birthDate, address, phone, profession };
 
   try {
     const res = await authFetch(`${API_URL}/patients`, {
