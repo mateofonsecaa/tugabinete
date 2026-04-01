@@ -41,9 +41,14 @@ export const createSale = async (req, res) => {
     }
 
     // ✅ monto total numérico >= 0
-    const amt = Number(amount);
-    if (Number.isNaN(amt) || amt < 0) {
-      return res.status(400).json({ error: "El monto debe ser un número mayor o igual a 0" });
+    let amt = null;
+
+    if (amount !== undefined && amount !== null && String(amount).trim() !== "") {
+      amt = Number(amount);
+
+      if (Number.isNaN(amt) || amt < 0) {
+        return res.status(400).json({ error: "El monto debe ser un número mayor o igual a 0" });
+      }
     }
 
     // ✅ notas <= 300
@@ -52,15 +57,17 @@ export const createSale = async (req, res) => {
     }
 
     // ✅ fecha: hoy o anterior (no futuro)
-    if (!date) {
-      return res.status(400).json({ error: "La fecha es obligatoria" });
-    }
+    let saleDate = null;
 
-    const inputISO = String(date).slice(0, 10); // "YYYY-MM-DD"
-    const todayISO = toISODateOnly(new Date());
+    if (date !== undefined && date !== null && String(date).trim() !== "") {
+      const inputISO = String(date).slice(0, 10);
+      const todayISO = toISODateOnly(new Date());
 
-    if (inputISO > todayISO) {
-      return res.status(400).json({ error: "La fecha no puede ser futura" });
+      if (inputISO > todayISO) {
+        return res.status(400).json({ error: "La fecha no puede ser futura" });
+      }
+
+      saleDate = new Date(inputISO);
     }
 
     // Validación de existencia/propiedad del paciente (muy importante)
@@ -78,7 +85,7 @@ export const createSale = async (req, res) => {
         userId,
         patientId: pid,
         product: String(product).trim(),
-        date: new Date(inputISO), // guardamos solo fecha
+        date: saleDate,
         quantity: qty,
         amount: amt,
         status: String(status || "").trim(),
@@ -195,7 +202,15 @@ export const updateSale = async (req, res) => {
     const nextPatientId = patientId !== undefined ? Number(patientId) : existing.patientId;
     const nextProduct = product !== undefined ? String(product).trim() : existing.product;
     const nextQty = quantity !== undefined ? Number(quantity) : existing.quantity;
-    const nextAmt = amount !== undefined ? Number(amount) : existing.amount;
+    let nextAmt = existing.amount;
+
+    if (amount !== undefined) {
+      if (amount === null || String(amount).trim() === "") {
+        nextAmt = null;
+      } else {
+        nextAmt = Number(amount);
+      }
+    }
     const nextStatus = status !== undefined ? String(status || "").trim() : (existing.status || "");
     const nextMethod = method !== undefined ? String(method || "").trim() : (existing.method || "");
     const nextNotes = notes !== undefined ? (notes ? String(notes) : null) : existing.notes;
@@ -216,7 +231,7 @@ export const updateSale = async (req, res) => {
     }
 
     // ✅ monto >= 0
-    if (Number.isNaN(nextAmt) || nextAmt < 0) {
+    if (nextAmt !== null && (Number.isNaN(nextAmt) || nextAmt < 0)) {
       return res.status(400).json({ error: "El monto debe ser un número mayor o igual a 0" });
     }
 
@@ -227,16 +242,20 @@ export const updateSale = async (req, res) => {
 
     // ✅ fecha: si viene, validar que no sea futura; si no viene, mantener la actual
     let nextDate = existing.date;
+
     if (date !== undefined) {
-      if (!date) return res.status(400).json({ error: "La fecha es obligatoria" });
+      if (date === null || String(date).trim() === "") {
+        nextDate = null;
+      } else {
+        const inputISO = String(date).slice(0, 10);
+        const todayISO = toISODateOnly(new Date());
 
-      const inputISO = String(date).slice(0, 10); // YYYY-MM-DD
-      const todayISO = toISODateOnly(new Date());
+        if (inputISO > todayISO) {
+          return res.status(400).json({ error: "La fecha no puede ser futura" });
+        }
 
-      if (inputISO > todayISO) {
-        return res.status(400).json({ error: "La fecha no puede ser futura" });
+        nextDate = new Date(inputISO);
       }
-      nextDate = new Date(inputISO);
     }
 
     // ✅ validar paciente pertenece al user

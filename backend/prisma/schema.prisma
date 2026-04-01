@@ -83,10 +83,10 @@ model AuthSession {
 model Patient {
   id           Int           @id @default(autoincrement())
   fullName     String
-  birthDate    DateTime
-  age          Int
+  birthDate    DateTime?
+  age          Int?
   address      String?
-  phone        String
+  phone        String?
   profession   String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -101,7 +101,7 @@ model Patient {
 
 model Appointment {
   id                Int      @id @default(autoincrement())
-  date              DateTime
+  date              DateTime?
   treatment         String?
   patientId         Int?
   notes             String?
@@ -239,9 +239,9 @@ model Reminder {
 model Sale {
   id       Int      @id @default(autoincrement())
   product  String
-  date     DateTime
-  quantity Int
-  amount   Float
+  date     DateTime?
+  quantity Int?
+  amount   Float?
   status   String
   method   String
   notes    String?

@@ -35,18 +35,27 @@ function buildTreatmentDate(date, time) {
   const safeDate = String(date || "").trim();
   const safeTime = String(time || "").trim();
 
+  // si no hay fecha, no guardamos DateTime
   if (!safeDate) {
-    throw createAppError(400, "La fecha es obligatoria.", "APPOINTMENT_DATE_REQUIRED");
+    return null;
   }
 
-  if (!safeTime) {
-    throw createAppError(400, "La hora es obligatoria.", "APPOINTMENT_TIME_REQUIRED");
+  // si hay fecha y hay hora, armamos datetime completo
+  if (safeTime) {
+    const value = new Date(`${safeDate}T${safeTime}:00-03:00`);
+
+    if (Number.isNaN(value.getTime())) {
+      throw createAppError(400, "Fecha u hora inválida.", "APPOINTMENT_DATE_INVALID");
+    }
+
+    return value;
   }
 
-  const value = new Date(`${safeDate}T${safeTime}:00-03:00`);
+  // si hay fecha pero no hora, guardamos solo la fecha
+  const value = new Date(`${safeDate}T00:00:00-03:00`);
 
   if (Number.isNaN(value.getTime())) {
-    throw createAppError(400, "Fecha u hora inválida.", "APPOINTMENT_DATE_INVALID");
+    throw createAppError(400, "Fecha inválida.", "APPOINTMENT_DATE_INVALID");
   }
 
   return value;
@@ -197,7 +206,9 @@ export const create = async (userId, data, files) => {
         userId,
         patientId,
         date: treatmentDate,
-        time: String(data.time || "").trim(),
+        time: data.time !== undefined && data.time !== null && String(data.time).trim() !== ""
+          ? String(data.time).trim()
+          : null,
         treatment: data.treatment ? String(data.treatment).trim() : null,
         amount: data.amount !== undefined && data.amount !== null && data.amount !== ""
           ? parseFloat(data.amount)
@@ -296,14 +307,14 @@ export const update = async (userId, id, data, files) => {
       : existing.patientId;
 
   const nextDate =
-    data.date !== undefined && data.date !== null && data.date !== ""
-      ? String(data.date)
-      : new Date(existing.date).toISOString().slice(0, 10);
+    data.date !== undefined
+      ? (data.date ? String(data.date).trim() : "")
+      : (existing.date ? new Date(existing.date).toISOString().slice(0, 10) : "");
 
   const nextTime =
-    data.time !== undefined && data.time !== null && data.time !== ""
-      ? String(data.time)
-      : existing.time;
+    data.time !== undefined
+      ? (data.time ? String(data.time).trim() : "")
+      : (existing.time || "");
 
   const treatmentDate = buildTreatmentDate(nextDate, nextTime);
 
@@ -347,7 +358,7 @@ export const update = async (userId, id, data, files) => {
       data: {
         patientId,
         date: treatmentDate,
-        time: nextTime,
+        time: nextTime || null,
         treatment:
           data.treatment !== undefined
             ? (data.treatment ? String(data.treatment).trim() : null)
