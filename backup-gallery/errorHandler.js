@@ -18,18 +18,6 @@ export const errorHandler = (err, req, res, next) => {
       code = "FILE_TOO_LARGE";
       message = "El archivo supera el tamaño máximo permitido.";
     }
-
-    if (err.code === "LIMIT_FILE_COUNT") {
-      status = 400;
-      code = "TOO_MANY_FILES";
-      message = "Se superó la cantidad máxima de archivos permitidos.";
-    }
-
-    if (err.code === "LIMIT_UNEXPECTED_FILE") {
-      status = 400;
-      code = "UNEXPECTED_FILE_FIELD";
-      message = "Se recibió un campo de archivo no permitido.";
-    }
   }
 
   if (status >= 500) {

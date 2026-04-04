@@ -65,13 +65,4 @@ export const FILE_PURPOSES = {
     buildObjectPath: ({ ownerUserId, resourceId, fileId, extension }) =>
       `users/${ownerUserId}/appointments/${resourceId}/after/${fileId}.${extension}`,
   },
-
-  APPOINTMENT_PHOTO: {
-    visibility: "PRIVATE",
-    bucket: STORAGE_PRIVATE_BUCKET,
-    allowedMimeTypes: new Set(["image/jpeg", "image/png", "image/webp"]),
-    maxSizeBytes: mb(10),
-    buildObjectPath: ({ ownerUserId, resourceId, fileId, extension }) =>
-      `users/${ownerUserId}/appointments/${resourceId}/gallery/${fileId}.${extension}`,
-  },
 };

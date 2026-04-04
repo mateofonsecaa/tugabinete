@@ -6,14 +6,11 @@ const ALLOWED_IMAGE_MIME = new Set([
   "image/webp",
 ]);
 
-const MAX_GALLERY_FILES = 10;
-const MAX_TOTAL_FILES = 12;
-
 const appointmentUpload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024,
-    files: MAX_TOTAL_FILES,
+    files: 2,
   },
   fileFilter: (req, file, cb) => {
     if (!ALLOWED_IMAGE_MIME.has(file.mimetype)) {
@@ -28,7 +25,6 @@ const appointmentUpload = multer({
 }).fields([
   { name: "beforePhoto", maxCount: 1 },
   { name: "afterPhoto", maxCount: 1 },
-  { name: "photos", maxCount: MAX_GALLERY_FILES },
 ]);
 
 export default appointmentUpload;

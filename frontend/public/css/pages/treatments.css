@@ -765,15 +765,18 @@
 
   /* Mobile */
   @media (max-width: 520px){
-    .treatments-page .modal-detail-pro .detail-photos{
+    .treatments-page .modal-detail-pro .detail-photos:not(.detail-photos--gallery){
       grid-template-columns: 1fr;
     }
-    .treatments-page .modal-detail-pro .detail-photos .photo-frame{
+
+    .treatments-page .modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-frame{
       height: 200px;
       max-height: 200px;
     }
 
-    .treatments-page .treatments-grid{ grid-template-columns: 1fr; }
+    .treatments-page .treatments-grid{
+      grid-template-columns: 1fr;
+    }
   }
 
   .treatments-page #imagePreviewModal{
@@ -933,30 +936,32 @@
     overflow: auto;
   }
 
-  /* Fotos (solo existe en el modal de tratamiento, pero lo dejamos “bien” igual) */
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
+  /* ============================================================
+    DETALLE TRATAMIENTO — LAYOUT LEGACY (solo si NO es galería)
+  ============================================================ */
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery){
     margin-top: 14px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
   }
 
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos > div{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) > div{
     background: rgba(255,255,255,0.78);
     border: 1px solid rgba(255, 173, 173, 0.22);
     border-radius: 16px;
     padding: 12px;
   }
 
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos p{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) p{
     margin: 0 0 8px;
     font-size: 13px;
     font-weight: 900;
     color: #444;
   }
 
-  /* Frame fijo para que no colapse cuando no hay imagen */
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-frame{
     width: 100%;
     height: 240px;
     max-height: 240px;
@@ -965,8 +970,7 @@
     position: relative;
   }
 
-  /* Imagen ocupa todo el frame */
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame img{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-frame img{
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -975,27 +979,64 @@
     cursor: zoom-in;
   }
 
-  /* Placeholder cuando no hay foto */
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-empty{
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
     text-align: center;
-
     background: rgba(255,255,255,0.70);
     border: 2px dashed rgba(255, 173, 173, 0.55);
     border-radius: 14px;
-
     color: #777;
     font-weight: 700;
     font-size: 13px;
     gap: 8px;
   }
 
-  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-empty i{
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-empty i{
     color: #ffadad;
     font-size: 22px;
+  }
+
+  /* ============================================================
+    DETALLE TRATAMIENTO — GALERÍA NUEVA
+  ============================================================ */
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery{
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery > div{
+    background: transparent;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery .detail-photos-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery .detail-photos-head p{
+    margin: 0;
+    font-size: 13px;
+    font-weight: 900;
+    color: #444;
+  }
+
+  .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery #viewTreatmentGalleryList{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
   }
 
   /* Botón acciones (PDF) */
@@ -1017,10 +1058,12 @@
     .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-grid{
       grid-template-columns: 1fr;
     }
-    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos{
+
+    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery){
       grid-template-columns: 1fr;
     }
-    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos .photo-frame{
+
+    .treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos:not(.detail-photos--gallery) .photo-frame{
       height: 210px;
       max-height: 210px;
     }
@@ -1304,4 +1347,374 @@
 .treatments-page .tg-date-control.is-invalid > input{
   border-color: #ff6b6b !important;
   box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12) !important;
+}
+
+/* ============================================================
+   GALERÍA — REGISTRAR TRATAMIENTO
+============================================================ */
+
+.treatments-page .tg-photos-row--gallery {
+  grid-column: 1 / -1;
+}
+
+.treatments-page .gallery-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.treatments-page .gallery-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.treatments-page #treatmentGalleryInput,
+.treatments-page #editTreatmentGalleryInput {
+  display: none;
+}
+
+.treatments-page .gallery-counter {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.treatments-page .gallery-help {
+  margin: 0;
+  font-size: 13px;
+  color: #777;
+}
+
+.treatments-page .gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.treatments-page .gallery-empty {
+  grid-column: 1 / -1;
+  border: 2px dashed rgba(255, 173, 173, 0.45);
+  border-radius: 14px;
+  background: rgba(255, 245, 245, 0.55);
+  color: #777;
+  text-align: center;
+  padding: 22px 14px;
+  font-weight: 600;
+}
+
+.treatments-page .gallery-card {
+  position: relative;
+  background: #fff;
+  border: 1.5px solid rgba(255, 173, 173, 0.28);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 16px rgba(255, 173, 173, 0.10);
+}
+
+.treatments-page .gallery-remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 173, 173, 0.92);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.treatments-page .gallery-remove-btn:hover {
+  background: #f76e6e;
+}
+
+.treatments-page .gallery-image-wrap {
+  width: 100%;
+  height: 170px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fffaf9;
+  border: 1px solid rgba(255, 173, 173, 0.18);
+}
+
+.treatments-page .gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+}
+
+.treatments-page .gallery-meta {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.treatments-page .gallery-meta-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+}
+
+.treatments-page .gallery-label-select {
+  width: 100%;
+}
+
+/* ============================================================
+   GALERÍA — VER TRATAMIENTO
+============================================================ */
+
+.treatments-page .detail-photos--gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.treatments-page .detail-photos-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.treatments-page .gallery-label-readonly {
+  width: 100%;
+  border-radius: 10px;
+  border: 1.5px solid #ffd6d6;
+  background: #fffaf9;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #444;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.treatments-page .detail-photos--gallery .gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+/* ============================================================
+   FIX — DETALLE TRATAMIENTO CON GALERÍA
+============================================================ */
+
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.treatments-page .modal-overlay .modal-box.modal-detail-pro .detail-photos.detail-photos--gallery > div {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.treatments-page .detail-photos--gallery .detail-photos-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.treatments-page .detail-photos--gallery .detail-photos-head p {
+  margin: 0;
+}
+
+.treatments-page .detail-photos--gallery #viewTreatmentGalleryList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .treatments-page .detail-photos-head {
+    align-items: flex-start;
+  }
+
+  .treatments-page .detail-photos--gallery .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .treatments-page .gallery-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .treatments-page .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .treatments-page .gallery-image-wrap {
+    height: 200px;
+  }
+}
+
+/* ============================================================
+   FIX REAL — MODAL VER TRATAMIENTO / GALERÍA
+   Cabecera arriba en una sola tarjeta
+   Fotos abajo en 2 columnas
+============================================================ */
+
+.treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery{
+  margin-top: 14px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > .detail-photos-head{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  flex-wrap: nowrap !important;
+
+  width: 100% !important;
+  min-height: auto !important;
+  height: auto !important;
+  align-self: stretch !important;
+
+  padding: 14px 16px !important;
+  background: rgba(255,255,255,0.78) !important;
+  border: 1px solid rgba(255, 173, 173, 0.22) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06) !important;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > .detail-photos-head p{
+  margin: 0 !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #444 !important;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > #viewTreatmentGalleryList{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  width: 100% !important;
+  align-items: start !important;
+}
+
+.treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > #viewTreatmentGalleryList .gallery-card{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+@media (max-width: 760px){
+  .treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > .detail-photos-head{
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+  }
+
+  .treatments-page #viewTreatmentModal .detail-photos.detail-photos--gallery > #viewTreatmentGalleryList{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   FIX REAL — GALERÍAS EN REGISTRAR Y EDITAR TRATAMIENTO
+   La galería ocupa todo el ancho y muestra 2 columnas
+============================================================ */
+
+/* ---------- REGISTRAR TRATAMIENTO ---------- */
+.treatments-page .tg-photos-row.tg-photos-row--gallery{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+
+.treatments-page .tg-photos-row.tg-photos-row--gallery > .gallery-field{
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.treatments-page #treatmentGalleryList.gallery-grid{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  width: 100% !important;
+  align-items: start !important;
+}
+
+.treatments-page #treatmentGalleryList.gallery-grid .gallery-card{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* ---------- EDITAR TRATAMIENTO ---------- */
+.treatments-page #editTreatmentModal .edit-photo-section.edit-photo-section--gallery{
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+
+.treatments-page #editTreatmentModal .edit-photo-section.edit-photo-section--gallery > .gallery-field{
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.treatments-page #editTreatmentModal #editTreatmentGalleryList.gallery-grid{
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  width: 100% !important;
+  align-items: start !important;
+}
+
+.treatments-page #editTreatmentModal #editTreatmentGalleryList.gallery-grid .gallery-card{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* ---------- MOBILE / TABLET ---------- */
+@media (max-width: 760px){
+  .treatments-page #treatmentGalleryList.gallery-grid,
+  .treatments-page #editTreatmentModal #editTreatmentGalleryList.gallery-grid{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   LOADING — GALERÍAS DE TRATAMIENTOS
+============================================================ */
+
+.treatments-page .gallery-loading {
+  grid-column: 1 / -1;
+  min-height: 180px;
+  border: 2px dashed rgba(255, 173, 173, 0.45);
+  border-radius: 14px;
+  background: rgba(255, 245, 245, 0.55);
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 22px 14px;
+  font-weight: 600;
+}
+
+.treatments-page .gallery-loading i {
+  font-size: 24px;
+  color: #ffadad;
 }

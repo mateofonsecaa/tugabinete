@@ -119,22 +119,6 @@ model Appointment {
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   beforePhotoFile StoredFile? @relation("AppointmentBeforePhoto", fields: [beforePhotoFileId], references: [id], onDelete: SetNull)
   afterPhotoFile  StoredFile? @relation("AppointmentAfterPhoto", fields: [afterPhotoFileId], references: [id], onDelete: SetNull)
-  photos          AppointmentPhoto[]
-}
-
-model AppointmentPhoto {
-  id            Int       @id @default(autoincrement())
-  appointmentId Int
-  fileId        String    @unique
-  label         String?
-  position      Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  file        StoredFile  @relation(fields: [fileId], references: [id], onDelete: Cascade)
-
-  @@index([appointmentId, position])
 }
 
 model SimpleAppointment {
@@ -411,7 +395,6 @@ model StoredFile {
   avatarForUser           User?          @relation("UserAvatarFile")
   beforePhotoAppointments Appointment[]  @relation("AppointmentBeforePhoto")
   afterPhotoAppointments  Appointment[]  @relation("AppointmentAfterPhoto")
-  appointmentGalleryPhotos AppointmentPhoto[]
   feedbackAttachments     FeedbackItem[] @relation("FeedbackAttachmentFile")
 
   @@unique([bucket, objectPath])

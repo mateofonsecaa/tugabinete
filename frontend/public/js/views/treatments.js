@@ -2,6 +2,15 @@
 import { API_URL } from "../core/config.js";
 import { authFetch } from "../core/authFetch.js";
 import { initDrawer } from "../components/drawer.js";
+import {
+  MAX_TREATMENT_PHOTOS,
+  TREATMENT_PHOTO_LABELS,
+  buildDraftGalleryPhotosFromFiles,
+  buildGalleryPhotosFromApiResponse,
+  appendGalleryPhotosToFormData,
+  reindexGalleryPhotos,
+  canAddMorePhotos,
+} from "./treatments.gallery.js";
 
 /* ======================
    Template helpers
@@ -238,30 +247,34 @@ export function Treatments() {
                   </div>
 
                   <!-- Fotos -->
-                  <div class="tg-photos-row">
-                    <div class="file-field">
-                      <label>Foto ANTES</label>
-                      <div class="file-input-wrapper">
-                        <input type="file" id="beforePhoto" accept="image/*" />
-                        <img id="beforePreview" class="photo-mini-preview">
-                        <label for="beforePhoto" class="file-btn">
-                          <i class="fa-regular fa-image"></i>
-                          <span>Seleccionar</span>
-                        </label>
-                        <span class="file-name" id="beforeFileName">Ningún archivo seleccionado</span>
-                      </div>
-                    </div>
+                  <div class="tg-photos-row tg-photos-row--gallery">
+                    <div class="gallery-field">
+                      <label>Registro fotográfico</label>
 
-                    <div class="file-field">
-                      <label>Foto DESPUÉS</label>
-                      <div class="file-input-wrapper">
-                        <input type="file" id="afterPhoto" accept="image/*" />
-                        <img id="afterPreview" class="photo-mini-preview">
-                        <label for="afterPhoto" class="file-btn">
-                          <i class="fa-regular fa-image"></i>
-                          <span>Seleccionar</span>
+                      <div class="gallery-toolbar">
+                        <label for="treatmentGalleryInput" class="file-btn">
+                          <i class="fa-regular fa-images"></i>
+                          <span>Agregar fotos</span>
                         </label>
-                        <span class="file-name" id="afterFileName">Ningún archivo seleccionado</span>
+
+                        <input
+                          type="file"
+                          id="treatmentGalleryInput"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                        />
+
+                        <span class="gallery-counter" id="treatmentGalleryCounter">0/${MAX_TREATMENT_PHOTOS} fotos</span>
+                      </div>
+
+                      <p class="gallery-help">
+                        Podés cargar hasta ${MAX_TREATMENT_PHOTOS} fotos por tratamiento.
+                      </p>
+
+                      <div id="treatmentGalleryList" class="gallery-grid">
+                        <div class="gallery-empty" id="treatmentGalleryEmpty">
+                          Todavía no agregaste fotos.
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -549,21 +562,35 @@ export function Treatments() {
             </div>
           </form>
 
-          <div class="edit-photo-section">
-            <div class="photo-block">
-              <label>Foto ANTES</label>
-              <div class="photo-preview is-loading" id="editBeforePreviewWrap">
-                <img id="editBeforePreview" src="" alt="Foto antes" />
-              </div>
-              <input type="file" id="editBeforePhoto" accept="image/*" />
-            </div>
+          <div class="edit-photo-section edit-photo-section--gallery">
+            <div class="gallery-field">
+              <label>Registro fotográfico</label>
 
-            <div class="photo-block">
-              <label>Foto DESPUÉS</label>
-              <div class="photo-preview is-loading" id="editAfterPreviewWrap">
-                <img id="editAfterPreview" src="" alt="Foto después" />
+              <div class="gallery-toolbar">
+                <label for="editTreatmentGalleryInput" class="file-btn">
+                  <i class="fa-regular fa-images"></i>
+                  <span>Agregar fotos</span>
+                </label>
+
+                <input
+                  type="file"
+                  id="editTreatmentGalleryInput"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                />
+
+                <span class="gallery-counter" id="editTreatmentGalleryCounter">0/${MAX_TREATMENT_PHOTOS} fotos</span>
               </div>
-              <input type="file" id="editAfterPhoto" accept="image/*" />
+
+              <p class="gallery-help">
+                Podés cargar hasta ${MAX_TREATMENT_PHOTOS} fotos por tratamiento.
+              </p>
+
+              <div id="editTreatmentGalleryList" class="gallery-grid">
+                <div class="gallery-empty" id="editTreatmentGalleryEmpty">
+                  Todavía no hay fotos cargadas.
+                </div>
+              </div>
             </div>
           </div>
 
@@ -663,26 +690,15 @@ export function Treatments() {
             <p id="viewNotes">—</p>
           </div>
 
-          <div class="detail-photos">
-            <div>
-              <p><strong>Antes</strong></p>
-
-              <div class="photo-frame">
-                <img id="viewBeforePhoto" src="" alt="Foto antes" style="display:none;">
-                <div id="viewBeforeEmpty" class="photo-empty">
-                  <span>Sin foto cargada</span>
-                </div>
-              </div>
+          <div class="detail-photos detail-photos--gallery">
+            <div class="detail-photos-head">
+              <p><strong>Registro fotográfico</strong></p>
+              <span class="gallery-counter" id="viewTreatmentGalleryCounter">0/${MAX_TREATMENT_PHOTOS} fotos</span>
             </div>
 
-            <div>
-              <p><strong>Después</strong></p>
-
-              <div class="photo-frame">
-                <img id="viewAfterPhoto" src="" alt="Foto después" style="display:none;">
-                <div id="viewAfterEmpty" class="photo-empty">
-                  <span>Sin foto cargada</span>
-                </div>
+            <div id="viewTreatmentGalleryList" class="gallery-grid">
+              <div class="gallery-empty" id="viewTreatmentGalleryEmpty">
+                Sin fotos cargadas.
               </div>
             </div>
           </div>
@@ -763,6 +779,8 @@ let editingTreatment = null;
 let editingSale = null;
 let treatmentViewCache = null;
 let patientsCache = [];
+let createTreatmentGallery = [];
+let editTreatmentGallery = [];
 
 export async function initTreatments() {
   initDrawer();
@@ -961,6 +979,64 @@ function bindUI() {
   bindOnce("#filterStatus", "change", () => applyFilters());
   bindOnce("#clearAllFilters", "click", () => clearAllFilters());
 
+  bindOnce("#treatmentGalleryInput", "change", async (e) => {
+    try {
+      const files = e.target?.files;
+      if (!files || !files.length) return;
+
+      if (!canAddMorePhotos(createTreatmentGallery.length)) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Límite alcanzado",
+          text: `Solo se permiten ${MAX_TREATMENT_PHOTOS} fotos por tratamiento.`,
+          confirmButtonColor: "#ffadad",
+        });
+        e.target.value = "";
+        return;
+      }
+
+      await addFilesToCreateGallery(files);
+      e.target.value = "";
+    } catch (err) {
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudieron agregar las fotos",
+        text: err.message || "Ocurrió un error al procesar las imágenes.",
+        confirmButtonColor: "#ffadad",
+      });
+      e.target.value = "";
+    }
+  });
+
+  bindOnce("#editTreatmentGalleryInput", "change", async (e) => {
+    try {
+      const files = e.target?.files;
+      if (!files || !files.length) return;
+
+      if (!canAddMorePhotos(editTreatmentGallery.length)) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Límite alcanzado",
+          text: `Solo se permiten ${MAX_TREATMENT_PHOTOS} fotos por tratamiento.`,
+          confirmButtonColor: "#ffadad",
+        });
+        e.target.value = "";
+        return;
+      }
+
+      await addFilesToEditGallery(files);
+      e.target.value = "";
+    } catch (err) {
+      await Swal.fire({
+        icon: "error",
+        title: "No se pudieron agregar las fotos",
+        text: err.message || "Ocurrió un error al procesar las imágenes.",
+        confirmButtonColor: "#ffadad",
+      });
+      e.target.value = "";
+    }
+  });
+
   // Form submit (nuevo)
   bindOnce("#treatmentForm", "submit", (e) => onCreateTreatment(e));
 
@@ -970,6 +1046,53 @@ function bindUI() {
     window.__treatmentsDelegationBound = true;
     document.body.addEventListener("click", (e) => {
     if (!document.querySelector(".treatments-page")) return;
+        const removeGalleryBtn = e.target.closest("[data-gallery-remove]");
+    if (removeGalleryBtn) {
+      const index = Number(removeGalleryBtn.dataset.galleryRemove);
+      if (Number.isInteger(index)) {
+        removePhotoFromCreateGallery(index);
+      }
+      return;
+    }
+
+    const previewGalleryImg = e.target.closest("[data-gallery-preview]");
+    if (previewGalleryImg) {
+      const index = Number(previewGalleryImg.dataset.galleryPreview);
+      const photo = createTreatmentGallery[index];
+      if (photo?.url) {
+        openImagePreview(photo.url);
+      }
+      return;
+    }
+
+    const removeEditGalleryBtn = e.target.closest("[data-edit-gallery-remove]");
+    if (removeEditGalleryBtn) {
+      const index = Number(removeEditGalleryBtn.dataset.editGalleryRemove);
+      if (Number.isInteger(index)) {
+        removePhotoFromEditGallery(index);
+      }
+      return;
+    }
+
+    const previewEditGalleryImg = e.target.closest("[data-edit-gallery-preview]");
+    if (previewEditGalleryImg) {
+      const index = Number(previewEditGalleryImg.dataset.editGalleryPreview);
+      const photo = editTreatmentGallery[index];
+      if (photo?.url) {
+        openImagePreview(photo.url);
+      }
+      return;
+    }
+
+    const previewViewGalleryImg = e.target.closest("[data-view-gallery-preview]");
+    if (previewViewGalleryImg) {
+      const index = Number(previewViewGalleryImg.dataset.viewGalleryPreview);
+      const photo = buildGalleryPhotosFromApiResponse(treatmentViewCache || {})[index];
+      if (photo?.url) {
+        openImagePreview(photo.url);
+      }
+      return;
+    }
 
     // ✅ Click en fila -> abrir ver (si NO clickeó un botón)
     const row = e.target.closest(".treat-card[data-id]");
@@ -1033,6 +1156,30 @@ function bindUI() {
 
       if (btn.id === "closeImageBtn") closeImagePreview();
     });
+      if (!window.__treatmentsGalleryLabelChangeBound) {
+        window.__treatmentsGalleryLabelChangeBound = true;
+
+        document.body.addEventListener("change", (e) => {
+          if (!document.querySelector(".treatments-page")) return;
+
+            const createLabelSelect = e.target.closest("[data-gallery-label]");
+            if (createLabelSelect) {
+              const index = Number(createLabelSelect.dataset.galleryLabel);
+              if (Number.isInteger(index)) {
+                updateCreateGalleryPhotoLabel(index, createLabelSelect.value || "Sin etiqueta");
+              }
+              return;
+            }
+
+            const editLabelSelect = e.target.closest("[data-edit-gallery-label]");
+            if (editLabelSelect) {
+              const index = Number(editLabelSelect.dataset.editGalleryLabel);
+              if (Number.isInteger(index)) {
+                updateEditGalleryPhotoLabel(index, editLabelSelect.value || "Sin etiqueta");
+              }
+            }
+        });
+      }
   }
 
   // Edit form submit
@@ -1072,33 +1219,6 @@ function bindUI() {
     });
   });
 
-  // Edit modal file inputs (una vez)
-  bindOnce("#editBeforePhoto", "change", () => {
-    if (!editingTreatment) return;
-
-    const input = document.getElementById("editBeforePhoto");
-    const preview = document.getElementById("editBeforePreview");
-    const wrap = document.getElementById("editBeforePreviewWrap");
-
-    loadImageFile(input, "editBeforePreview", (img) => {
-      setEditPhotoPreview(preview, wrap, img);
-      editingTreatment.beforePhoto = img;
-    });
-  });
-
-  bindOnce("#editAfterPhoto", "change", () => {
-    if (!editingTreatment) return;
-
-    const input = document.getElementById("editAfterPhoto");
-    const preview = document.getElementById("editAfterPreview");
-    const wrap = document.getElementById("editAfterPreviewWrap");
-
-    loadImageFile(input, "editAfterPreview", (img) => {
-      setEditPhotoPreview(preview, wrap, img);
-      editingTreatment.afterPhoto = img;
-    });
-  });
-
   // Click en fotos del modal ver -> ampliar
   bindOnce("#viewBeforePhoto", "click", () => {
     const src = document.getElementById("viewBeforePhoto")?.src;
@@ -1107,16 +1227,6 @@ function bindUI() {
   bindOnce("#viewAfterPhoto", "click", () => {
     const src = document.getElementById("viewAfterPhoto")?.src;
     if (src) openImagePreview(src);
-  });
-
-    bindOnce("#editBeforePreview", "click", () => {
-    const src = document.getElementById("editBeforePreview")?.src;
-    if (isValidPhotoSrc(src)) openImagePreview(src);
-  });
-
-  bindOnce("#editAfterPreview", "click", () => {
-    const src = document.getElementById("editAfterPreview")?.src;
-    if (isValidPhotoSrc(src)) openImagePreview(src);
   });
 
   // Cerrar modal ampliada clickeando fondo
@@ -1998,16 +2108,7 @@ async function onCreateTreatment(e) {
       document.getElementById("paymentMethod")?.value || ""
     );
 
-    const beforeFile = document.getElementById("beforePhoto")?.files?.[0];
-    const afterFile = document.getElementById("afterPhoto")?.files?.[0];
-
-    if (beforeFile) {
-      formData.append("beforePhoto", beforeFile);
-    }
-
-    if (afterFile) {
-      formData.append("afterPhoto", afterFile);
-    }
+    appendGalleryPhotosToFormData(formData, createTreatmentGallery);
 
     const res = await authFetch(`${API_URL}/appointments`, {
       method: "POST",
@@ -2089,6 +2190,9 @@ function resetTreatmentForm() {
   const to = document.getElementById("treatmentOptions");
   if (po) po.style.display = "none";
   if (to) to.style.display = "none";
+
+  createTreatmentGallery = [];
+  renderCreateTreatmentGallery();
 }
 
 /* ======================
@@ -2303,22 +2407,12 @@ function openEditModal(treatment) {
   modal.style.display = "flex";
 
   const editTreatmentInput = document.getElementById("editTreatmentInput");
-  const editTreatmentDate = document.getElementById("editTreatmentDate");
   const editTreatmentTime = document.getElementById("editTreatmentTime");
   const editTreatmentAmount = document.getElementById("editTreatmentAmount");
   const editTreatmentStatus = document.getElementById("editTreatmentStatus");
   const editTreatmentMethod = document.getElementById("editTreatmentMethod");
   const editTreatmentNotes = document.getElementById("editTreatmentNotes");
-
-  const beforeImg = document.getElementById("editBeforePreview");
-  const afterImg = document.getElementById("editAfterPreview");
-  const beforeWrap = document.getElementById("editBeforePreviewWrap");
-  const afterWrap = document.getElementById("editAfterPreviewWrap");
-  const beforeFile = document.getElementById("editBeforePhoto");
-  const afterFile = document.getElementById("editAfterPhoto");
-
-  setEditPhotoLoading(beforeImg, beforeWrap);
-  setEditPhotoLoading(afterImg, afterWrap);
+  const editGalleryInput = document.getElementById("editTreatmentGalleryInput");
 
   if (editTreatmentInput) editTreatmentInput.value = treatment.treatment || "";
 
@@ -2332,44 +2426,32 @@ function openEditModal(treatment) {
   if (editTreatmentMethod) editTreatmentMethod.value = treatment.method || "";
   if (editTreatmentNotes) editTreatmentNotes.value = treatment.notes || "";
 
-  if (beforeFile) beforeFile.value = "";
-  if (afterFile) afterFile.value = "";
+  if (editGalleryInput) editGalleryInput.value = "";
+
+  editTreatmentGallery = [];
+  renderEditTreatmentGalleryLoading();
 
   (async () => {
     try {
       const currentId = treatment.id;
       const resp = await authFetch(`${API_URL}/appointments/${currentId}/photos`);
+
       if (!resp.ok) {
-        setEditPhotoEmpty(beforeImg, beforeWrap);
-        setEditPhotoEmpty(afterImg, afterWrap);
+        editTreatmentGallery = [];
+        renderEditTreatmentGallery();
         return;
       }
 
-      const photos = await resp.json();
+      const photosPayload = await resp.json();
 
       if (!editingTreatment || String(editingTreatment.id) !== String(currentId)) return;
 
-      if (photos.beforePhoto) {
-        setEditPhotoPreview(beforeImg, beforeWrap, photos.beforePhoto);
-        editingTreatment.beforePhoto = photos.beforePhoto;
-      } else {
-        setEditPhotoEmpty(beforeImg, beforeWrap);
-        editingTreatment.beforePhoto = null;
-      }
-
-      if (photos.afterPhoto) {
-        setEditPhotoPreview(afterImg, afterWrap, photos.afterPhoto);
-        editingTreatment.afterPhoto = photos.afterPhoto;
-      } else {
-        setEditPhotoEmpty(afterImg, afterWrap);
-        editingTreatment.afterPhoto = null;
-      }
+      editTreatmentGallery = buildGalleryPhotosFromApiResponse(photosPayload);
+      renderEditTreatmentGallery();
     } catch (err) {
       console.error("Error cargando fotos del tratamiento:", err);
-      setEditPhotoEmpty(beforeImg, beforeWrap);
-      setEditPhotoEmpty(afterImg, afterWrap);
-      editingTreatment.beforePhoto = null;
-      editingTreatment.afterPhoto = null;
+      editTreatmentGallery = [];
+      renderEditTreatmentGallery();
     }
   })();
 }
@@ -2383,22 +2465,15 @@ function closeEditModal() {
 
   const form = document.getElementById("editTreatmentForm");
   if (form) form.reset();
+
   setDateInputISO("editTreatmentDate", "");
 
-  const beforeImg = document.getElementById("editBeforePreview");
-  const afterImg = document.getElementById("editAfterPreview");
-  const beforeWrap = document.getElementById("editBeforePreviewWrap");
-  const afterWrap = document.getElementById("editAfterPreviewWrap");
-  const beforeFile = document.getElementById("editBeforePhoto");
-  const afterFile = document.getElementById("editAfterPhoto");
-
-  setEditPhotoEmpty(beforeImg, beforeWrap);
-  setEditPhotoEmpty(afterImg, afterWrap);
-
-  if (beforeFile) beforeFile.value = "";
-  if (afterFile) afterFile.value = "";
+  const editGalleryInput = document.getElementById("editTreatmentGalleryInput");
+  if (editGalleryInput) editGalleryInput.value = "";
 
   editingTreatment = null;
+  editTreatmentGallery = [];
+  renderEditTreatmentGallery();
 }
 
 async function onSaveEditTreatment(e) {
@@ -2492,16 +2567,7 @@ async function onSaveEditTreatment(e) {
       document.getElementById("editTreatmentNotes")?.value || ""
     );
 
-    const beforeFile = document.getElementById("editBeforePhoto")?.files?.[0];
-    const afterFile = document.getElementById("editAfterPhoto")?.files?.[0];
-
-    if (beforeFile) {
-      formData.append("beforePhoto", beforeFile);
-    }
-
-    if (afterFile) {
-      formData.append("afterPhoto", afterFile);
-    }
+    appendGalleryPhotosToFormData(formData, editTreatmentGallery);
 
     const res = await authFetch(`${API_URL}/appointments/${editingTreatment.id}`, {
       method: "PUT",
@@ -2757,29 +2823,17 @@ async function openViewModal(treatment) {
   const modal = document.getElementById("viewTreatmentModal");
   if (!modal) return;
 
-  treatmentViewCache = treatment;
+  treatmentViewCache = { ...treatment, photos: [] };
 
-  // mostrar modal inmediatamente
   modal.classList.add("active");
   modal.style.display = "flex";
 
-  // limpiar fotos mientras carga
-  setPhotoSlot(
-    document.getElementById("viewBeforePhoto"),
-    document.getElementById("viewBeforeEmpty"),
-    null
-  );
-  setPhotoSlot(
-    document.getElementById("viewAfterPhoto"),
-    document.getElementById("viewAfterEmpty"),
-    null
-  );
-
-  // mostrar loading visual simple en notas
   const notesEl = document.getElementById("viewNotes");
   if (notesEl) {
     notesEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Cargando...`;
   }
+
+  renderViewTreatmentGalleryLoading();
 
   try {
     const pid = treatment.patientId ?? treatment.patient?.id;
@@ -2803,30 +2857,17 @@ async function openViewModal(treatment) {
     document.getElementById("viewMethod").textContent = treatment.method || "—";
     document.getElementById("viewNotes").textContent = treatment.notes || "—";
 
-    // 🔥 ahora sí cargar fotos (como antes)
     const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
     if (resp.ok) {
-      const photos = await resp.json();
+      const photosPayload = await resp.json();
 
-      setPhotoSlot(
-        document.getElementById("viewBeforePhoto"),
-        document.getElementById("viewBeforeEmpty"),
-        photos.beforePhoto
-      );
-
-      setPhotoSlot(
-        document.getElementById("viewAfterPhoto"),
-        document.getElementById("viewAfterEmpty"),
-        photos.afterPhoto
-      );
+      renderViewTreatmentGallery(photosPayload);
 
       treatmentViewCache = {
         ...treatment,
-        beforePhoto: photos.beforePhoto,
-        afterPhoto: photos.afterPhoto,
+        ...photosPayload,
       };
     }
-
   } catch (err) {
     console.error(err);
   }
@@ -2839,14 +2880,7 @@ function closeViewModal() {
   modal.classList.remove("active");
   modal.style.display = "none";
 
-  const beforeImg = document.getElementById("viewBeforePhoto");
-  const afterImg = document.getElementById("viewAfterPhoto");
-  const beforeEmpty = document.getElementById("viewBeforeEmpty");
-  const afterEmpty = document.getElementById("viewAfterEmpty");
-
-  // ✅ al cerrar, deja placeholders listos para el próximo modal
-  setPhotoSlot(beforeImg, beforeEmpty, null);
-  setPhotoSlot(afterImg, afterEmpty, null);
+  renderViewTreatmentGallery({ photos: [] });
 
   treatmentViewCache = null;
 }
@@ -3056,6 +3090,9 @@ function cancelTreatmentForm() {
   const afterName = document.getElementById("afterFileName");
   if (beforeName) beforeName.textContent = "Ningún archivo seleccionado";
   if (afterName) afterName.textContent = "Ningún archivo seleccionado";
+
+  createTreatmentGallery = [];
+  renderCreateTreatmentGallery();
 }
 
 function showExistingPatientForm() {
@@ -3104,6 +3141,262 @@ function loadImageFile(input, previewId, callback = null) {
 function appendFormValue(formData, key, value) {
   if (value === undefined || value === null) return;
   formData.append(key, String(value));
+}
+
+function getGalleryLabelOptions(selectedLabel = "Sin etiqueta") {
+  return TREATMENT_PHOTO_LABELS.map((label) => {
+    const selected = label === selectedLabel ? "selected" : "";
+    return `<option value="${label}" ${selected}>${label}</option>`;
+  }).join("");
+}
+
+function updateCreateGalleryCounter() {
+  const counter = document.getElementById("treatmentGalleryCounter");
+  if (!counter) return;
+  counter.textContent = `${createTreatmentGallery.length}/${MAX_TREATMENT_PHOTOS} fotos`;
+}
+
+function renderCreateTreatmentGallery() {
+  const list = document.getElementById("treatmentGalleryList");
+  const empty = document.getElementById("treatmentGalleryEmpty");
+
+  if (!list) return;
+
+  if (!Array.isArray(createTreatmentGallery) || createTreatmentGallery.length === 0) {
+    list.innerHTML = `<div class="gallery-empty" id="treatmentGalleryEmpty">Todavía no agregaste fotos.</div>`;
+    updateCreateGalleryCounter();
+    return;
+  }
+
+  list.innerHTML = createTreatmentGallery
+    .map(
+      (photo, index) => `
+        <div class="gallery-card" data-gallery-index="${index}">
+          <button
+            type="button"
+            class="gallery-remove-btn"
+            data-gallery-remove="${index}"
+            aria-label="Eliminar foto"
+            title="Eliminar foto"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <div class="gallery-image-wrap">
+            <img
+              src="${photo.url || ""}"
+              alt="Foto ${index + 1}"
+              class="gallery-image"
+              data-gallery-preview="${index}"
+            />
+          </div>
+
+          <div class="gallery-meta">
+            <label class="gallery-meta-label">Etiqueta</label>
+            <select class="gallery-label-select" data-gallery-label="${index}">
+              ${getGalleryLabelOptions(photo.label || "Sin etiqueta")}
+            </select>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  updateCreateGalleryCounter();
+
+  if (empty) empty.remove();
+}
+
+async function addFilesToCreateGallery(fileList) {
+  const nextPhotos = await buildDraftGalleryPhotosFromFiles(
+    fileList,
+    createTreatmentGallery.length
+  );
+
+  createTreatmentGallery = reindexGalleryPhotos([
+    ...createTreatmentGallery,
+    ...nextPhotos,
+  ]);
+
+  renderCreateTreatmentGallery();
+}
+
+function removePhotoFromCreateGallery(index) {
+  createTreatmentGallery = reindexGalleryPhotos(
+    createTreatmentGallery.filter((_, i) => i !== index)
+  );
+  renderCreateTreatmentGallery();
+}
+
+function updateCreateGalleryPhotoLabel(index, label) {
+  createTreatmentGallery = reindexGalleryPhotos(
+    createTreatmentGallery.map((photo, i) =>
+      i === index ? { ...photo, label } : photo
+    )
+  );
+  renderCreateTreatmentGallery();
+}
+
+function updateEditGalleryCounter() {
+  const counter = document.getElementById("editTreatmentGalleryCounter");
+  if (!counter) return;
+  counter.textContent = `${editTreatmentGallery.length}/${MAX_TREATMENT_PHOTOS} fotos`;
+}
+
+function renderEditTreatmentGalleryLoading() {
+  const list = document.getElementById("editTreatmentGalleryList");
+  const counter = document.getElementById("editTreatmentGalleryCounter");
+
+  if (!list) return;
+
+  list.innerHTML = `
+    <div class="gallery-loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>Cargando fotos...</span>
+    </div>
+  `;
+
+  if (counter) {
+    counter.textContent = "Cargando...";
+  }
+}
+
+function renderEditTreatmentGallery() {
+  const list = document.getElementById("editTreatmentGalleryList");
+  if (!list) return;
+
+  if (!Array.isArray(editTreatmentGallery) || editTreatmentGallery.length === 0) {
+    list.innerHTML = `<div class="gallery-empty" id="editTreatmentGalleryEmpty">Todavía no hay fotos cargadas.</div>`;
+    updateEditGalleryCounter();
+    return;
+  }
+
+  list.innerHTML = editTreatmentGallery
+    .map(
+      (photo, index) => `
+        <div class="gallery-card" data-edit-gallery-index="${index}">
+          <button
+            type="button"
+            class="gallery-remove-btn"
+            data-edit-gallery-remove="${index}"
+            aria-label="Eliminar foto"
+            title="Eliminar foto"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <div class="gallery-image-wrap">
+            <img
+              src="${photo.url || ""}"
+              alt="Foto ${index + 1}"
+              class="gallery-image"
+              data-edit-gallery-preview="${index}"
+            />
+          </div>
+
+          <div class="gallery-meta">
+            <label class="gallery-meta-label">Etiqueta</label>
+            <select class="gallery-label-select" data-edit-gallery-label="${index}">
+              ${getGalleryLabelOptions(photo.label || "Sin etiqueta")}
+            </select>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  updateEditGalleryCounter();
+}
+
+function updateViewGalleryCounter(count = 0) {
+  const counter = document.getElementById("viewTreatmentGalleryCounter");
+  if (!counter) return;
+  counter.textContent = `${count}/${MAX_TREATMENT_PHOTOS} fotos`;
+}
+
+function renderViewTreatmentGalleryLoading() {
+  const list = document.getElementById("viewTreatmentGalleryList");
+  const counter = document.getElementById("viewTreatmentGalleryCounter");
+
+  if (!list) return;
+
+  list.innerHTML = `
+    <div class="gallery-loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>Cargando fotos...</span>
+    </div>
+  `;
+
+  if (counter) {
+    counter.textContent = "Cargando...";
+  }
+}
+
+function renderViewTreatmentGallery(photosPayload = {}) {
+  const list = document.getElementById("viewTreatmentGalleryList");
+  if (!list) return;
+
+  const galleryPhotos = buildGalleryPhotosFromApiResponse(photosPayload);
+
+  if (!galleryPhotos.length) {
+    list.innerHTML = `<div class="gallery-empty" id="viewTreatmentGalleryEmpty">Sin fotos cargadas.</div>`;
+    updateViewGalleryCounter(0);
+    return;
+  }
+
+  list.innerHTML = galleryPhotos
+    .map(
+      (photo, index) => `
+        <div class="gallery-card">
+          <div class="gallery-image-wrap">
+            <img
+              src="${photo.url || ""}"
+              alt="Foto ${index + 1}"
+              class="gallery-image"
+              data-view-gallery-preview="${index}"
+            />
+          </div>
+
+          <div class="gallery-meta">
+            <label class="gallery-meta-label">Etiqueta</label>
+            <div class="gallery-label-readonly">${photo.label || "Sin etiqueta"}</div>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  updateViewGalleryCounter(galleryPhotos.length);
+}
+
+async function addFilesToEditGallery(fileList) {
+  const nextPhotos = await buildDraftGalleryPhotosFromFiles(
+    fileList,
+    editTreatmentGallery.length
+  );
+
+  editTreatmentGallery = reindexGalleryPhotos([
+    ...editTreatmentGallery,
+    ...nextPhotos,
+  ]);
+
+  renderEditTreatmentGallery();
+}
+
+function removePhotoFromEditGallery(index) {
+  editTreatmentGallery = reindexGalleryPhotos(
+    editTreatmentGallery.filter((_, i) => i !== index)
+  );
+  renderEditTreatmentGallery();
+}
+
+function updateEditGalleryPhotoLabel(index, label) {
+  editTreatmentGallery = reindexGalleryPhotos(
+    editTreatmentGallery.map((photo, i) =>
+      i === index ? { ...photo, label } : photo
+    )
+  );
+  renderEditTreatmentGallery();
 }
 
 /* ======================
