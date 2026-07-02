@@ -18,8 +18,8 @@
 // Si authFetch no agrega Content-Type, el backend ya lo tolera hoy;
 // no se cambia acá para no alterar comportamiento.
 
-import { API_URL } from "../core/config.js";
-import { authFetch } from "../core/authFetch.js";
+import { API_URL } from "../../core/config.js";
+import { authFetch } from "../../core/authFetch.js";
 
 // --- Sesión ---
 

@@ -1,6 +1,6 @@
 // /public/js/views/treatments.js
 import * as api from "./treatments.api.js";
-import { initDrawer } from "../components/drawer.js";
+import { initDrawer } from "../../components/drawer.js";
 import {
   MAX_TREATMENT_PHOTOS,
   buildDraftGalleryPhotosFromFiles,

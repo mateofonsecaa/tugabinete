@@ -16,7 +16,7 @@ import { InterviewEdit1, initInterviewEdit1 } from "./views/interview-edit-1.js"
 import { InterviewEdit2, initInterviewEdit2 } from "./views/interview-edit-2.js";
 import { Profile, initProfile } from "./views/profile.js";
 import { ProfileEdit, initProfileEdit } from "./views/profile-edit.js";
-import { Treatments, initTreatments } from "./views/treatments.js";
+import { Treatments, initTreatments } from "./features/treatments/treatments.view.js";
 import { Policies, initPolicies } from "./views/policies.js";
 import { Terms, initTerms } from "./views/terms.js";
 import { Help, initHelp } from "./views/help.js";
