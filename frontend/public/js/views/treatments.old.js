@@ -1,5 +1,6 @@
 // /public/js/views/treatments.js
-import * as api from "./treatments.api.js";
+import { API_URL } from "../core/config.js";
+import { authFetch } from "../core/authFetch.js";
 import { initDrawer } from "../components/drawer.js";
 import {
   MAX_TREATMENT_PHOTOS,
@@ -10,19 +11,96 @@ import {
   reindexGalleryPhotos,
   canAddMorePhotos,
 } from "./treatments.gallery.js";
-import {
-  TREATMENTS_LIST,
-  normalizeText,
-  allowedTreatments,
-} from "./treatments.config.js";
 
 /* ======================
    Template helpers
 ====================== */
 
+const TREATMENTS_LIST = [
+  // Faciales
+  "Diagnóstico facial",
+  "Limpieza facial express",
+  "Limpieza facial profunda",
+  "Higiene facial profesional",
+  "Limpieza de espalda",
+  "Hidratación facial",
+  "Nutrición facial",
+  "Tratamiento calmante/descongestivo",
+  "Tratamiento para piel sensible",
+  "Tratamiento antiacné",
+  "Tratamiento despigmentante",
+  "Tratamiento antiage",
+
+  // Renovación / exfoliación
+  "Peeling químico",
+  "Peeling enzimático",
+  "Peeling mecánico",
+  "Microdermoabrasión",
+  "Microdermoabrasión con punta de diamante",
+  "Dermaplaning",
+  "Espátula ultrasónica",
+
+  // Aparatología facial
+  "Alta frecuencia",
+  "Electroporación",
+  "Corrientes galvánicas",
+  "Ultrasonido facial",
+  "Radiofrecuencia facial",
+  "Fotobiomodulación LED",
+  "HydraFacial / Hidrodermoabrasión",
+  "Microneedling / Dermapen",
+  "BB Glow",
+  "HIFU facial",
+  "IPL acné",
+  "IPL manchas",
+  "Fotorejuvenecimiento IPL",
+
+  // Corporales manuales
+  "Masaje relajante",
+  "Masaje descontracturante",
+  "Drenaje linfático manual",
+  "Masaje modelador/reductor",
+  "Exfoliación corporal",
+  "Hidratación corporal",
+
+  // Corporales con aparatología
+  "Radiofrecuencia corporal",
+  "Cavitación",
+  "Ultracavitación",
+  "Presoterapia",
+  "Vacumterapia",
+  "Electroestimulación / gimnasia pasiva",
+  "Ondas de choque",
+  "Criolipólisis",
+  "HIFU corporal",
+  "Lipoláser",
+  "Mesoterapia corporal",
+
+  // Capilares
+  "Tratamiento capilar nutritivo",
+  "Hidratación capilar",
+  "Shock de keratina",
+  "Botox capilar",
+  "Reparación capilar",
+  "Mesoterapia capilar",
+
+  // Depilación
+  "Depilación con cera",
+  "Depilación con cera roll-on",
+  "Depilación definitiva láser",
+  "Depilación IPL"
+];
 
 const TREATMENTS_OPTIONS_HTML = TREATMENTS_LIST.map((t) => `<div>${t}</div>`).join("");
 
+function normalizeText(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+const allowedTreatments = TREATMENTS_LIST.map((t) => normalizeText(t));
 
 /* ======================
    SPA View
@@ -1460,8 +1538,9 @@ function initManualDateFields() {
 
 async function loadCurrentUser() {
   try {
-    const user = await api.fetchCurrentUser();
-    if (user) currentUser = user;
+    const res = await authFetch(`${API_URL}/auth/me`);
+    const user = await res.json();
+    if (res.ok) currentUser = user;
 
     const du = document.getElementById("drawer-username");
     if (du) du.textContent = currentUser?.name || "Profesional";
@@ -1473,7 +1552,11 @@ async function loadCurrentUser() {
 async function loadPatients() {
   let data = []; 
   try {
-    data = await api.fetchPatients();
+    const res = await authFetch(`${API_URL}/patients`);
+    if (!res.ok) throw new Error("Error al obtener pacientes");
+
+    const result = await res.json();
+    data = Array.isArray(result) ? result : (result.patients || []);
 
     patientsCache = data;
 
@@ -1561,7 +1644,11 @@ if (saleList) {
 
 async function loadTreatments() {
   try {
-    allTreatments = await api.fetchTreatments({ offset: 0, limit: 50 });
+    const res = await authFetch(`${API_URL}/appointments?offset=0&limit=50`);
+    if (!res.ok) throw new Error("Error al obtener tratamientos");
+
+    const data = await res.json();
+    allTreatments = Array.isArray(data) ? data : (data.appointments || data.items || []);
   } catch (err) {
     console.error("❌ Error al cargar tratamientos:", err);
     allTreatments = [];
@@ -1576,7 +1663,11 @@ async function loadTreatments() {
 
 async function loadSales() {
   try {
-    allSales = await api.fetchSales({ offset: 0, limit: 50 });
+    const res = await authFetch(`${API_URL}/sales?offset=0&limit=50`);
+    if (!res.ok) throw new Error("Error al obtener ventas");
+
+    const data = await res.json();
+    allSales = Array.isArray(data) ? data : (data.sales || data.items || []);
     console.log("✅ SALES:", allSales.length, allSales[0]); // <-- ESTE
   } catch (err) {
     console.error("❌ Error al cargar ventas:", err);
@@ -2019,7 +2110,13 @@ async function onCreateTreatment(e) {
 
     appendGalleryPhotosToFormData(formData, createTreatmentGallery);
 
-    const saved = await api.createTreatment(formData);
+    const res = await authFetch(`${API_URL}/appointments`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const saved = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(saved?.error || "Error al registrar");
 
     allTreatments.unshift(saved);
     applyFilters();
@@ -2175,7 +2272,13 @@ async function onCreateSale(e) {
       if (newSale[k] === undefined) delete newSale[k];
     });
 
-    const saved = await api.createSale(newSale);
+    const res = await authFetch(`${API_URL}/sales`, {
+      method: "POST",
+      body: JSON.stringify(newSale),
+    });
+
+    const saved = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(saved?.error || "Error al registrar venta");
 
     allSales.unshift(saved);
     applyFilters();
@@ -2233,7 +2336,11 @@ async function deleteTreatment(id) {
   if (!confirm.isConfirmed) return;
 
   try {
-    await api.deleteTreatment(id);
+    const res = await authFetch(`${API_URL}/appointments/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(t || "No se pudo eliminar");
+    }
 
     allTreatments = allTreatments.filter((t) => String(t.id) !== String(id));
     applyFilters();
@@ -2265,7 +2372,11 @@ async function deleteSale(id) {
   if (!confirm.isConfirmed) return;
 
   try {
-    await api.deleteSale(id);
+    const res = await authFetch(`${API_URL}/sales/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(t || "No se pudo eliminar");
+    }
 
     allSales = allSales.filter((s) => String(s.id) !== String(id));
     applyFilters();
@@ -2323,13 +2434,15 @@ function openEditModal(treatment) {
   (async () => {
     try {
       const currentId = treatment.id;
-      const photosPayload = await api.fetchTreatmentPhotos(currentId);
+      const resp = await authFetch(`${API_URL}/appointments/${currentId}/photos`);
 
-      if (!photosPayload) {
+      if (!resp.ok) {
         editTreatmentGallery = [];
         renderEditTreatmentGallery();
         return;
       }
+
+      const photosPayload = await resp.json();
 
       if (!editingTreatment || String(editingTreatment.id) !== String(currentId)) return;
 
@@ -2456,7 +2569,13 @@ async function onSaveEditTreatment(e) {
 
     appendGalleryPhotosToFormData(formData, editTreatmentGallery);
 
-    const saved = await api.updateTreatment(editingTreatment.id, formData);
+    const res = await authFetch(`${API_URL}/appointments/${editingTreatment.id}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    const saved = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(saved?.error || "No se pudo actualizar");
 
     const i = allTreatments.findIndex(
       (t) => String(t.id) === String(editingTreatment.id)
@@ -2583,7 +2702,13 @@ async function onSaveEditSale(e) {
 
     Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
 
-    const saved = await api.updateSale(editingSale.id, payload);
+    const res = await authFetch(`${API_URL}/sales/${editingSale.id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+
+    const saved = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(saved?.error || "No se pudo actualizar la venta");
 
     const merged = { ...editingSale, ...(saved || {}) };
     if (!merged.patient && editingSale.patient) merged.patient = editingSale.patient;
@@ -2732,8 +2857,10 @@ async function openViewModal(treatment) {
     document.getElementById("viewMethod").textContent = treatment.method || "—";
     document.getElementById("viewNotes").textContent = treatment.notes || "—";
 
-    const photosPayload = await api.fetchTreatmentPhotos(treatment.id);
-    if (photosPayload) {
+    const resp = await authFetch(`${API_URL}/appointments/${treatment.id}/photos`);
+    if (resp.ok) {
+      const photosPayload = await resp.json();
+
       renderViewTreatmentGallery(photosPayload);
 
       treatmentViewCache = {
@@ -2879,7 +3006,13 @@ async function confirmNewPatient() {
     });
 
   try {
-    const patient = await api.createPatient(newPatient);
+    const res = await authFetch(`${API_URL}/patients`, {
+      method: "POST",
+      body: JSON.stringify(newPatient),
+    });
+
+    const patient = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(patient?.error || "Error al registrar el paciente");
 
     await Swal.fire({
       icon: "success",
