@@ -1,6 +1,6 @@
 // /public/js/views/patient-edit.js
-import { initDrawer } from "../components/drawer.js";
-import { initPatientEditPage } from "../patients/patientEdit.page.js";
+import { initDrawer } from "../../components/drawer.js";
+import { initPatientEditPage } from "./patient-edit.page.js";
 
 function getTodayYYYYMMDD() {
   const d = new Date();

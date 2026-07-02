@@ -1,5 +1,5 @@
-import { initDrawer } from "../components/drawer.js";
-import { initPatientsPage } from "../patients/patients.page.js";
+import { initDrawer } from "../../components/drawer.js";
+import { initPatientsPage } from "./patients-list.page.js";
 
 export function Patients() {
     return `

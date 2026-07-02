@@ -1,5 +1,5 @@
 import * as interviewApi from "./interview.api.js";
-import * as patientsApi from "../patients/patients.api.js"; // para traer nombre del paciente (opcional)
+import * as patientsApi from "../features/patients/patients.api.js"; // para traer nombre del paciente (opcional)
 
 function go(path) {
   history.pushState(null, "", path);

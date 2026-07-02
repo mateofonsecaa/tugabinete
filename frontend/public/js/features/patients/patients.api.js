@@ -1,4 +1,4 @@
-import { authFetch } from "../core/authFetch.js";
+import { authFetch } from "../../core/authFetch.js";
 
 export const getPatients = () => authFetch("/patients");
 

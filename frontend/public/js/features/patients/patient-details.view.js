@@ -1,6 +1,6 @@
 // /public/js/views/patient-details.js
-import { initDrawer } from "../components/drawer.js";
-import { initPatientDetailsPage } from "../patients/patientDetails.page.js";
+import { initDrawer } from "../../components/drawer.js";
+import { initPatientDetailsPage } from "./patient-details.page.js";
 
 export function PatientDetails() {
   return `
