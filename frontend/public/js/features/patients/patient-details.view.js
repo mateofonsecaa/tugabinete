@@ -1,253 +1,469 @@
-// /public/js/views/patient-details.js
+// /public/js/features/patients/patient-details.view.js
+//
+// Pantalla de detalles de paciente completa: ficha, rutina domiciliaria
+// (con estado draft y modal) y ultimos turnos. Fusion del Paso 6.
+// El HTML vive en patients.templates.js; aca vive el comportamiento.
+
 import { initDrawer } from "../../components/drawer.js";
-import { initPatientDetailsPage } from "./patient-details.page.js";
+import * as api from "./patients.api.js";
+import {
+  patientDetailsPageTemplate,
+  patientInfoRowTemplate,
+  homecareItemRowTemplate,
+  homecareItemsEmptyRowTemplate,
+  homecareDraftItemTemplate,
+  homecareDraftEmptyTemplate,
+  patientAppointmentRowTemplate,
+  patientAppointmentsEmptyRowTemplate,
+  fmtDate,
+  textOrDash,
+} from "./patients.templates.js";
 
-export function PatientDetails() {
-  return `
-    <div class="patient-details-page">
-      <div class="top-bar">
-        <button id="open-menu" class="menu-btn">
-          <i class="fa-solid fa-bars"></i>
-        </button>
+const MAX_HOMECARE_ITEMS = 10;
 
-        <span class="app-title">TuGabinete</span>
-      </div>
+let currentPatientId = null;
+let currentHomeCarePlan = null;
+let homeCareDraftItems = [];
+let isSavingHomeCare = false;
 
-      <aside id="drawer" class="drawer">
-        <div class="drawer-header">
-          <span id="drawer-username">Profesional</span>
-          <button id="close-menu" class="close-btn">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <nav class="drawer-nav">
-          <a href="/dashboard" data-link><i class="fa-solid fa-house"></i> Dashboard</a>
-          <a href="/agenda" data-link><i class="fa-solid fa-calendar-days"></i> Agenda</a>
-          <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
-          <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
-          <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
-          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guia y tutoriales</a>
-          <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-      </aside>
-
-      <div id="drawer-overlay" class="drawer-overlay"></div>
-
-      <main>
-        <!-- LOADER: se ve al inicio -->
-        <div id="pd-loading" class="pd-loading">
-          <div class="pd-loading-card">
-            <div class="pd-spinner"></div>
-            <div class="pd-loading-text">Cargando...</div>
-          </div>
-        </div>
-
-        <!-- CONTENIDO REAL: arranca oculto -->
-        <div id="pd-content" class="pd-content" hidden>
-          <div class="main-top-actions">
-            <button id="back-btn" class="btn-back">
-              <i class="fa-solid fa-arrow-left"></i> Volver
-            </button>
-
-            <div class="right-actions">
-              <button id="view-interview-btn" class="btn-add">
-                <i class="fa-solid fa-clipboard-list"></i> Ver entrevista
-              </button>
-
-            </div>
-          </div>
-
-          <h1 id="patient-name">Cargando...</h1>
-
-                    <div class="table-container" style="margin-top:12px;">
-            <table>
-              <tbody id="patient-info"></tbody>
-            </table>
-          </div>
-
-          <!-- RUTINA EN CASA -->
-          <section class="homecare-section" style="margin-top:18px;">
-            <div class="section-header homecare-header">
-              <h2 style="margin:0;">Rutina en casa</h2>
-
-              <div class="homecare-actions">
-                <button id="homecare-add-btn" class="btn-add" type="button">
-                  <i class="fa-solid fa-plus"></i> Crear rutina
-                </button>
-
-                <button id="homecare-edit-btn" class="btn-add" type="button" hidden>
-                  <i class="fa-solid fa-pen"></i> Editar rutina
-                </button>
-              </div>
-            </div>
-
-            <!-- Estado vacío -->
-            <div id="homecare-empty" class="table-container" style="margin-top:12px;">
-              <div style="padding:16px;">
-                <p style="margin:0 0 8px 0;"><strong>Sin rutina cargada</strong></p>
-                <p style="margin:0; color:#666;">
-                  Este paciente no tiene una rutina domiciliaria registrada.
-                </p>
-              </div>
-            </div>
-
-            <!-- Resumen de rutina -->
-            <div id="homecare-content" hidden>
-              <div class="table-container" style="margin-top:12px;">
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Nombre</th>
-                      <td id="homecare-title">-</td>
-                    </tr>
-                    <tr>
-                      <th>Objetivo</th>
-                      <td id="homecare-objective">-</td>
-                    </tr>
-                    <tr>
-                      <th>Fecha de inicio</th>
-                      <td id="homecare-start-date">-</td>
-                    </tr>
-                    <tr>
-                      <th>Fecha de fin</th>
-                      <td id="homecare-end-date">-</td>
-                    </tr>
-                    <tr>
-                      <th>Estado</th>
-                      <td id="homecare-status">-</td>
-                    </tr>
-                    <tr>
-                      <th>Observaciones</th>
-                      <td id="homecare-notes">-</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="table-container table-scroll" style="margin-top:12px;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Paso</th>
-                      <th>Momento</th>
-                      <th>Acción</th>
-                      <th>Producto</th>
-                      <th>Frecuencia</th>
-                    </tr>
-                  </thead>
-                  <tbody id="homecare-items"></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-          <h2 style="margin-top:18px;">Últimos turnos</h2>
-          <div class="table-container table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Tratamiento</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody id="patient-appointments"></tbody>
-            </table>
-          </div>
-        </div>
-      </main>
-
-      <!-- MODAL RUTINA EN CASA -->
-      <div id="homecare-modal" class="modal-overlay">
-        <div class="modal-box modal-edit-pro">
-          <button class="close-btn" id="close-homecare-modal-btn">&times;</button>
-
-          <h2>
-            <i class="fa-solid fa-house-medical"></i>
-            Rutina en casa
-          </h2>
-
-          <form id="homecare-form" class="homecare-form-stack">
-            <section class="edit-column homecare-main-card">
-              <h3 class="homecare-card-title">
-                <i class="fa-solid fa-clipboard-list"></i>
-                Información de la rutina
-              </h3>
-
-              <label for="homecare-form-title">Nombre de la rutina</label>
-              <input
-                type="text"
-                id="homecare-form-title"
-                maxlength="80"
-                placeholder="Ej: Rutina antiacné"
-                required
-              />
-
-              <label for="homecare-form-objective">Objetivo</label>
-              <input
-                type="text"
-                id="homecare-form-objective"
-                maxlength="120"
-                placeholder="Ej: Control de sebo"
-              />
-
-              <label for="homecare-form-start-date">Fecha de inicio</label>
-              <input type="date" id="homecare-form-start-date" min="2000-01-01" max="2100-12-31" />
-
-              <label for="homecare-form-end-date">Fecha de fin</label>
-              <input type="date" id="homecare-form-end-date" min="2000-01-01" max="2100-12-31" />
-
-              <label for="homecare-form-status">Estado</label>
-              <select id="homecare-form-status" required>
-                <option value="Activa">Activa</option>
-                <option value="Pausada">Pausada</option>
-                <option value="Finalizada">Finalizada</option>
-              </select>
-
-              <label for="homecare-form-notes">Observaciones generales</label>
-              <textarea
-                id="homecare-form-notes"
-                maxlength="400"
-                placeholder="Indicaciones generales de la rutina..."
-              ></textarea>
-            </section>
-
-            <section class="edit-column homecare-steps-card">
-              <div class="homecare-steps-header">
-                <h3 class="homecare-card-title">
-                  <i class="fa-solid fa-list-check"></i>
-                  Pasos de la rutina
-                </h3>
-
-                <button type="button" class="btn-add" id="homecare-add-item-btn">
-                  <i class="fa-solid fa-plus"></i> Agregar paso
-                </button>
-              </div>
-
-              <div id="homecare-form-items" class="homecare-form-items"></div>
-            </section>
-          </form>
-
-          <div class="modal-actions edit-treatment-actions">
-            <button type="submit" form="homecare-form" class="btn-edit-treatment-save" id="save-homecare-btn">
-              <i class="fa-solid fa-floppy-disk"></i> Guardar rutina
-            </button>
-
-            <button type="button" class="btn-edit-treatment-cancel" id="cancel-homecare-btn">
-              <i class="fa-solid fa-xmark"></i> Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  `;
+function go(path) {
+  history.pushState(null, "", path);
+  window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-export function initPatientDetails() {
-  document.body.className = "is-patient-details"; // importante
+function getPatientIdFromPath() {
+  // "/patients/123"
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  const id = Number(parts[1]);
+  return Number.isFinite(id) ? id : null;
+}
 
+function renderHomeCare(plan) {
+  const emptyBox = document.getElementById("homecare-empty");
+  const contentBox = document.getElementById("homecare-content");
+  const addBtn = document.getElementById("homecare-add-btn");
+  const editBtn = document.getElementById("homecare-edit-btn");
+
+  const titleEl = document.getElementById("homecare-title");
+  const objectiveEl = document.getElementById("homecare-objective");
+  const startDateEl = document.getElementById("homecare-start-date");
+  const endDateEl = document.getElementById("homecare-end-date");
+  const statusEl = document.getElementById("homecare-status");
+  const notesEl = document.getElementById("homecare-notes");
+  const itemsEl = document.getElementById("homecare-items");
+
+  if (!emptyBox || !contentBox || !addBtn || !editBtn || !itemsEl) return;
+
+  if (!plan) {
+    emptyBox.hidden = false;
+    contentBox.hidden = true;
+    addBtn.hidden = false;
+    editBtn.hidden = true;
+    itemsEl.innerHTML = "";
+    return;
+  }
+
+  emptyBox.hidden = true;
+  contentBox.hidden = false;
+  addBtn.hidden = true;
+  editBtn.hidden = false;
+
+  if (titleEl) titleEl.textContent = textOrDash(plan.title);
+  if (objectiveEl) objectiveEl.textContent = textOrDash(plan.objective);
+  if (startDateEl) startDateEl.textContent = fmtDate(plan.startDate);
+  if (endDateEl) endDateEl.textContent = fmtDate(plan.endDate);
+  if (statusEl) statusEl.textContent = textOrDash(plan.status);
+  if (notesEl) notesEl.textContent = textOrDash(plan.generalNotes);
+
+  const items = Array.isArray(plan.items) ? plan.items : [];
+
+  if (!items.length) {
+    itemsEl.innerHTML = homecareItemsEmptyRowTemplate();
+    return;
+  }
+
+  itemsEl.innerHTML = items
+    .sort((a, b) => (a.stepOrder ?? 0) - (b.stepOrder ?? 0))
+    .map(homecareItemRowTemplate)
+    .join("");
+}
+
+function openHomeCareModal() {
+  const modal = document.getElementById("homecare-modal");
+  if (!modal) return;
+
+  modal.classList.add("active");
+  modal.style.display = "flex";
+}
+
+function closeHomeCareModal() {
+  const modal = document.getElementById("homecare-modal");
+  const form = document.getElementById("homecare-form");
+  const itemsWrap = document.getElementById("homecare-form-items");
+
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
+
+  if (form) form.reset();
+  if (itemsWrap) itemsWrap.innerHTML = "";
+
+  homeCareDraftItems = [];
+}
+
+function getEmptyHomeCareItem(stepOrder = 1) {
+  return {
+    stepOrder,
+    moment: "",
+    action: "",
+    product: "",
+    frequency: "",
+    duration: "",
+    notes: "",
+  };
+}
+
+function renderHomeCareDraftItems() {
+  const wrap = document.getElementById("homecare-form-items");
+  if (!wrap) return;
+
+  if (!homeCareDraftItems.length) {
+    wrap.innerHTML = homecareDraftEmptyTemplate();
+    updateHomeCareAddButtonState();
+    return;
+  }
+
+  wrap.innerHTML = homeCareDraftItems
+    .map(homecareDraftItemTemplate)
+    .join("");
+
+  updateHomeCareAddButtonState();
+}
+
+function updateHomeCareAddButtonState() {
+  const btn = document.getElementById("homecare-add-item-btn");
+  if (!btn) return;
+
+  const reachedLimit = homeCareDraftItems.length >= MAX_HOMECARE_ITEMS;
+
+  btn.disabled = reachedLimit;
+  btn.style.opacity = reachedLimit ? "0.6" : "1";
+  btn.style.cursor = reachedLimit ? "not-allowed" : "pointer";
+  btn.innerHTML = reachedLimit
+    ? `<i class="fa-solid fa-ban"></i> Límite alcanzado`
+    : `<i class="fa-solid fa-plus"></i> Agregar paso`;
+}
+
+function fillHomeCareForm(plan) {
+  const formTitle = document.getElementById("homecare-form-title");
+  const formObjective = document.getElementById("homecare-form-objective");
+  const formStartDate = document.getElementById("homecare-form-start-date");
+  const formEndDate = document.getElementById("homecare-form-end-date");
+  const formStatus = document.getElementById("homecare-form-status");
+  const formNotes = document.getElementById("homecare-form-notes");
+
+  if (!plan) {
+    if (formTitle) formTitle.value = "";
+    if (formObjective) formObjective.value = "";
+    if (formStartDate) formStartDate.value = "";
+    if (formEndDate) formEndDate.value = "";
+    if (formStatus) formStatus.value = "Activa";
+    if (formNotes) formNotes.value = "";
+
+    homeCareDraftItems = [];
+    renderHomeCareDraftItems();
+    return;
+  }
+
+  if (formTitle) formTitle.value = plan.title || "";
+  if (formObjective) formObjective.value = plan.objective || "";
+  if (formStartDate) formStartDate.value = plan.startDate ? String(plan.startDate).slice(0, 10) : "";
+  if (formEndDate) formEndDate.value = plan.endDate ? String(plan.endDate).slice(0, 10) : "";
+  if (formStatus) formStatus.value = plan.status || "Activa";
+  if (formNotes) formNotes.value = plan.generalNotes || "";
+
+  homeCareDraftItems = Array.isArray(plan.items) && plan.items.length
+  ? plan.items.map((item, index) => ({
+      stepOrder: item.stepOrder || index + 1,
+      moment: item.moment || "",
+      action: item.action || "",
+      product: item.product || "",
+      frequency: item.frequency || "",
+      duration: item.duration || "",
+      notes: item.notes || "",
+    }))
+  : [];
+
+  renderHomeCareDraftItems();
+}
+
+function normalizeHomeCareItemsForSave() {
+  return homeCareDraftItems
+    .map((item, index) => ({
+      stepOrder: index + 1,
+      moment: String(item.moment || "").trim(),
+      action: String(item.action || "").trim(),
+      product: String(item.product || "").trim(),
+      frequency: String(item.frequency || "").trim(),
+      duration: String(item.duration || "").trim(),
+      notes: String(item.notes || "").trim(),
+    }))
+    .filter((item) => item.action);
+}
+
+function isValidHomeCareDate(value) {
+  if (!value) return true;
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const min = "2000-01-01";
+  const max = "2100-12-31";
+
+  return value >= min && value <= max;
+}
+
+function buildHomeCarePayload() {
+  const title = String(document.getElementById("homecare-form-title")?.value || "").trim();
+  const objective = String(document.getElementById("homecare-form-objective")?.value || "").trim();
+  const startDate = document.getElementById("homecare-form-start-date")?.value || "";
+  const endDate = document.getElementById("homecare-form-end-date")?.value || "";
+
+    if (!isValidHomeCareDate(startDate)) {
+    throw new Error("La fecha de inicio debe estar entre 2000-01-01 y 2100-12-31.");
+  }
+
+  if (!isValidHomeCareDate(endDate)) {
+    throw new Error("La fecha de fin debe estar entre 2000-01-01 y 2100-12-31.");
+  }
+
+  if (startDate && endDate && endDate < startDate) {
+    throw new Error("La fecha de fin no puede ser anterior a la fecha de inicio.");
+  }
+
+  const status = document.getElementById("homecare-form-status")?.value || "Activa";
+  const generalNotes = String(document.getElementById("homecare-form-notes")?.value || "").trim();
+
+  if (!title) {
+    throw new Error("El nombre de la rutina es obligatorio.");
+  }
+
+  const items = normalizeHomeCareItemsForSave();
+
+  return {
+    title,
+    objective,
+    startDate,
+    endDate,
+    status,
+    generalNotes,
+    items,
+  };
+}
+
+async function onSaveHomeCare(e) {
+  e.preventDefault();
+
+  if (isSavingHomeCare) return;
+  if (!currentPatientId) {
+    Swal.fire({ icon: "error", title: "Error", text: "Paciente inválido." });
+    return;
+  }
+
+  const btnSave = document.getElementById("save-homecare-btn");
+
+  try {
+    isSavingHomeCare = true;
+
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+      btnSave.style.opacity = "0.6";
+    }
+
+    const payload = buildHomeCarePayload();
+    const saved = await api.savePatientHomeCare(currentPatientId, payload);
+
+    currentHomeCarePlan = saved;
+
+    closeHomeCareModal();
+    await loadPatient(currentPatientId);
+
+    await Swal.fire({
+      icon: "success",
+      title: "Guardado",
+      text: "La rutina en casa se guardó correctamente.",
+      timer: 1800,
+      showConfirmButton: false,
+    });
+  } catch (err) {
+    console.error("PUT /patients/:id/homecare failed", {
+      patientId: currentPatientId,
+      status: err.status,
+      body: err.body,
+      error: err,
+    });
+
+    await Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: err.message || "No se pudo guardar la rutina.",
+    });
+  } finally {
+    isSavingHomeCare = false;
+
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar rutina`;
+      btnSave.style.opacity = "1";
+    }
+  }
+}
+
+export function PatientDetails() {
+  return patientDetailsPageTemplate();
+}
+
+export async function initPatientDetails() {
+  document.body.className = "is-patient-details"; // importante
   initDrawer();
-  initPatientDetailsPage();
+
+
+  const loading = document.getElementById("pd-loading");
+  const content = document.getElementById("pd-content");
+  if (loading) loading.hidden = false;
+  if (content) content.hidden = true;
+
+  const id = getPatientIdFromPath();
+  if (!id) {
+    Swal.fire({ icon: "error", title: "Error", text: "ID de paciente inválido" });
+    go("/patients");
+    return;
+  }
+
+  document.getElementById("back-btn")?.addEventListener("click", () => go("/patients"));
+
+  document.getElementById("view-interview-btn")?.addEventListener("click", () => {
+    go(`/patients/${id}/interview`);
+  });
+
+    document.getElementById("homecare-add-btn")?.addEventListener("click", () => {
+    fillHomeCareForm(null);
+    openHomeCareModal();
+  });
+
+  document.getElementById("homecare-edit-btn")?.addEventListener("click", () => {
+    fillHomeCareForm(currentHomeCarePlan);
+    openHomeCareModal();
+  });
+
+  document.getElementById("close-homecare-modal-btn")?.addEventListener("click", () => {
+    closeHomeCareModal();
+  });
+
+  document.getElementById("cancel-homecare-btn")?.addEventListener("click", () => {
+    closeHomeCareModal();
+  });
+
+    document.getElementById("homecare-add-item-btn")?.addEventListener("click", () => {
+    if (homeCareDraftItems.length >= MAX_HOMECARE_ITEMS) {
+      Swal.fire({
+        icon: "warning",
+        title: "Límite alcanzado",
+        text: `Solo podés cargar hasta ${MAX_HOMECARE_ITEMS} pasos en una rutina.`,
+      });
+      return;
+    }
+
+    homeCareDraftItems.push(getEmptyHomeCareItem(homeCareDraftItems.length + 1));
+    renderHomeCareDraftItems();
+  });
+
+  document.getElementById("homecare-form-items")?.addEventListener("input", (e) => {
+    const index = Number(e.target.dataset.index);
+    if (!Number.isInteger(index) || !homeCareDraftItems[index]) return;
+
+    if (e.target.classList.contains("homecare-item-moment")) {
+      homeCareDraftItems[index].moment = e.target.value;
+    }
+
+    if (e.target.classList.contains("homecare-item-action")) {
+      homeCareDraftItems[index].action = e.target.value;
+    }
+
+    if (e.target.classList.contains("homecare-item-product")) {
+      homeCareDraftItems[index].product = e.target.value;
+    }
+
+    if (e.target.classList.contains("homecare-item-frequency")) {
+      homeCareDraftItems[index].frequency = e.target.value;
+    }
+  });
+
+  document.getElementById("homecare-form-items")?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".homecare-remove-item-btn");
+    if (!btn) return;
+
+    const index = Number(btn.dataset.index);
+    if (!Number.isInteger(index)) return;
+
+    homeCareDraftItems.splice(index, 1);
+
+    homeCareDraftItems = homeCareDraftItems.map((item, idx) => ({
+    ...item,
+    stepOrder: idx + 1,
+  }));
+
+    renderHomeCareDraftItems();
+  });
+  
+  document.getElementById("homecare-form")?.addEventListener("submit", onSaveHomeCare);
+  
+  await loadPatient(id);
+}
+
+async function loadPatient(id) {
+  const loading = document.getElementById("pd-loading");
+  const content = document.getElementById("pd-content");
+
+  try {
+    const p = await api.getPatientById(id);
+
+    currentPatientId = p.id;
+    currentHomeCarePlan = p.homeCarePlan || null;
+
+    document.getElementById("patient-name").textContent = p.fullName || "Paciente";
+
+    const info = document.getElementById("patient-info");
+    info.innerHTML = [
+      patientInfoRowTemplate("Teléfono", p.phone || "-"),
+      patientInfoRowTemplate("Fecha de nacimiento", fmtDate(p.birthDate)),
+      patientInfoRowTemplate("Edad", p.age ?? "-"),
+      patientInfoRowTemplate("Dirección", p.address || "-"),
+      patientInfoRowTemplate("Profesión", p.profession || "-"),
+    ].join("");
+
+    renderHomeCare(p.homeCarePlan || null);
+
+    const ap = document.getElementById("patient-appointments");
+    const list = Array.isArray(p.appointments) ? p.appointments.slice(0, 10) : [];
+
+    if (!list.length) {
+      ap.innerHTML = patientAppointmentsEmptyRowTemplate();
+    } else {
+      ap.innerHTML = list.map(patientAppointmentRowTemplate).join("");
+    }
+
+    if (loading) loading.hidden = true;
+    if (content) content.hidden = false;
+
+  } catch (err) {
+    console.error("loadPatient failed", { patientId: id, error: err });
+
+    const txt = document.querySelector("#pd-loading .pd-loading-text");
+    if (txt) txt.textContent = "Error al cargar";
+
+    Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
+    go("/patients");
+  }
 }

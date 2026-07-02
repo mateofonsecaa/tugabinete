@@ -8,6 +8,7 @@
 import { initDrawer } from "../../components/drawer.js";
 import * as api from "./patients.api.js";
 import { patientCreatePageTemplate } from "./patients.templates.js";
+import { invalidatePatientsCache } from "./patients.cache.js";
 
 function go(path) {
   history.pushState(null, "", path);
@@ -162,7 +163,7 @@ async function onSubmit(e) {
       showConfirmButton: false,
     });
 
-    localStorage.removeItem("patients");
+    invalidatePatientsCache();
     go("/patients");
   } catch (err) {
     Swal.fire({

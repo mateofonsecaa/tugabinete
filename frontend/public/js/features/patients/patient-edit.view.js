@@ -9,6 +9,7 @@
 import { initDrawer } from "../../components/drawer.js";
 import * as api from "./patients.api.js";
 import { patientEditPageTemplate } from "./patients.templates.js";
+import { invalidatePatientsCache } from "./patients.cache.js";
 
 function getTodayYYYYMMDD() {
   const d = new Date();
@@ -203,7 +204,7 @@ async function onSubmit(e, id) {
       showConfirmButton: false,
     });
 
-    localStorage.removeItem("patients");
+    invalidatePatientsCache();
     go("/patients");
   } catch (err) {
     Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
