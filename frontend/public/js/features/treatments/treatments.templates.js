@@ -1,4 +1,4 @@
-// /public/js/views/treatments.templates.js
+// /public/js/features/treatments/treatments.templates.js
 //
 // Templates HTML de la vista de tratamientos. Funciones puras:
 // datos -> string. Aca NO hay DOM (ni getElementById, ni listeners),
@@ -7,14 +7,20 @@
 //
 // treatments.js decide CUANDO renderizar y sobre QUE nodo;
 // este modulo decide QUE HTML se genera.
+//
+// XSS: todo dato de usuario/backend interpolado pasa por escapeHtml.
+// NO se escapan: HTML pre-renderizado (TREATMENTS_OPTIONS_HTML,
+// getGalleryLabelOptions), literales de clase (status-paid, selected)
+// y numericos controlados (index, toFixed, MAX_TREATMENT_PHOTOS).
 
 import { TREATMENTS_LIST } from "./treatments.config.js";
 import {
   MAX_TREATMENT_PHOTOS,
   TREATMENT_PHOTO_LABELS,
 } from "./treatments.gallery.js";
+import { escapeHtml } from "../../core/utils/security.js";
 
-const TREATMENTS_OPTIONS_HTML = TREATMENTS_LIST.map((t) => `<div>${t}</div>`).join("");
+const TREATMENTS_OPTIONS_HTML = TREATMENTS_LIST.map((t) => `<div>${escapeHtml(t)}</div>`).join("");
 
 /* ====================== Página (shell de la SPA) ====================== */
 
@@ -687,31 +693,31 @@ export function treatmentCardTemplate(t) {
   const amountStr = `$${amount.toFixed(2)}`;
 
   return `
-    <div class="treat-card" data-id="${t.id}" data-kind="treatment">
+    <div class="treat-card" data-id="${escapeHtml(t.id)}" data-kind="treatment">
       <div class="treat-card-main">
         <div class="treat-left">
-          <div class="treat-patient-pill">${t.patient?.fullName || "Sin paciente"}</div>
+          <div class="treat-patient-pill">${escapeHtml(t.patient?.fullName || "Sin paciente")}</div>
 
           <div class="treat-sub treat-sub--stack">
-            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
-            <div class="treat-sub-line"><span class="lbl">Hora:</span> <span class="val">${timeStr}</span></div>
-            <div class="treat-sub-line"><span class="lbl">Tratamiento:</span> <span class="val">${t.treatment || "-"}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${escapeHtml(dateStr)}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Hora:</span> <span class="val">${escapeHtml(timeStr)}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Tratamiento:</span> <span class="val">${escapeHtml(t.treatment || "-")}</span></div>
           </div>
         </div>
 
         <div class="treat-right">
           <div class="treat-amount">${amountStr}</div>
           <div class="treat-badges">
-            <span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${t.status || "-"}</span>
-            <span class="treat-method">${t.method || "-"}</span>
+            <span class="${t.status === "Pagado" ? "status-paid" : "status-pending"}">${escapeHtml(t.status || "-")}</span>
+            <span class="treat-method">${escapeHtml(t.method || "-")}</span>
           </div>
         </div>
       </div>
 
       <div class="treat-card-actions actions">
-        <button class="btn-view" data-id="${t.id}" title="Ver"><i class="fa-solid fa-eye"></i></button>
-        <button class="btn-edit" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-        <button class="btn-delete" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+        <button class="btn-view" data-id="${escapeHtml(t.id)}" title="Ver"><i class="fa-solid fa-eye"></i></button>
+        <button class="btn-edit" data-id="${escapeHtml(t.id)}" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+        <button class="btn-delete" data-id="${escapeHtml(t.id)}" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>
   `;
@@ -725,37 +731,37 @@ export function saleCardTemplate(s) {
   const qty = Number(s.quantity ?? 0);
 
   return `
-    <div class="treat-card" data-id="${s.id}" data-kind="sale">
+    <div class="treat-card" data-id="${escapeHtml(s.id)}" data-kind="sale">
       <div class="treat-card-main">
         <div class="treat-left">
-          <div class="treat-patient-pill">${s.patient?.fullName || "Sin paciente"}</div>
+          <div class="treat-patient-pill">${escapeHtml(s.patient?.fullName || "Sin paciente")}</div>
 
           <div class="treat-sub treat-sub--stack">
-            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${dateStr}</span></div>
-            <div class="treat-sub-line"><span class="lbl">Venta:</span> <span class="val">${s.product || "-"}</span></div>
-            <div class="treat-sub-line"><span class="lbl">Cantidad:</span> <span class="val">${qty || "-"}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Fecha:</span> <span class="val">${escapeHtml(dateStr)}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Venta:</span> <span class="val">${escapeHtml(s.product || "-")}</span></div>
+            <div class="treat-sub-line"><span class="lbl">Cantidad:</span> <span class="val">${escapeHtml(qty || "-")}</span></div>
           </div>
         </div>
 
         <div class="treat-right">
           <div class="treat-amount">${amountStr}</div>
           <div class="treat-badges">
-            <span class="${s.status === "Pagado" ? "status-paid" : "status-pending"}">${s.status || "-"}</span>
-            <span class="treat-method">${s.method || "-"}</span>
+            <span class="${s.status === "Pagado" ? "status-paid" : "status-pending"}">${escapeHtml(s.status || "-")}</span>
+            <span class="treat-method">${escapeHtml(s.method || "-")}</span>
           </div>
         </div>
       </div>
 
       <div class="treat-card-actions actions">
-        <button class="btn-view" data-id="${s.id}" title="Ver">
+        <button class="btn-view" data-id="${escapeHtml(s.id)}" title="Ver">
           <i class="fa-solid fa-eye"></i>
         </button>
 
-        <button class="btn-edit" data-id="${s.id}" title="Editar">
+        <button class="btn-edit" data-id="${escapeHtml(s.id)}" title="Editar">
           <i class="fa-solid fa-pen-to-square"></i>
         </button>
 
-        <button class="btn-delete" data-id="${s.id}" title="Eliminar">
+        <button class="btn-delete" data-id="${escapeHtml(s.id)}" title="Eliminar">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
@@ -767,8 +773,8 @@ export function saleCardTemplate(s) {
 
 export function filterChipTemplate(c) {
   return `
-        <button class="tg-chip" type="button" data-chip="${c.key}">
-          ${c.label} <i class="fa-solid fa-xmark"></i>
+        <button class="tg-chip" type="button" data-chip="${escapeHtml(c.key)}">
+          ${escapeHtml(c.label)} <i class="fa-solid fa-xmark"></i>
         </button>
       `;
 }
@@ -777,7 +783,7 @@ export function modalLoadingTemplate(message) {
   return `
     <div class="modal-loading">
       <i class="fa-solid fa-spinner fa-spin"></i>
-      <p>${message}</p>
+      <p>${escapeHtml(message)}</p>
     </div>
   `;
 }
@@ -787,12 +793,12 @@ export function modalLoadingTemplate(message) {
 function getGalleryLabelOptions(selectedLabel = "Sin etiqueta") {
   return TREATMENT_PHOTO_LABELS.map((label) => {
     const selected = label === selectedLabel ? "selected" : "";
-    return `<option value="${label}" ${selected}>${label}</option>`;
+    return `<option value="${escapeHtml(label)}" ${selected}>${escapeHtml(label)}</option>`;
   }).join("");
 }
 
 export function galleryEmptyTemplate(id, message) {
-  return `<div class="gallery-empty" id="${id}">${message}</div>`;
+  return `<div class="gallery-empty" id="${escapeHtml(id)}">${escapeHtml(message)}</div>`;
 }
 
 export function galleryLoadingTemplate() {
@@ -819,7 +825,7 @@ export function createGalleryCardTemplate(photo, index) {
 
           <div class="gallery-image-wrap">
             <img
-              src="${photo.url || ""}"
+              src="${escapeHtml(photo.url || "")}"
               alt="Foto ${index + 1}"
               class="gallery-image"
               data-gallery-preview="${index}"
@@ -851,7 +857,7 @@ export function editGalleryCardTemplate(photo, index) {
 
           <div class="gallery-image-wrap">
             <img
-              src="${photo.url || ""}"
+              src="${escapeHtml(photo.url || "")}"
               alt="Foto ${index + 1}"
               class="gallery-image"
               data-edit-gallery-preview="${index}"
@@ -873,7 +879,7 @@ export function viewGalleryCardTemplate(photo, index) {
         <div class="gallery-card">
           <div class="gallery-image-wrap">
             <img
-              src="${photo.url || ""}"
+              src="${escapeHtml(photo.url || "")}"
               alt="Foto ${index + 1}"
               class="gallery-image"
               data-view-gallery-preview="${index}"
@@ -882,7 +888,7 @@ export function viewGalleryCardTemplate(photo, index) {
 
           <div class="gallery-meta">
             <label class="gallery-meta-label">Etiqueta</label>
-            <div class="gallery-label-readonly">${photo.label || "Sin etiqueta"}</div>
+            <div class="gallery-label-readonly">${escapeHtml(photo.label || "Sin etiqueta")}</div>
           </div>
         </div>
       `;
