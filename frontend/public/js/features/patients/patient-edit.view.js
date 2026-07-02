@@ -1,6 +1,14 @@
-// /public/js/views/patient-edit.js
+// /public/js/features/patients/patient-edit.view.js
+//
+// Pantalla "Editar paciente" completa: vista (router) + logica de pagina,
+// fusionadas en el Paso 4 del plan de migracion del dominio Pacientes.
+// El HTML vive en patients.templates.js; aca vive el comportamiento:
+// carga del paciente, bloqueo del form, listeners, submit e invalidacion
+// de cache. Las validaciones se unifican recien en el Paso 7.
+
 import { initDrawer } from "../../components/drawer.js";
-import { initPatientEditPage } from "./patient-edit.page.js";
+import * as api from "./patients.api.js";
+import { patientEditPageTemplate } from "./patients.templates.js";
 
 function getTodayYYYYMMDD() {
   const d = new Date();
@@ -8,182 +16,196 @@ function getTodayYYYYMMDD() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-export function PatientEdit() {
-  const today = getTodayYYYYMMDD();
-
-  return `
-    <div class="patients-page patient-edit-page">
-      <div class="top-bar">
-        <button id="open-menu" class="menu-btn">
-          <i class="fa-solid fa-bars"></i>
-        </button>
-        <span class="app-title">TuGabinete</span>
-      </div>
-
-      <aside id="drawer" class="drawer">
-        <div class="drawer-header">
-          <span id="drawer-username">Profesional</span>
-          <button id="close-menu" class="close-btn">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <nav class="drawer-nav">
-          <a href="/dashboard" data-link><i class="fa-solid fa-house"></i> Dashboard</a>
-          <a href="/agenda" data-link><i class="fa-solid fa-calendar-days"></i> Agenda</a>
-          <a href="/patients" data-link><i class="fa-solid fa-users"></i> Pacientes</a>
-          <a href="/treatments" data-link><i class="fa-solid fa-spa"></i> Tratamientos</a>
-          <a href="/profile" data-link><i class="fa-solid fa-user"></i> Perfil</a>
-          <a href="/ayuda" data-link><i class="fa-solid fa-circle-question"></i> Guías y tutoriales</a>
-          <a href="#" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
-        </nav>
-      </aside>
-
-      <div id="drawer-overlay" class="drawer-overlay"></div>
-
-      <main>
-        <div class="main-top-actions">
-          <button id="back-btn" class="btn-back" type="button">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-          </button>
-
-          <div class="right-actions">
-            <button id="to-details-btn" class="btn-add" type="button">
-              <i class="fa-solid fa-id-card"></i> Ver ficha
-            </button>
-          </div>
-        </div>
-
-        <section class="patient-edit-view">
-          <div class="patient-edit-header">
-            <h1 id="patient-title" class="patient-edit-title">Cargando paciente...</h1>
-            <p class="patient-edit-subtitle">
-              Modificá los datos básicos del paciente. Solo <strong>Nombre completo</strong> es obligatorio.
-            </p>
-          </div>
-
-          <section class="patient-edit-card">
-            <form id="patient-form" class="patient-form patient-edit-form is-loading" novalidate>
-              <div class="patient-field" data-field="fullName">
-                <div class="patient-field-head">
-                  <label for="fullName" class="patient-label">Nombre completo</label>
-                  <span class="patient-field-status patient-field-status--required">Obligatorio</span>
-                </div>
-
-                <input
-                  id="fullName"
-                  type="text"
-                  required
-                  maxlength="60"
-                  autocomplete="name"
-                  placeholder="Ej.: María Fernández"
-                  disabled
-                />
-
-                <p class="patient-field-help">Ingresá nombre y apellido del paciente.</p>
-                <p class="patient-field-error" id="fullName-error" aria-live="polite"></p>
-              </div>
-
-              <div class="patient-field" data-field="birthDate">
-                <div class="patient-field-head">
-                  <label for="birthDate" class="patient-label">Fecha de nacimiento</label>
-                  <span class="patient-field-status">Opcional</span>
-                </div>
-
-                <div class="patient-input-wrap patient-input-wrap--date">
-                  <input
-                    id="birthDate"
-                    type="date"
-                    max="${today}"
-                    autocomplete="bday"
-                    placeholder="Seleccionar fecha"
-                    disabled
-                  />
-                  <i class="fa-regular fa-calendar patient-input-icon" aria-hidden="true"></i>
-                </div>
-
-                <p class="patient-field-help">Hacé clic en cualquier parte del campo para abrir el calendario.</p>
-                <p class="patient-field-error" id="birthDate-error" aria-live="polite"></p>
-              </div>
-
-              <div class="patient-field" data-field="phone">
-                <div class="patient-field-head">
-                  <label for="phone" class="patient-label">Teléfono</label>
-                  <span class="patient-field-status">Opcional</span>
-                </div>
-
-                <input
-                  id="phone"
-                  type="text"
-                  maxlength="25"
-                  inputmode="tel"
-                  autocomplete="tel"
-                  placeholder="Ej.: +54 351 123 4567"
-                  disabled
-                />
-
-                <p class="patient-field-help">Podés escribirlo con espacios, guiones o código de país.</p>
-                <p class="patient-field-error" id="phone-error" aria-live="polite"></p>
-              </div>
-
-              <div class="patient-field" data-field="address">
-                <div class="patient-field-head">
-                  <label for="address" class="patient-label">Dirección</label>
-                  <span class="patient-field-status">Opcional</span>
-                </div>
-
-                <input
-                  id="address"
-                  type="text"
-                  maxlength="80"
-                  autocomplete="street-address"
-                  placeholder="Ej.: Av. Colón 1234"
-                  disabled
-                />
-
-                <p class="patient-field-help">Usá una referencia breve y clara.</p>
-                <p class="patient-field-error" id="address-error" aria-live="polite"></p>
-              </div>
-
-              <div class="patient-field" data-field="profession">
-                <div class="patient-field-head">
-                  <label for="profession" class="patient-label">Profesión</label>
-                  <span class="patient-field-status">Opcional</span>
-                </div>
-
-                <input
-                  id="profession"
-                  type="text"
-                  maxlength="50"
-                  autocomplete="organization-title"
-                  placeholder="Ej.: Cosmetóloga"
-                  disabled
-                />
-
-                <p class="patient-field-help">Campo libre para registrar ocupación o profesión.</p>
-                <p class="patient-field-error" id="profession-error" aria-live="polite"></p>
-              </div>
-
-              <div class="patient-form-actions">
-                <button class="btn-save btn-save-edit" id="submit-edit-patient-btn" type="submit" disabled>
-                  <i class="fa-solid fa-check"></i> Guardar cambios
-                </button>
-              </div>
-            </form>
-          </section>
-        </section>
-      </main>
-    </div>
-  `;
+function go(path) {
+  history.pushState(null, "", path);
+  window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
-export function initPatientEdit() {
+function getPatientIdFromEditPath() {
+  // "/patients/123/edit"
+  const m = window.location.pathname.match(/^\/patients\/(\d+)\/edit$/);
+  return m ? Number(m[1]) : null;
+}
+
+function toDateInputValue(dateLike) {
+  if (!dateLike) return "";
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return "";
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function setEditFormLocked(locked) {
+  const form = document.getElementById("patient-form");
+  if (!form) return;
+
+  form.classList.toggle("is-loading", locked);
+
+  form
+    .querySelectorAll("input, select, textarea, button[type='submit']")
+    .forEach((el) => {
+      el.disabled = locked;
+    });
+}
+
+export function PatientEdit() {
+  return patientEditPageTemplate({ today: getTodayYYYYMMDD() });
+}
+
+export async function initPatientEdit() {
   document.body.className = "is-patient-edit";
   initDrawer();
-  initPatientEditPage();
 
-  const birthInput = document.querySelector("#birthDate");
-  if (birthInput) {
-    birthInput.max = getTodayYYYYMMDD();
+  setEditFormLocked(true);
+
+  const id = getPatientIdFromEditPath();
+  if (!id) {
+    Swal.fire({ icon: "error", title: "Error", text: "ID inválido" });
+    go("/patients");
+    return;
+  }
+
+  document.getElementById("back-btn")?.addEventListener("click", () => go("/patients"));
+  document.getElementById("to-details-btn")?.addEventListener("click", () => go(`/patients/${id}`));
+
+  try {
+    await loadPatientIntoForm(id);
+  } catch (err) {
+    console.error(err);
+    document.getElementById("patient-title").textContent = "No se pudo cargar el paciente";
+
+    await Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: err.message || "No se pudo cargar el paciente",
+    });
+
+    return;
+  }
+
+  const fullNameEl = document.getElementById("fullName");
+  const phoneEl = document.getElementById("phone");
+  const addressEl = document.getElementById("address");
+  const professionEl = document.getElementById("profession");
+
+  if (fullNameEl) {
+    fullNameEl.maxLength = 20;
+    fullNameEl.addEventListener("input", () => {
+      fullNameEl.value = fullNameEl.value.replace(/[^\p{L}\s]/gu, "");
+    });
+  }
+
+  if (phoneEl) {
+    phoneEl.maxLength = 20;
+    phoneEl.addEventListener("input", () => {
+      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, "");
+    });
+  }
+
+  if (addressEl) {
+    addressEl.maxLength = 30;
+    addressEl.addEventListener("input", () => {
+      addressEl.value = addressEl.value.replace(/[^\p{L}0-9\s]/gu, "");
+    });
+  }
+
+  if (professionEl) {
+    professionEl.maxLength = 20;
+    professionEl.addEventListener("input", () => {
+      professionEl.value = professionEl.value.replace(/[^\p{L}\s]/gu, "");
+    });
+  }
+
+  const birth = document.getElementById("birthDate");
+  if (birth) {
+    birth.addEventListener("click", () => {
+      if (typeof birth.showPicker === "function") birth.showPicker();
+    });
+  }
+
+  document.getElementById("patient-form")?.addEventListener("submit", (e) => onSubmit(e, id));
+}
+
+async function loadPatientIntoForm(id) {
+  const p = await api.getPatientById(id);
+
+  document.getElementById("patient-title").textContent = p.fullName || "Paciente";
+  document.getElementById("fullName").value = p.fullName || "";
+  document.getElementById("birthDate").value = toDateInputValue(p.birthDate);
+  document.getElementById("phone").value = p.phone || "";
+  document.getElementById("address").value = p.address || "";
+  document.getElementById("profession").value = p.profession || "";
+
+  setEditFormLocked(false);
+}
+
+async function onSubmit(e, id) {
+  e.preventDefault();
+
+  const fullName = document.getElementById("fullName").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const profession = document.getElementById("profession").value.trim();
+
+  const onlyLetters = (s) => /^[\p{L}\s]+$/u.test(s);
+  const onlyDigits = (s) => /^[0-9]+$/.test(s);
+  const lettersDigits = (s) => /^[\p{L}0-9\s]+$/u.test(s);
+
+  // Nombre
+  if (!fullName) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Nombre completo: es obligatorio." });
+  }
+  if (fullName.length > 20) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Nombre: máximo 20 caracteres." });
+  }
+  if (!onlyLetters(fullName)) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Nombre: solo letras y espacios." });
+  }
+
+  // Teléfono opcional
+  if (phone.length > 20) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: máximo 20 caracteres." });
+  }
+  if (phone && !onlyDigits(phone)) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: solo números." });
+  }
+
+  // Dirección opcional
+  if (address.length > 30) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Dirección: máximo 30 caracteres." });
+  }
+  if (address && !lettersDigits(address)) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Dirección: solo letras, números y espacios." });
+  }
+
+  // Profesión opcional
+  if (profession.length > 20) {
+    return Swal.fire({ icon: "error", title: "Error", text: "Profesión: máximo 20 caracteres." });
+  }
+
+  const data = {
+    fullName,
+    birthDate: document.getElementById("birthDate").value || null,
+    phone: phone || null,
+    address: address || null,
+    profession: profession || null,
+  };
+
+  try {
+    await api.updatePatient(id, data);
+
+    await Swal.fire({
+      icon: "success",
+      title: "Actualizado",
+      timer: 1200,
+      showConfirmButton: false,
+    });
+
+    localStorage.removeItem("patients");
+    go("/patients");
+  } catch (err) {
+    Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
   }
 }
