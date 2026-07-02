@@ -1,32 +1,33 @@
-import prisma from "../../config/prisma.js";
-import {
-  createPrivateSignedUrlForFile,
-  queueFileDeletion,
-  uploadManagedFile,
-} from "../../core/storage/storage.service.js";
+/**
+ * appointments.service.js (refactorizado)
+ *
+ * Orquestación y lógica de negocio del módulo de turnos. Ya no importa
+ * Prisma ni el storage service de core: delega en
+ *
+ *   appointments.repository.js  -> toda la interacción con la BD
+ *   appointments.storage.js     -> uploads, URLs firmadas, borrado de archivos
+ *
+ * Se queda acá lo que es negocio:
+ *   - Normalización de input (fechas, labels, montos, payloads JSON).
+ *   - La regla "antes/después" (pickLegacyFileIdsFromPhotos), que se
+ *     inyecta al repositorio como callback dentro de la transacción.
+ *   - El límite de fotos por tratamiento.
+ *   - La reconciliación de existingPhotos (qué se retiene, qué se borra).
+ *   - La coreografía upload -> persistencia -> limpieza, con rollback
+ *     de archivos si la persistencia falla.
+ *
+ * El procesamiento de fotos entrantes está extraído a helpers
+ * declarativos: uploadIncomingPhotoRows (create) y
+ * replaceLegacyPhotoInGallery + appendGalleryDrafts (update), que
+ * reportan cada fileId subido vía onUploaded para que el caller
+ * conserve el control del rollback.
+ */
+
+import * as repo from "./appointments.repository.js";
+import * as storage from "./appointments.storage.js";
 
 const APPOINTMENT_PHOTO_LIMIT = 10;
 const APPOINTMENT_LABEL_MAX_LENGTH = 30;
-
-const APPOINTMENT_LIST_SELECT = {
-  id: true,
-  date: true,
-  time: true,
-  treatment: true,
-  amount: true,
-  notes: true,
-  status: true,
-  method: true,
-  createdAt: true,
-  patient: {
-    select: {
-      id: true,
-      fullName: true,
-      phone: true,
-      address: true,
-    },
-  },
-};
 
 function createAppError(status, message, code = "APPOINTMENT_ERROR") {
   const err = new Error(message);
@@ -34,6 +35,8 @@ function createAppError(status, message, code = "APPOINTMENT_ERROR") {
   err.code = code;
   return err;
 }
+
+// --- Normalización de input (negocio) ---
 
 function normalizeLooseText(value) {
   return String(value || "")
@@ -76,62 +79,6 @@ function buildTreatmentDate(date, time) {
   return value;
 }
 
-async function ensureOwnedPatient(userId, patientId) {
-  const normalizedPatientId = Number(patientId);
-
-  if (!Number.isInteger(normalizedPatientId) || normalizedPatientId <= 0) {
-    throw createAppError(400, "patientId inválido.", "PATIENT_ID_INVALID");
-  }
-
-  const patient = await prisma.patient.findFirst({
-    where: {
-      id: normalizedPatientId,
-      userId,
-    },
-    select: { id: true },
-  });
-
-  if (!patient) {
-    throw createAppError(404, "Paciente no encontrado.", "PATIENT_NOT_FOUND");
-  }
-
-  return normalizedPatientId;
-}
-
-async function findOwnedAppointment(id, userId) {
-  return prisma.appointment.findFirst({
-    where: {
-      id: Number(id),
-      userId,
-    },
-    select: {
-      id: true,
-      userId: true,
-      patientId: true,
-      date: true,
-      time: true,
-      treatment: true,
-      amount: true,
-      notes: true,
-      status: true,
-      method: true,
-      createdAt: true,
-      beforePhotoFileId: true,
-      afterPhotoFileId: true,
-      photos: {
-        select: {
-          id: true,
-          fileId: true,
-          label: true,
-          position: true,
-          createdAt: true,
-        },
-        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-      },
-    },
-  });
-}
-
 function parseJsonArrayField(value, fieldName) {
   if (value === undefined || value === null || value === "") return [];
 
@@ -166,6 +113,8 @@ function parseJsonArrayField(value, fieldName) {
   }
 }
 
+// --- Extracción de archivos del request ---
+
 function getBeforePhotoFile(files) {
   return files?.beforePhoto?.[0] || null;
 }
@@ -190,6 +139,8 @@ function extractNewGalleryDrafts(files, data) {
     label: normalizeGalleryLabel(newPhotoLabels[index]),
   }));
 }
+
+// --- Regla de negocio: antes/después ---
 
 function labelIsBefore(label) {
   return normalizeLooseText(label) === "antes";
@@ -220,6 +171,47 @@ function pickLegacyFileIdsFromPhotos(photos) {
   };
 }
 
+function buildLegacyPhotoUrlsFromSignedGallery(signedGallery) {
+  if (!signedGallery.length) {
+    return {
+      beforePhoto: null,
+      afterPhoto: null,
+    };
+  }
+
+  const before = signedGallery.find((photo) => labelIsBefore(photo.label)) || signedGallery[0] || null;
+
+  const after =
+    signedGallery.find((photo) => labelIsAfter(photo.label)) ||
+    signedGallery.find((photo) => photo.fileId !== before?.fileId) ||
+    null;
+
+  return {
+    beforePhoto: before?.url || null,
+    afterPhoto: after?.url || null,
+  };
+}
+
+// --- Validaciones de dominio ---
+
+async function ensureOwnedPatient(userId, patientId) {
+  const normalizedPatientId = Number(patientId);
+
+  if (!Number.isInteger(normalizedPatientId) || normalizedPatientId <= 0) {
+    throw createAppError(400, "patientId inválido.", "PATIENT_ID_INVALID");
+  }
+
+  const patient = await repo.findOwnedPatient(userId, normalizedPatientId);
+
+  if (!patient) {
+    throw createAppError(404, "Paciente no encontrado.", "PATIENT_NOT_FOUND");
+  }
+
+  return normalizedPatientId;
+}
+
+// --- Migración perezosa: fotos legacy -> galería ---
+
 async function syncLegacyPhotosToGallery(appointment) {
   if (!appointment) return [];
 
@@ -246,87 +238,202 @@ async function syncLegacyPhotosToGallery(appointment) {
   }
 
   if (inserts.length) {
-    await prisma.appointmentPhoto.createMany({
-      data: inserts,
-      skipDuplicates: true,
-    });
+    await repo.createAppointmentPhotos(inserts, { skipDuplicates: true });
   }
 
-  return prisma.appointmentPhoto.findMany({
-    where: { appointmentId: appointment.id },
-    select: {
-      id: true,
-      fileId: true,
-      label: true,
-      position: true,
-      createdAt: true,
-    },
-    orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-  });
+  return repo.findAppointmentPhotos(appointment.id);
 }
 
-async function buildSignedGallery(photos, ownerUserId) {
-  const signed = await Promise.all(
-    (photos || []).map(async (photo) => {
-      try {
-        const result = await createPrivateSignedUrlForFile({
-          fileId: photo.fileId,
-          ownerUserId,
-        });
+// --- Upload de fotos (delegando el archivo, quedándose el negocio) ---
 
-        return {
-          id: photo.id,
-          fileId: photo.fileId,
-          label: photo.label || null,
-          position: photo.position,
-          url: result.signedUrl,
-        };
-      } catch {
-        return null;
-      }
-    })
-  );
-
-  return signed.filter(Boolean);
-}
-
-function buildLegacyPhotoUrlsFromSignedGallery(signedGallery) {
-  if (!signedGallery.length) {
-    return {
-      beforePhoto: null,
-      afterPhoto: null,
-    };
-  }
-
-  const before = signedGallery.find((photo) => labelIsBefore(photo.label)) || signedGallery[0] || null;
-
-  const after =
-    signedGallery.find((photo) => labelIsAfter(photo.label)) ||
-    signedGallery.find((photo) => photo.fileId !== before?.fileId) ||
-    null;
-
-  return {
-    beforePhoto: before?.url || null,
-    afterPhoto: after?.url || null,
-  };
-}
-
-async function uploadAppointmentPhoto({ userId, appointmentId, file, purpose, label, position, metadata }) {
-  const uploaded = await uploadManagedFile({
+async function uploadPhotoRow({ userId, appointmentId, file, purpose, label, position, metadata }) {
+  const { fileId } = await storage.uploadAppointmentPhoto({
     ownerUserId: userId,
-    purpose,
-    resourceType: "APPOINTMENT",
-    resourceId: String(appointmentId),
+    appointmentId,
     file,
+    purpose,
     metadata,
   });
 
   return {
-    fileId: uploaded.id,
+    fileId,
     label: normalizeGalleryLabel(label),
     position,
   };
 }
+
+// --- Procesamiento declarativo de fotos entrantes ---
+
+const LEGACY_PHOTO_SLOTS = {
+  before: {
+    purpose: "APPOINTMENT_BEFORE_PHOTO",
+    label: "Antes",
+    side: "before",
+    matches: labelIsBefore,
+    insertAtStart: true,
+  },
+  after: {
+    purpose: "APPOINTMENT_AFTER_PHOTO",
+    label: "Después",
+    side: "after",
+    matches: labelIsAfter,
+    insertAtStart: false,
+  },
+};
+
+/**
+ * CREATE: sube todas las fotos entrantes de un turno nuevo en orden
+ * (Antes -> Después -> galería) y devuelve las filas listas para la BD.
+ *
+ * Cada fileId se reporta vía `onUploaded` ANTES de seguir con la próxima
+ * foto, para que el caller pueda hacer rollback de lo ya subido si algo
+ * falla a mitad de camino.
+ */
+async function uploadIncomingPhotoRows({
+  userId,
+  appointmentId,
+  beforeFile,
+  afterFile,
+  newGalleryDrafts,
+  source,
+  onUploaded,
+}) {
+  const specs = [
+    beforeFile && {
+      file: beforeFile,
+      purpose: LEGACY_PHOTO_SLOTS.before.purpose,
+      label: LEGACY_PHOTO_SLOTS.before.label,
+      metadata: { source, side: "before", mode: "legacy" },
+    },
+    afterFile && {
+      file: afterFile,
+      purpose: LEGACY_PHOTO_SLOTS.after.purpose,
+      label: LEGACY_PHOTO_SLOTS.after.label,
+      metadata: { source, side: "after", mode: "legacy" },
+    },
+    ...newGalleryDrafts.map((draft) => ({
+      file: draft.file,
+      purpose: "APPOINTMENT_PHOTO",
+      label: draft.label,
+      metadata: { source, mode: "gallery" },
+    })),
+  ].filter(Boolean);
+
+  const rows = [];
+
+  for (const spec of specs) {
+    const uploaded = await uploadPhotoRow({
+      userId,
+      appointmentId,
+      file: spec.file,
+      purpose: spec.purpose,
+      label: spec.label,
+      position: rows.length,
+      metadata: spec.metadata,
+    });
+    onUploaded(uploaded.fileId);
+    rows.push(uploaded);
+  }
+
+  return rows;
+}
+
+/**
+ * UPDATE: sube una foto legacy (Antes/Después) y la aplica sobre la
+ * galería retenida con semántica reemplazar-o-insertar:
+ *  - Si ya existe una foto con ese label, la pisa y marca el archivo
+ *    anterior para borrado diferido (`onReplaced`).
+ *  - Si no existe, la inserta (Antes al principio, Después al final).
+ *
+ * Muta `retainedPhotos` in place. No hace nada si `file` es null.
+ */
+async function replaceLegacyPhotoInGallery({
+  userId,
+  appointmentId,
+  file,
+  slot,
+  retainedPhotos,
+  source,
+  onUploaded,
+  onReplaced,
+}) {
+  if (!file) return;
+
+  const config = LEGACY_PHOTO_SLOTS[slot];
+
+  const uploaded = await uploadPhotoRow({
+    userId,
+    appointmentId,
+    file,
+    purpose: config.purpose,
+    label: config.label,
+    position: config.insertAtStart ? 0 : retainedPhotos.length,
+    metadata: { source, side: config.side, mode: "legacy" },
+  });
+  onUploaded(uploaded.fileId);
+
+  const index = retainedPhotos.findIndex((photo) => config.matches(photo.label));
+
+  if (index >= 0) {
+    onReplaced(retainedPhotos[index].fileId);
+    retainedPhotos[index] = {
+      ...retainedPhotos[index],
+      fileId: uploaded.fileId,
+      label: config.label,
+    };
+    return;
+  }
+
+  const inserted = {
+    id: null,
+    fileId: uploaded.fileId,
+    label: config.label,
+    position: config.insertAtStart ? -1 : retainedPhotos.length,
+    createdAt: new Date(),
+  };
+
+  if (config.insertAtStart) {
+    retainedPhotos.unshift(inserted);
+  } else {
+    retainedPhotos.push(inserted);
+  }
+}
+
+/**
+ * UPDATE: sube los borradores nuevos de galería y los agrega al final
+ * de la galería retenida. Muta `retainedPhotos` in place.
+ */
+async function appendGalleryDrafts({
+  userId,
+  appointmentId,
+  drafts,
+  retainedPhotos,
+  source,
+  onUploaded,
+}) {
+  for (const draft of drafts) {
+    const uploaded = await uploadPhotoRow({
+      userId,
+      appointmentId,
+      file: draft.file,
+      purpose: "APPOINTMENT_PHOTO",
+      label: draft.label,
+      position: retainedPhotos.length,
+      metadata: { source, mode: "gallery" },
+    });
+    onUploaded(uploaded.fileId);
+
+    retainedPhotos.push({
+      id: null,
+      fileId: uploaded.fileId,
+      label: uploaded.label,
+      position: retainedPhotos.length,
+      createdAt: new Date(),
+    });
+  }
+}
+
+// --- Reconciliación de galería existente ---
 
 function normalizeExistingPhotoPayload(payload, currentPhotos) {
   if (!payload.length) {
@@ -422,44 +529,31 @@ function normalizeUpdateBaseData(existing, data, patientId) {
   };
 }
 
-export const getAll = async (userId, offset = 0, limit = 50) => {
-  offset = Number(offset) || 0;
-  limit = Number(limit) || 50;
+// --- API pública del servicio ---
 
-  return prisma.appointment.findMany({
-    where: { userId },
-    select: APPOINTMENT_LIST_SELECT,
-    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-    skip: offset,
-    take: limit,
+export const getAll = async (userId, offset = 0, limit = 50) => {
+  return repo.findManyByUser(userId, {
+    offset: Number(offset) || 0,
+    limit: Number(limit) || 50,
   });
 };
 
 export const getByPatient = async (userId, patientId, offset = 0, limit = 50) => {
-  offset = Number(offset) || 0;
-  limit = Number(limit) || 50;
-
-  return prisma.appointment.findMany({
-    where: {
-      userId,
-      patientId: Number(patientId),
-    },
-    select: APPOINTMENT_LIST_SELECT,
-    orderBy: [{ date: "desc" }, { createdAt: "desc" }],
-    skip: offset,
-    take: limit,
+  return repo.findManyByPatient(userId, patientId, {
+    offset: Number(offset) || 0,
+    limit: Number(limit) || 50,
   });
 };
 
 export const getPhotos = async (id, userId) => {
-  const appointment = await findOwnedAppointment(id, userId);
+  const appointment = await repo.findOwnedAppointment(id, userId);
 
   if (!appointment) {
     throw createAppError(404, "Tratamiento no encontrado.", "APPOINTMENT_NOT_FOUND");
   }
 
   const galleryRows = await syncLegacyPhotosToGallery(appointment);
-  const signedGallery = await buildSignedGallery(galleryRows, userId);
+  const signedGallery = await storage.buildSignedGallery(galleryRows, userId);
   const legacy = buildLegacyPhotoUrlsFromSignedGallery(signedGallery);
 
   return {
@@ -477,7 +571,8 @@ export const create = async (userId, data, files) => {
   const afterFile = getAfterPhotoFile(files);
   const newGalleryDrafts = extractNewGalleryDrafts(files, data);
 
-  const incomingPhotosCount = Number(Boolean(beforeFile)) + Number(Boolean(afterFile)) + newGalleryDrafts.length;
+  const incomingPhotosCount =
+    Number(Boolean(beforeFile)) + Number(Boolean(afterFile)) + newGalleryDrafts.length;
   if (incomingPhotosCount > APPOINTMENT_PHOTO_LIMIT) {
     throw createAppError(400, `Se permiten hasta ${APPOINTMENT_PHOTO_LIMIT} fotos por tratamiento.`, "APPOINTMENT_GALLERY_LIMIT_EXCEEDED");
   }
@@ -486,109 +581,58 @@ export const create = async (userId, data, files) => {
   const uploadedFileIds = [];
 
   try {
-    createdAppointment = await prisma.appointment.create({
-      data: {
-        userId,
-        patientId,
-        date: treatmentDate,
-        time: data.time !== undefined && data.time !== null && String(data.time).trim() !== ""
-          ? String(data.time).trim()
-          : null,
-        treatment: data.treatment ? String(data.treatment).trim() : null,
-        amount: data.amount !== undefined && data.amount !== null && data.amount !== ""
-          ? parseFloat(data.amount)
-          : null,
-        notes: data.notes ? String(data.notes) : null,
-        status: data.status ? String(data.status).trim() : null,
-        method: data.method ? String(data.method).trim() : null,
-        completed: normalizeLooseText(data.status || "") === "pagado",
-      },
-      select: { id: true },
+    createdAppointment = await repo.createAppointment({
+      userId,
+      patientId,
+      date: treatmentDate,
+      time: data.time !== undefined && data.time !== null && String(data.time).trim() !== ""
+        ? String(data.time).trim()
+        : null,
+      treatment: data.treatment ? String(data.treatment).trim() : null,
+      amount: data.amount !== undefined && data.amount !== null && data.amount !== ""
+        ? parseFloat(data.amount)
+        : null,
+      notes: data.notes ? String(data.notes) : null,
+      status: data.status ? String(data.status).trim() : null,
+      method: data.method ? String(data.method).trim() : null,
+      completed: normalizeLooseText(data.status || "") === "pagado",
     });
 
-    const uploadedRows = [];
-
-    if (beforeFile) {
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: createdAppointment.id,
-        file: beforeFile,
-        purpose: "APPOINTMENT_BEFORE_PHOTO",
-        label: "Antes",
-        position: uploadedRows.length,
-        metadata: { source: "appointments-create", side: "before", mode: "legacy" },
-      });
-      uploadedFileIds.push(uploaded.fileId);
-      uploadedRows.push(uploaded);
-    }
-
-    if (afterFile) {
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: createdAppointment.id,
-        file: afterFile,
-        purpose: "APPOINTMENT_AFTER_PHOTO",
-        label: "Después",
-        position: uploadedRows.length,
-        metadata: { source: "appointments-create", side: "after", mode: "legacy" },
-      });
-      uploadedFileIds.push(uploaded.fileId);
-      uploadedRows.push(uploaded);
-    }
-
-    for (const draft of newGalleryDrafts) {
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: createdAppointment.id,
-        file: draft.file,
-        purpose: "APPOINTMENT_PHOTO",
-        label: draft.label,
-        position: uploadedRows.length,
-        metadata: { source: "appointments-create", mode: "gallery" },
-      });
-      uploadedFileIds.push(uploaded.fileId);
-      uploadedRows.push(uploaded);
-    }
+    const uploadedRows = await uploadIncomingPhotoRows({
+      userId,
+      appointmentId: createdAppointment.id,
+      beforeFile,
+      afterFile,
+      newGalleryDrafts,
+      source: "appointments-create",
+      onUploaded: (fileId) => uploadedFileIds.push(fileId),
+    });
 
     if (uploadedRows.length) {
-      await prisma.appointmentPhoto.createMany({
-        data: uploadedRows.map((row, index) => ({
+      await repo.createAppointmentPhotos(
+        uploadedRows.map((row, index) => ({
           appointmentId: createdAppointment.id,
           fileId: row.fileId,
           label: row.label,
           position: index,
-        })),
-      });
+        }))
+      );
     }
 
     const legacyFileIds = pickLegacyFileIdsFromPhotos(uploadedRows);
 
-    const updated = await prisma.appointment.update({
-      where: { id: createdAppointment.id },
-      data: {
-        beforePhotoFileId: legacyFileIds.beforePhotoFileId,
-        afterPhotoFileId: legacyFileIds.afterPhotoFileId,
-      },
-      select: APPOINTMENT_LIST_SELECT,
+    return repo.setLegacyPhotoFileIds(createdAppointment.id, legacyFileIds);
+  } catch (error) {
+    await storage.queueAppointmentFileDeletions({
+      fileIds: uploadedFileIds,
+      ownerUserId: userId,
+      reason: "appointment-create-rollback",
     });
 
-    return updated;
-  } catch (error) {
-    for (const fileId of uploadedFileIds) {
-      await queueFileDeletion({
-        fileId,
-        ownerUserId: userId,
-        reason: "appointment-create-rollback",
-      }).catch(() => {});
-    }
-
     if (createdAppointment?.id) {
-      await prisma.appointment.deleteMany({
-        where: {
-          id: createdAppointment.id,
-          userId,
-        },
-      }).catch(() => {});
+      await repo
+        .deleteOwnedAppointment(createdAppointment.id, userId)
+        .catch(() => {});
     }
 
     throw error;
@@ -596,7 +640,7 @@ export const create = async (userId, data, files) => {
 };
 
 export const update = async (userId, id, data, files) => {
-  const existing = await findOwnedAppointment(id, userId);
+  const existing = await repo.findOwnedAppointment(id, userId);
 
   if (!existing) {
     throw createAppError(404, "Tratamiento no encontrado.", "APPOINTMENT_NOT_FOUND");
@@ -634,95 +678,39 @@ export const update = async (userId, id, data, files) => {
   const filesToDeleteAfterSuccess = new Set(removedPhotos.map((photo) => photo.fileId));
 
   try {
-    if (beforeFile) {
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: existing.id,
-        file: beforeFile,
-        purpose: "APPOINTMENT_BEFORE_PHOTO",
-        label: "Antes",
-        position: 0,
-        metadata: { source: "appointments-update", side: "before", mode: "legacy" },
-      });
-      uploadedNewFileIds.push(uploaded.fileId);
+    const onUploaded = (fileId) => uploadedNewFileIds.push(fileId);
+    const onReplaced = (fileId) => filesToDeleteAfterSuccess.add(fileId);
 
-      const beforeIndex = retainedPhotos.findIndex((photo) => labelIsBefore(photo.label));
-      if (beforeIndex >= 0) {
-        filesToDeleteAfterSuccess.add(retainedPhotos[beforeIndex].fileId);
-        retainedPhotos[beforeIndex] = {
-          ...retainedPhotos[beforeIndex],
-          fileId: uploaded.fileId,
-          label: "Antes",
-        };
-      } else {
-        retainedPhotos.unshift({
-          id: null,
-          fileId: uploaded.fileId,
-          label: "Antes",
-          position: -1,
-          createdAt: new Date(),
-        });
-      }
-    }
-
-    if (afterFile) {
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: existing.id,
-        file: afterFile,
-        purpose: "APPOINTMENT_AFTER_PHOTO",
-        label: "Después",
-        position: retainedPhotos.length,
-        metadata: { source: "appointments-update", side: "after", mode: "legacy" },
-      });
-      uploadedNewFileIds.push(uploaded.fileId);
-
-      const afterIndex = retainedPhotos.findIndex((photo) => labelIsAfter(photo.label));
-      if (afterIndex >= 0) {
-        filesToDeleteAfterSuccess.add(retainedPhotos[afterIndex].fileId);
-        retainedPhotos[afterIndex] = {
-          ...retainedPhotos[afterIndex],
-          fileId: uploaded.fileId,
-          label: "Después",
-        };
-      } else {
-        retainedPhotos.push({
-          id: null,
-          fileId: uploaded.fileId,
-          label: "Después",
-          position: retainedPhotos.length,
-          createdAt: new Date(),
-        });
-      }
-    }
-
-    newGalleryDrafts.forEach((draft) => {
-      retainedPhotos.push({
-        id: null,
-        fileId: null,
-        label: draft.label,
-        position: retainedPhotos.length,
-        createdAt: new Date(),
-        __draft: draft,
-      });
+    await replaceLegacyPhotoInGallery({
+      userId,
+      appointmentId: existing.id,
+      file: beforeFile,
+      slot: "before",
+      retainedPhotos,
+      source: "appointments-update",
+      onUploaded,
+      onReplaced,
     });
 
-    for (const photo of retainedPhotos) {
-      if (!photo.__draft) continue;
-      const uploaded = await uploadAppointmentPhoto({
-        userId,
-        appointmentId: existing.id,
-        file: photo.__draft.file,
-        purpose: "APPOINTMENT_PHOTO",
-        label: photo.__draft.label,
-        position: photo.position,
-        metadata: { source: "appointments-update", mode: "gallery" },
-      });
-      uploadedNewFileIds.push(uploaded.fileId);
-      photo.fileId = uploaded.fileId;
-      photo.label = uploaded.label;
-      delete photo.__draft;
-    }
+    await replaceLegacyPhotoInGallery({
+      userId,
+      appointmentId: existing.id,
+      file: afterFile,
+      slot: "after",
+      retainedPhotos,
+      source: "appointments-update",
+      onUploaded,
+      onReplaced,
+    });
+
+    await appendGalleryDrafts({
+      userId,
+      appointmentId: existing.id,
+      drafts: newGalleryDrafts,
+      retainedPhotos,
+      source: "appointments-update",
+      onUploaded,
+    });
 
     retainedPhotos = retainedPhotos.map((photo, index) => ({
       ...photo,
@@ -735,129 +723,62 @@ export const update = async (userId, id, data, files) => {
 
     const updateData = normalizeUpdateBaseData(existing, data, patientId);
 
-    await prisma.$transaction(async (tx) => {
-      await tx.appointment.update({
-        where: { id: existing.id },
-        data: updateData,
-      });
-
-      if (removedPhotos.length) {
-        await tx.appointmentPhoto.deleteMany({
-          where: {
-            appointmentId: existing.id,
-            id: { in: removedPhotos.map((photo) => photo.id) },
-          },
-        });
-      }
-
-      for (const photo of retainedPhotos) {
-        if (photo.id) {
-          await tx.appointmentPhoto.update({
-            where: { id: photo.id },
-            data: {
-              fileId: photo.fileId,
-              label: photo.label,
-              position: photo.position,
-            },
-          });
-        } else {
-          await tx.appointmentPhoto.create({
-            data: {
-              appointmentId: existing.id,
-              fileId: photo.fileId,
-              label: photo.label,
-              position: photo.position,
-            },
-          });
-        }
-      }
-
-      const freshPhotos = await tx.appointmentPhoto.findMany({
-        where: { appointmentId: existing.id },
-        select: {
-          fileId: true,
-          label: true,
-          position: true,
-        },
-        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-      });
-
-      const legacyFileIds = pickLegacyFileIdsFromPhotos(freshPhotos);
-      await tx.appointment.update({
-        where: { id: existing.id },
-        data: {
-          beforePhotoFileId: legacyFileIds.beforePhotoFileId,
-          afterPhotoFileId: legacyFileIds.afterPhotoFileId,
-        },
-      });
+    // La transacción vive en el repositorio; la regla legacy se inyecta
+    // como callback para que se calcule sobre las fotos frescas DENTRO
+    // de la misma transacción (DIP).
+    await repo.updateAppointmentWithPhotos({
+      appointmentId: existing.id,
+      updateData,
+      removedPhotoIds: removedPhotos.map((photo) => photo.id),
+      retainedPhotos,
+      computeLegacyFileIds: pickLegacyFileIdsFromPhotos,
     });
 
-    for (const fileId of filesToDeleteAfterSuccess) {
-      await queueFileDeletion({
-        fileId,
-        ownerUserId: userId,
-        reason: "appointment-photo-removed-or-replaced",
-      }).catch(() => {});
-    }
-
-    return prisma.appointment.findUnique({
-      where: { id: existing.id },
-      select: APPOINTMENT_LIST_SELECT,
+    await storage.queueAppointmentFileDeletions({
+      fileIds: [...filesToDeleteAfterSuccess],
+      ownerUserId: userId,
+      reason: "appointment-photo-removed-or-replaced",
     });
+
+    return repo.findByIdForList(existing.id);
   } catch (error) {
-    for (const fileId of uploadedNewFileIds) {
-      await queueFileDeletion({
-        fileId,
-        ownerUserId: userId,
-        reason: "appointment-update-rollback",
-      }).catch(() => {});
-    }
+    await storage.queueAppointmentFileDeletions({
+      fileIds: uploadedNewFileIds,
+      ownerUserId: userId,
+      reason: "appointment-update-rollback",
+    });
 
     throw error;
   }
 };
 
 export const remove = async (userId, id) => {
-  const existing = await findOwnedAppointment(id, userId);
+  const existing = await repo.findOwnedAppointment(id, userId);
 
   if (!existing) {
     return { count: 0 };
   }
 
   const galleryRows = await syncLegacyPhotosToGallery(existing);
-  const fileIds = new Set([
-    ...galleryRows.map((photo) => photo.fileId),
-    existing.beforePhotoFileId,
-    existing.afterPhotoFileId,
-  ].filter(Boolean));
+  const fileIds = new Set(
+    [
+      ...galleryRows.map((photo) => photo.fileId),
+      existing.beforePhotoFileId,
+      existing.afterPhotoFileId,
+    ].filter(Boolean)
+  );
 
-  await prisma.appointment.deleteMany({
-    where: {
-      id: existing.id,
-      userId,
-    },
+  await repo.deleteOwnedAppointment(existing.id, userId);
+
+  await storage.queueAppointmentFileDeletions({
+    fileIds: [...fileIds],
+    ownerUserId: userId,
+    reason: "appointment-deleted",
   });
-
-  for (const fileId of fileIds) {
-    await queueFileDeletion({
-      fileId,
-      ownerUserId: userId,
-      reason: "appointment-deleted",
-    }).catch(() => {});
-  }
 
   return { count: 1 };
 };
 
 export const getCompletedCount = async (userId) => {
-  return prisma.appointment.count({
-    where: {
-      userId,
-      OR: [
-        { completed: true },
-        { status: "Pagado" },
-        { status: "pagado" },
-      ],
-    },
-  });
+  return repo.countCompleted(userId);
 };
