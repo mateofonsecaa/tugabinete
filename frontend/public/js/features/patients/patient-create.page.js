@@ -138,12 +138,7 @@ async function onSubmit(e) {
       submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creando...`;
     }
 
-    const res = await api.createPatient(data);
-
-    if (!res.ok) {
-      const err = await safeJson(res);
-      throw new Error(err?.error || "No se pudo guardar");
-    }
+    await api.createPatient(data);
 
     await Swal.fire({
       icon: "success",
@@ -264,12 +259,4 @@ function clearAllFieldErrors() {
 function focusFirstError() {
   const firstErrorField = document.querySelector(".patient-field.is-error input");
   firstErrorField?.focus();
-}
-
-async function safeJson(res) {
-  try {
-    return await res.json();
-  } catch {
-    return null;
-  }
 }

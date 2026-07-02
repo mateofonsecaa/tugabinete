@@ -67,11 +67,7 @@ function loadPatientsFast() {
 // ===== 2) server =====
 async function loadPatientsFromServer() {
   try {
-    const res = await api.getPatients();     // Response
-    if (!res.ok) throw new Error("Error obteniendo pacientes");
-
-    const data = await res.json();
-    const list = Array.isArray(data) ? data : [];
+    const list = await api.getPatients();
 
     const compactServer = compactPatients(list);
     const compactLocal = compactPatients(allPatients);
@@ -178,8 +174,7 @@ async function confirmDelete(id, name) {
 
 async function deletePatient(id) {
   try {
-    const res = await api.deletePatient(id); // Response
-    if (!res.ok) throw new Error("No se pudo eliminar");
+    await api.deletePatient(id);
 
     allPatients = allPatients.filter(p => p.id !== Number(id));
     renderPatients(allPatients);

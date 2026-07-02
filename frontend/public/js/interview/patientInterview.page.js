@@ -44,11 +44,8 @@ export async function initPatientInterviewPage() {
 
   // título con nombre
   try {
-    const pres = await patientsApi.getPatientById(patientId);
-    if (pres.ok) {
-      const p = await pres.json();
-      document.getElementById("title").textContent = `Entrevista: ${p.fullName || ""}`;
-    }
+    const p = await patientsApi.getPatientById(patientId);
+    document.getElementById("title").textContent = `Entrevista: ${p.fullName || ""}`;
   } catch {}
 
   // cargar entrevista existente

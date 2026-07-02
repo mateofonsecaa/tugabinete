@@ -107,10 +107,7 @@ export async function initPatientEditPage() {
 }
 
 async function loadPatientIntoForm(id) {
-  const res = await api.getPatientById(id);
-  if (!res.ok) throw new Error("No se pudo cargar el paciente");
-
-  const p = await res.json();
+  const p = await api.getPatientById(id);
 
   document.getElementById("patient-title").textContent = p.fullName || "Paciente";
   document.getElementById("fullName").value = p.fullName || "";
@@ -175,11 +172,7 @@ async function onSubmit(e, id) {
   };
 
   try {
-    const res = await api.updatePatient(id, data);
-    if (!res.ok) {
-      const err = await safeJson(res);
-      throw new Error(err?.error || "No se pudo guardar");
-    }
+    await api.updatePatient(id, data);
 
     await Swal.fire({
       icon: "success",
@@ -192,13 +185,5 @@ async function onSubmit(e, id) {
     go("/patients");
   } catch (err) {
     Swal.fire({ icon: "error", title: "Error", text: err.message || "Error" });
-  }
-}
-
-async function safeJson(res) {
-  try {
-    return await res.json();
-  } catch {
-    return null;
   }
 }

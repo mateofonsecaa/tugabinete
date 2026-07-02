@@ -347,19 +347,8 @@ async function onSaveHomeCare(e) {
     }
 
     const payload = buildHomeCarePayload();
-    const res = await api.savePatientHomeCare(currentPatientId, payload);
-    const saved = await res.json().catch(() => null);
+    const saved = await api.savePatientHomeCare(currentPatientId, payload);
 
-    if (!res.ok) {
-      console.error("PUT /patients/:id/homecare failed", {
-        status: res.status,
-        patientId: currentPatientId,
-        body: saved,
-        payload,
-      });
-
-      throw new Error(saved?.error || saved?.message || "No se pudo guardar la rutina.");
-    }
     currentHomeCarePlan = saved;
 
     closeHomeCareModal();
@@ -373,6 +362,13 @@ async function onSaveHomeCare(e) {
       showConfirmButton: false,
     });
   } catch (err) {
+    console.error("PUT /patients/:id/homecare failed", {
+      patientId: currentPatientId,
+      status: err.status,
+      body: err.body,
+      error: err,
+    });
+
     await Swal.fire({
       icon: "error",
       title: "Error",
@@ -489,19 +485,7 @@ async function loadPatient(id) {
   const content = document.getElementById("pd-content");
 
   try {
-    const res = await api.getPatientById(id);
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      console.error("Error response GET /patients/:id", {
-        status: res.status,
-        body: data,
-        patientId: id,
-      });
-      throw new Error(data?.error || data?.message || "No se pudo cargar el paciente");
-    }
-
-    const p = data;
+    const p = await api.getPatientById(id);
 
     currentPatientId = p.id;
     currentHomeCarePlan = p.homeCarePlan || null;
