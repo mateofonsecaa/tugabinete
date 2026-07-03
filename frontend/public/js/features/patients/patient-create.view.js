@@ -9,24 +9,25 @@ import { initDrawer } from "../../components/drawer.js";
 import * as api from "./patients.api.js";
 import { patientCreatePageTemplate } from "./patients.templates.js";
 import { invalidatePatientsCache } from "./patients.cache.js";
+import {
+  getTodayYYYYMMDD,
+  normalizeSpaces,
+  sanitizeFullNameInput,
+  sanitizePhoneInput,
+  sanitizeAddressInput,
+  sanitizeProfessionInput,
+  toPhoneDigits,
+  validateFullName,
+  validateBirthDate,
+  validatePhone,
+  validateAddress,
+  validateProfession,
+} from "./patients.validation.js";
 
 function go(path) {
   history.pushState(null, "", path);
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
-
-function getTodayYYYYMMDD() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-const normalizeSpaces = (s) => s.replace(/\s+/g, " ").trim();
-
-const onlyLetters = (s) => /^[\p{L}\s]+$/u.test(s);
-const phoneAllowed = (s) => /^[0-9+\s()-]+$/.test(s);
-const addressAllowed = (s) => /^[\p{L}0-9\s.,#°ºª/\-]+$/u.test(s);
-const professionAllowed = (s) => /^[\p{L}\s]+$/u.test(s);
 
 export function PatientNew() {
   return patientCreatePageTemplate({ today: getTodayYYYYMMDD() });
@@ -63,7 +64,7 @@ export function initPatientNew() {
 
   if (fullNameEl) {
     fullNameEl.addEventListener("input", () => {
-      fullNameEl.value = fullNameEl.value.replace(/[^\p{L}\s]/gu, "");
+      fullNameEl.value = sanitizeFullNameInput(fullNameEl.value);
       clearFieldError("fullName");
     });
     fullNameEl.addEventListener("blur", () => validateAndRenderField("fullName"));
@@ -71,7 +72,7 @@ export function initPatientNew() {
 
   if (phoneEl) {
     phoneEl.addEventListener("input", () => {
-      phoneEl.value = phoneEl.value.replace(/[^0-9+\s()-]/g, "");
+      phoneEl.value = sanitizePhoneInput(phoneEl.value);
       clearFieldError("phone");
     });
     phoneEl.addEventListener("blur", () => validateAndRenderField("phone"));
@@ -79,7 +80,7 @@ export function initPatientNew() {
 
   if (addressEl) {
     addressEl.addEventListener("input", () => {
-      addressEl.value = addressEl.value.replace(/[^\p{L}0-9\s.,#°ºª/\-]/gu, "");
+      addressEl.value = sanitizeAddressInput(addressEl.value);
       clearFieldError("address");
     });
     addressEl.addEventListener("blur", () => validateAndRenderField("address"));
@@ -87,7 +88,7 @@ export function initPatientNew() {
 
   if (professionEl) {
     professionEl.addEventListener("input", () => {
-      professionEl.value = professionEl.value.replace(/[^\p{L}\s]/gu, "");
+      professionEl.value = sanitizeProfessionInput(professionEl.value);
       clearFieldError("profession");
     });
     professionEl.addEventListener("blur", () => validateAndRenderField("profession"));
@@ -135,7 +136,7 @@ async function onSubmit(e) {
     return;
   }
 
-  const phoneDigits = phoneRaw.replace(/\D/g, "");
+  const phoneDigits = toPhoneDigits(phoneRaw);
 
   const data = {
     fullName,
@@ -207,49 +208,6 @@ function getCurrentValues() {
     address: normalizeSpaces(document.getElementById("address").value),
     profession: normalizeSpaces(document.getElementById("profession").value),
   };
-}
-
-function validateFullName(value) {
-  if (!value) return "Ingresá el nombre completo.";
-  if (value.length > 60) return "El nombre no puede superar los 60 caracteres.";
-  if (!onlyLetters(value)) return "Usá solo letras y espacios.";
-  return "";
-}
-
-function validateBirthDate(value) {
-  if (!value) return "";
-
-  const today = getTodayYYYYMMDD();
-  if (value > today) return "La fecha no puede ser posterior a hoy.";
-
-  return "";
-}
-
-function validatePhone(value) {
-  if (!value) return "";
-
-  if (value.length > 25) return "El teléfono no puede superar los 25 caracteres.";
-  if (!phoneAllowed(value)) return "Ingresá un teléfono válido.";
-
-  const digits = value.replace(/\D/g, "");
-  if (digits.length < 6) return "Ingresá un teléfono válido.";
-  if (digits.length > 20) return "El teléfono no puede superar los 20 dígitos.";
-
-  return "";
-}
-
-function validateAddress(value) {
-  if (!value) return "";
-  if (value.length > 80) return "La dirección no puede superar los 80 caracteres.";
-  if (!addressAllowed(value)) return "Usá solo letras, números y signos básicos.";
-  return "";
-}
-
-function validateProfession(value) {
-  if (!value) return "";
-  if (value.length > 50) return "La profesión no puede superar los 50 caracteres.";
-  if (!professionAllowed(value)) return "Usá solo letras y espacios.";
-  return "";
 }
 
 function setFieldError(fieldId, message) {

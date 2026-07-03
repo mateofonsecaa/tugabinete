@@ -10,12 +10,20 @@ import { initDrawer } from "../../components/drawer.js";
 import * as api from "./patients.api.js";
 import { patientEditPageTemplate } from "./patients.templates.js";
 import { invalidatePatientsCache } from "./patients.cache.js";
-
-function getTodayYYYYMMDD() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
+import {
+  getTodayYYYYMMDD,
+  normalizeSpaces,
+  sanitizeFullNameInput,
+  sanitizePhoneInput,
+  sanitizeAddressInput,
+  sanitizeProfessionInput,
+  toPhoneDigits,
+  validateFullName,
+  validateBirthDate,
+  validatePhone,
+  validateAddress,
+  validateProfession,
+} from "./patients.validation.js";
 
 function go(path) {
   history.pushState(null, "", path);
@@ -92,30 +100,26 @@ export async function initPatientEdit() {
   const professionEl = document.getElementById("profession");
 
   if (fullNameEl) {
-    fullNameEl.maxLength = 20;
     fullNameEl.addEventListener("input", () => {
-      fullNameEl.value = fullNameEl.value.replace(/[^\p{L}\s]/gu, "");
+      fullNameEl.value = sanitizeFullNameInput(fullNameEl.value);
     });
   }
 
   if (phoneEl) {
-    phoneEl.maxLength = 20;
     phoneEl.addEventListener("input", () => {
-      phoneEl.value = phoneEl.value.replace(/[^0-9]/g, "");
+      phoneEl.value = sanitizePhoneInput(phoneEl.value);
     });
   }
 
   if (addressEl) {
-    addressEl.maxLength = 30;
     addressEl.addEventListener("input", () => {
-      addressEl.value = addressEl.value.replace(/[^\p{L}0-9\s]/gu, "");
+      addressEl.value = sanitizeAddressInput(addressEl.value);
     });
   }
 
   if (professionEl) {
-    professionEl.maxLength = 20;
     professionEl.addEventListener("input", () => {
-      professionEl.value = professionEl.value.replace(/[^\p{L}\s]/gu, "");
+      professionEl.value = sanitizeProfessionInput(professionEl.value);
     });
   }
 
@@ -145,51 +149,29 @@ async function loadPatientIntoForm(id) {
 async function onSubmit(e, id) {
   e.preventDefault();
 
-  const fullName = document.getElementById("fullName").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const profession = document.getElementById("profession").value.trim();
+  const fullName = normalizeSpaces(document.getElementById("fullName").value);
+  const birthDate = document.getElementById("birthDate").value;
+  const phoneRaw = normalizeSpaces(document.getElementById("phone").value);
+  const address = normalizeSpaces(document.getElementById("address").value);
+  const profession = normalizeSpaces(document.getElementById("profession").value);
 
-  const onlyLetters = (s) => /^[\p{L}\s]+$/u.test(s);
-  const onlyDigits = (s) => /^[0-9]+$/.test(s);
-  const lettersDigits = (s) => /^[\p{L}0-9\s]+$/u.test(s);
+  // Reglas unificadas (Paso 7): las mismas de alta, desde patients.validation.js.
+  // Presentacion: Swal con el primer error, como siempre en esta pantalla.
+  const firstError =
+    validateFullName(fullName) ||
+    validateBirthDate(birthDate) ||
+    validatePhone(phoneRaw) ||
+    validateAddress(address) ||
+    validateProfession(profession);
 
-  // Nombre
-  if (!fullName) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Nombre completo: es obligatorio." });
-  }
-  if (fullName.length > 20) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Nombre: máximo 20 caracteres." });
-  }
-  if (!onlyLetters(fullName)) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Nombre: solo letras y espacios." });
-  }
-
-  // Teléfono opcional
-  if (phone.length > 20) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: máximo 20 caracteres." });
-  }
-  if (phone && !onlyDigits(phone)) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Teléfono: solo números." });
-  }
-
-  // Dirección opcional
-  if (address.length > 30) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Dirección: máximo 30 caracteres." });
-  }
-  if (address && !lettersDigits(address)) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Dirección: solo letras, números y espacios." });
-  }
-
-  // Profesión opcional
-  if (profession.length > 20) {
-    return Swal.fire({ icon: "error", title: "Error", text: "Profesión: máximo 20 caracteres." });
+  if (firstError) {
+    return Swal.fire({ icon: "error", title: "Error", text: firstError });
   }
 
   const data = {
     fullName,
-    birthDate: document.getElementById("birthDate").value || null,
-    phone: phone || null,
+    birthDate: birthDate || null,
+    phone: toPhoneDigits(phoneRaw) || null,
     address: address || null,
     profession: profession || null,
   };
