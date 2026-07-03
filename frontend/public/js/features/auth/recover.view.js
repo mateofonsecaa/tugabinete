@@ -1,4 +1,4 @@
-import { API_URL } from "../core/config.js";
+import { API_URL } from "../../core/config.js";
 
 let isSubmittingRecover = false;
 

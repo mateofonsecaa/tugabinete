@@ -1,12 +1,12 @@
-import { API_URL } from "../core/config.js";
-import { authFetch } from "../core/authFetch.js";
-import { initDrawer } from "../components/drawer.js";
+import { API_URL } from "../../core/config.js";
+import { authFetch } from "../../core/authFetch.js";
+import { initDrawer } from "../../components/drawer.js";
 import {
   getCurrentUser,
   fetchMe,
   clearSession,
   redirectToLoginIfNeeded,
-} from "../core/session.js";
+} from "../../core/session.js";
 
 export function Dashboard() {
   return `

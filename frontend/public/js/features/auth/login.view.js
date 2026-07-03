@@ -1,6 +1,6 @@
-import { API_URL } from "../core/config.js";
-import { loginSession } from "../core/session.js";
-import { showNotification as showToast } from "../components/toast.js";
+import { API_URL } from "../../core/config.js";
+import { loginSession } from "../../core/session.js";
+import { showNotification as showToast } from "../../components/toast.js";
 
 // Preserva la presentacion historica del login: toast unico colgado
 // de <body>, sin icono, 5 segundos. El escape lo hace el componente.

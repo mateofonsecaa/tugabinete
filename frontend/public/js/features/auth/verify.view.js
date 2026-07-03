@@ -1,5 +1,5 @@
-import { API_URL } from "../core/config.js";
-import { showNotification as showToast } from "../components/toast.js";
+import { API_URL } from "../../core/config.js";
+import { showNotification as showToast } from "../../components/toast.js";
 
 // Preserva la presentacion historica de verify: clases tg-verify-*,
 // 5 segundos. El escape lo hace el componente.

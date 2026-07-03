@@ -1,10 +1,10 @@
 import { Home, initHome } from "./views/home.js";
-import { Login, initLogin } from "./views/login.js";
-import { Verify, initVerify } from "./views/verify.js";
-import { Register, initRegister } from "./views/register.js";
-import { Recover, initRecover } from "./views/recover.js";
-import { ResetPassword, initResetPassword } from "./views/reset-password.js";
-import { Dashboard, initDashboard } from "./views/dashboard.js";
+import { Login, initLogin } from "./features/auth/login.view.js";
+import { Verify, initVerify } from "./features/auth/verify.view.js";
+import { Register, initRegister } from "./features/auth/register.view.js";
+import { Recover, initRecover } from "./features/auth/recover.view.js";
+import { ResetPassword, initResetPassword } from "./features/auth/reset-password.view.js";
+import { Dashboard, initDashboard } from "./features/dashboard/dashboard.view.js";
 import { Patients, initPatients } from "./features/patients/patients-list.view.js";
 import { Agenda, initAgenda } from "./views/agenda.js";
 import { PatientNew, initPatientNew } from "./features/patients/patient-create.view.js";

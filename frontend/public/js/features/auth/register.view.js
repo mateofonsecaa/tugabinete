@@ -1,5 +1,5 @@
-import { API_URL } from "../core/config.js";
-import { showNotification } from "../components/toast.js";
+import { API_URL } from "../../core/config.js";
+import { showNotification } from "../../components/toast.js";
 console.log("REGISTER VERSION 2026-03-18");
 
 let isSubmitting = false;

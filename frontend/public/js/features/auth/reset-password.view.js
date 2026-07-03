@@ -1,5 +1,5 @@
-import { API_URL } from "../core/config.js";
-import { escapeHtml } from "../core/utils/security.js";
+import { API_URL } from "../../core/config.js";
+import { escapeHtml } from "../../core/utils/security.js";
 
 let currentResetToken = "";
 let isSubmittingReset = false;
