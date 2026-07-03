@@ -3,14 +3,8 @@ import {
   clearSession,
   getAccessToken,
   refreshSession,
+  redirectToLoginIfNeeded,
 } from "./session.js";
-
-function redirectToLogin() {
-  if (window.location.pathname !== "/login") {
-    history.pushState(null, "", "/login");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }
-}
 
 async function executeRequest(url, options, token) {
   const headers = new Headers(options.headers || {});
@@ -44,7 +38,7 @@ export async function authFetch(endpoint, options = {}) {
     } catch (error) {
       if (error.code !== "NETWORK_ERROR") {
         clearSession();
-        redirectToLogin();
+        redirectToLoginIfNeeded();
       }
       throw error;
     }
@@ -61,7 +55,7 @@ export async function authFetch(endpoint, options = {}) {
   } catch (error) {
     if (error.code !== "NETWORK_ERROR") {
       clearSession();
-      redirectToLogin();
+      redirectToLoginIfNeeded();
     }
     throw error;
   }
@@ -70,7 +64,7 @@ export async function authFetch(endpoint, options = {}) {
 
   if (res.status === 401 || res.status === 403) {
     clearSession();
-    redirectToLogin();
+    redirectToLoginIfNeeded();
     throw new Error("Sesión no válida.");
   }
 

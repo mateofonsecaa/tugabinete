@@ -72,7 +72,7 @@ function broadcastLogout() {
   } catch {}
 }
 
-function redirectToLoginIfNeeded() {
+export function redirectToLoginIfNeeded() {
   if (window.location.pathname !== "/login") {
     history.pushState(null, "", "/login");
     window.dispatchEvent(new PopStateEvent("popstate"));
