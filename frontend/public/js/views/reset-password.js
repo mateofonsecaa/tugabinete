@@ -1,4 +1,5 @@
 import { API_URL } from "../core/config.js";
+import { escapeHtml } from "../core/utils/security.js";
 
 let currentResetToken = "";
 let isSubmittingReset = false;
@@ -89,8 +90,8 @@ function getStatusMarkup({ title, text, icon, variant = "error" }) {
       <i class="fa-solid ${icon}"></i>
     </div>
 
-    <h1 class="tg-reset-password-title">${title}</h1>
-    <p class="tg-reset-password-text">${text}</p>
+    <h1 class="tg-reset-password-title">${escapeHtml(title)}</h1>
+    <p class="tg-reset-password-text">${escapeHtml(text)}</p>
 
     <div class="tg-reset-password-actions">
       <a href="/recover" data-link class="tg-reset-password-primary-link">Solicitar un nuevo enlace</a>

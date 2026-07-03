@@ -1,5 +1,12 @@
 import { API_URL } from "../core/config.js";
 import { loginSession } from "../core/session.js";
+import { showNotification as showToast } from "../components/toast.js";
+
+// Preserva la presentacion historica del login: toast unico colgado
+// de <body>, sin icono, 5 segundos. El escape lo hace el componente.
+function showNotification(message, type = "success") {
+  showToast(message, type, { mode: "body-single", duration: 5000 });
+}
 
 export function Login() {
   return `
@@ -97,32 +104,6 @@ async function loginUser(event) {
     btn.style.opacity = "1";
     btn.style.cursor = "pointer";
   }
-}
-
-// Notificación
-function showNotification(message, type = "success") {
-  const existing = document.querySelector(".notification-toast");
-  if (existing) existing.remove();
-
-  const notification = document.createElement("div");
-  notification.classList.add("notification-toast");
-
-  if (type === "error") notification.classList.add("error");
-
-  notification.innerHTML = `<span>${message}</span>`;
-
-  document.body.appendChild(notification);
-
-  setTimeout(() => {
-    notification.style.opacity = "1";
-    notification.style.transform = "translateY(0)";
-  }, 50);
-
-  setTimeout(() => {
-    notification.style.opacity = "0";
-    notification.style.transform = "translateY(-15px)";
-    setTimeout(() => notification.remove(), 400);
-  }, 5000);
 }
 
 export function initLogin() {

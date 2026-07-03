@@ -1,4 +1,5 @@
 import { API_URL } from "../core/config.js";
+import { showNotification } from "../components/toast.js";
 console.log("REGISTER VERSION 2026-03-18");
 
 let isSubmitting = false;
@@ -440,27 +441,4 @@ async function registerUser(event) {
 
     isSubmitting = false;
   }
-}
-
-function showNotification(message, type = "success") {
-  const container = document.getElementById("notification-container");
-  if (!container) return;
-
-  const notification = document.createElement("div");
-  notification.classList.add("notification-toast", type);
-
-  notification.innerHTML = `
-    <i class="fa-solid ${
-      type === "success" ? "fa-circle-check" : "fa-triangle-exclamation"
-    }"></i>
-    <span>${message}</span>
-  `;
-
-  container.appendChild(notification);
-
-  setTimeout(() => notification.classList.add("show"), 50);
-  setTimeout(() => {
-    notification.classList.remove("show");
-    setTimeout(() => notification.remove(), 400);
-  }, 6000);
 }

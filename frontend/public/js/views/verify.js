@@ -1,4 +1,14 @@
 import { API_URL } from "../core/config.js";
+import { showNotification as showToast } from "../components/toast.js";
+
+// Preserva la presentacion historica de verify: clases tg-verify-*,
+// 5 segundos. El escape lo hace el componente.
+function showNotification(message, type = "success") {
+  showToast(message, type, {
+    baseClass: "tg-verify-notification-toast",
+    duration: 5000,
+  });
+}
 
 export function Verify(status) {
   const normalizedStatus = String(status || "").toLowerCase();
@@ -150,27 +160,4 @@ async function handleResendVerification(event) {
   } finally {
     setResendLoadingState(false);
   }
-}
-
-function showNotification(message, type = "success") {
-  const container = document.getElementById("notification-container");
-  if (!container) return;
-
-  const notification = document.createElement("div");
-  notification.classList.add("tg-verify-notification-toast", type);
-
-  notification.innerHTML = `
-    <i class="fa-solid ${
-      type === "success" ? "fa-circle-check" : "fa-triangle-exclamation"
-    }"></i>
-    <span>${message}</span>
-  `;
-
-  container.appendChild(notification);
-
-  setTimeout(() => notification.classList.add("show"), 50);
-  setTimeout(() => {
-    notification.classList.remove("show");
-    setTimeout(() => notification.remove(), 400);
-  }, 5000);
 }
