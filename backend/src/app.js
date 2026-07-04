@@ -7,21 +7,33 @@ import routes from "./routes.js";
 
 const app = express();
 
+// Variable de entorno para saber si estamos en producción
+const isProd = process.env.NODE_ENV === "production";
+
 app.set("trust proxy", 1);
 
-const allowedOrigins = [
+// Separamos los orígenes locales
+const localOrigins = [
   "http://localhost:3000",
   "http://localhost:4000",
   "http://localhost:5500",
   "http://127.0.0.1:5500",
   "http://localhost:5501",
   "http://127.0.0.1:5501",
+];
+
+// Dejamos solo los dominios reales en producción
+// NOTA VITAL: Asegúrate de que los links de Netlify/Pages sigan siendo tuyos y no hayan caducado
+const prodOrigins = [
   "https://tugabinete.com",
   "https://www.tugabinete.com",
   "https://api.tugabinete.com",
   "https://tugabinete.pages.dev",
   "https://gleeful-moxie-181612.netlify.app",
 ];
+
+// Construimos la lista dinámicamente según el entorno
+const allowedOrigins = isProd ? prodOrigins : [...localOrigins, ...prodOrigins];
 
 app.use(
   cors({
@@ -32,7 +44,9 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      // 🛡️ BLINDAJE DE RED (PASO 3): Rechazo silencioso. 
+      // Al pasar 'false', CORS bloquea la petición a nivel de navegador sin lanzar un Error 500
+      return callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

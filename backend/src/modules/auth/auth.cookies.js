@@ -5,10 +5,16 @@ export function getRefreshCookieName() {
 }
 
 function baseCookieOptions() {
+  // 🛡️ BLINDAJE DE SESIÓN (PASO 4): Política SameSite dinámica.
+  // Permite "none" para arquitecturas desacopladas (Frontend en Netlify, API en otro lado).
+  // Por defecto en producción usamos "none" para que no se caigan las sesiones cross-site.
+  const sameSitePolicy = process.env.COOKIE_SAME_SITE || (isProd ? "none" : "lax");
+
   return {
     httpOnly: true,
-    secure: isProd,
-    sameSite: "lax",
+    // La regla estricta de los navegadores: si es "none", TIENE que ser secure (HTTPS).
+    secure: sameSitePolicy === "none" ? true : isProd,
+    sameSite: sameSitePolicy,
     path: "/api/auth",
   };
 }
