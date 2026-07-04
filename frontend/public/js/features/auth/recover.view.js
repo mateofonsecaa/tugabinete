@@ -1,88 +1,14 @@
-import { API_URL } from "../../core/config.js";
+import * as api from "./auth.api.js";
+import {
+  recoverPageTemplate,
+  recoverFormTemplate,
+  recoverSuccessTemplate,
+} from "./auth.templates.js";
 
 let isSubmittingRecover = false;
 
-function getRecoverFormMarkup() {
-  return `
-    <div class="tg-recover-card__icon">
-      <i class="fa-solid fa-key"></i>
-    </div>
-
-    <h1 class="tg-recover-card__title">Recuperar contraseña</h1>
-    <p class="tg-recover-card__text">
-      Ingresá tu correo electrónico y, si está registrado, te vamos a enviar un enlace para restablecer tu contraseña.
-    </p>
-
-    <div id="tg-recover-alert" class="tg-recover-alert" hidden></div>
-
-    <form id="tg-recover-form" class="tg-recover-form" novalidate>
-      <div class="tg-recover-field">
-        <label class="tg-recover-label" for="recover-email">Correo electrónico</label>
-        <input
-          class="tg-recover-input"
-          type="email"
-          id="recover-email"
-          name="email"
-          placeholder="ejemplo@correo.com"
-          autocomplete="email"
-          required
-        />
-        <p id="tg-recover-email-error" class="tg-recover-field-error" hidden></p>
-      </div>
-
-      <button type="submit" id="tg-recover-submit" class="tg-recover-submit">
-        Enviar enlace
-      </button>
-    </form>
-
-    <div class="tg-recover-card__actions">
-      <a href="/login" data-link class="tg-recover-secondary-link">Volver a iniciar sesión</a>
-    </div>
-  `;
-}
-
-function getRecoverSuccessMarkup() {
-  return `
-    <div class="tg-recover-card__icon is-success">
-      <i class="fa-solid fa-envelope-circle-check"></i>
-    </div>
-
-    <h1 class="tg-recover-card__title">Revisá tu correo</h1>
-    <p class="tg-recover-card__text">
-      Si el correo ingresado está registrado, te vamos a enviar un enlace para restablecer tu contraseña.
-    </p>
-
-    <div class="tg-recover-info-box">
-      Revisá la bandeja de entrada y también spam o promociones. El enlace vence pronto por seguridad.
-    </div>
-
-    <div class="tg-recover-card__actions">
-      <a href="/login" data-link class="tg-recover-primary-link">Ir a iniciar sesión</a>
-      <button type="button" id="tg-recover-back-btn" class="tg-recover-secondary-btn">
-        Volver a intentar
-      </button>
-    </div>
-  `;
-}
-
 export function Recover() {
-  return `
-    <section class="tg-recover-page">
-      <div class="tg-recover-shell">
-        <a href="/" data-link class="tg-recover-brand">TuGabinete</a>
-
-        <div id="tg-recover-card" class="tg-recover-card">
-          ${getRecoverFormMarkup()}
-        </div>
-
-        <div class="tg-recover-footer">
-          <a href="/policies" data-link>Políticas</a>
-          <a href="/terms" data-link>Términos</a>
-          <a href="/help" data-link>Ayuda</a>
-        </div>
-      </div>
-    </section>
-  `;
+  return recoverPageTemplate();
 }
 
 function isValidEmail(email) {
@@ -148,7 +74,7 @@ function renderRecoverSuccess() {
   const card = document.getElementById("tg-recover-card");
   if (!card) return;
 
-  card.innerHTML = getRecoverSuccessMarkup();
+  card.innerHTML = recoverSuccessTemplate();
 
   document
     .getElementById("tg-recover-back-btn")
@@ -159,7 +85,7 @@ function renderRecoverForm() {
   const card = document.getElementById("tg-recover-card");
   if (!card) return;
 
-  card.innerHTML = getRecoverFormMarkup();
+  card.innerHTML = recoverFormTemplate();
   initRecover();
 }
 
@@ -188,36 +114,31 @@ async function handleRecoverSubmit(event) {
   setRecoverLoadingState(true);
 
   try {
-    const res = await fetch(`${API_URL}/auth/forgot-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
+    const data = await api.forgotPassword(email);
 
-    const data = await res.json().catch(() => ({}));
-
-    if (res.ok && data.code === "PASSWORD_RESET_REQUEST_ACCEPTED") {
+    if (data?.code === "PASSWORD_RESET_REQUEST_ACCEPTED") {
       renderRecoverSuccess();
       return;
     }
 
-    if (res.status === 429) {
-      setRecoverAlert(
-        data?.message ||
-          "Demasiados intentos. Esperá unos minutos e intentá nuevamente."
-      );
-      return;
-    }
-
+    // 2xx con código inesperado: mismo fallback histórico
     setRecoverAlert(
       data?.error ||
         data?.message ||
         "No se pudo procesar la solicitud en este momento."
     );
-  } catch {
-    setRecoverAlert("No se pudo conectar con el servidor.");
+  } catch (err) {
+    // 429 histórico: prefería data.message con su propio fallback.
+    if (err.status === 429) {
+      setRecoverAlert(
+        err.body?.message ||
+          "Demasiados intentos. Esperá unos minutos e intentá nuevamente."
+      );
+      return;
+    }
+
+    // Resto (incluida red): el mensaje ya viene resuelto por auth.api.js.
+    setRecoverAlert(err.message);
   } finally {
     isSubmittingRecover = false;
     setRecoverLoadingState(false);

@@ -1,4 +1,4 @@
-import { API_URL } from "../../core/config.js";
+import * as api from "./auth.api.js";
 import { showNotification } from "../../components/toast.js";
 console.log("REGISTER VERSION 2026-03-18");
 
@@ -267,46 +267,26 @@ async function handleResendVerification() {
   setResendButtonState({ loading: true });
 
   try {
-    const res = await fetch(`${API_URL}/auth/resend-verification`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json().catch(() => ({}));
-    const code = data?.code;
+    const data = await api.resendVerification(email);
     const message =
       data?.error ||
       data?.message ||
       "No se pudo reenviar el correo de verificación.";
 
-    if (res.ok && code === "VERIFICATION_EMAIL_RESENT") {
+    if (data?.code === "VERIFICATION_EMAIL_RESENT") {
       showNotification(message, "success");
       startResendCooldown(60);
       return;
     }
 
+    // 2xx con código inesperado: mismo camino histórico
     setResendButtonState();
-
-    if (code === "EMAIL_ALREADY_VERIFIED") {
-      showNotification(message, "error");
-      return;
-    }
-
-    if (code === "PENDING_ACCOUNT_NOT_FOUND") {
-      showNotification(message, "error");
-      return;
-    }
-
-    if (code === "MAIL_SEND_FAILED") {
-      showNotification(message, "error");
-      return;
-    }
-
     showNotification(message, "error");
-  } catch {
+  } catch (err) {
+    // EMAIL_ALREADY_VERIFIED, PENDING_ACCOUNT_NOT_FOUND, MAIL_SEND_FAILED
+    // y red: todos mostraban err.message; el boton se rehabilita igual.
     setResendButtonState();
-    showNotification("No se pudo conectar con el servidor.", "error");
+    showNotification(err.message, "error");
   }
 }
 
@@ -392,45 +372,29 @@ async function registerUser(event) {
   setRegisterLoadingState(true);
 
   try {
-    const res = await fetch(`${API_URL}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json().catch(() => ({}));
-    const code = data?.code;
-    const message =
-      data?.error || data?.message || "Error al registrar usuario.";
+    const data = await api.registerAccount({ name, email, password });
 
     // Caso 1: usuario nuevo, correo enviado
-    if (res.ok && code === "VERIFY_EMAIL_SENT") {
+    if (data?.code === "VERIFY_EMAIL_SENT") {
       showVerificationState(data?.email || email, "created");
       return;
     }
 
     // Caso 2: usuario ya existente pero NO verificado, correo reenviado
-    if (res.ok && code === "EMAIL_ALREADY_PENDING_VERIFICATION") {
+    if (data?.code === "EMAIL_ALREADY_PENDING_VERIFICATION") {
       showVerificationState(data?.email || email, "pending");
       return;
     }
 
-    // Caso 3: cuenta ya verificada => error normal, NO pantalla de verificación
-    if (code === "EMAIL_ALREADY_REGISTERED") {
-      showNotification(message, "error");
-      return;
-    }
-
-    // Caso 4: fallo al enviar mail
-    if (code === "MAIL_SEND_FAILED") {
-      showNotification(message, "error");
-      return;
-    }
-
-    // Fallback para cualquier otro caso
-    showNotification(message, "error");
-  } catch {
-    showNotification("No se pudo conectar con el servidor.", "error");
+    // 2xx con código inesperado: mismo fallback histórico
+    showNotification(
+      data?.error || data?.message || "Error al registrar usuario.",
+      "error"
+    );
+  } catch (err) {
+    // Errores del backend (EMAIL_ALREADY_REGISTERED, MAIL_SEND_FAILED,
+    // etc.) y de red: el mensaje ya viene resuelto por auth.api.js.
+    showNotification(err.message, "error");
   } finally {
     const successView = document.getElementById("register-success-view");
     const successVisible = successView && successView.hidden === false;
