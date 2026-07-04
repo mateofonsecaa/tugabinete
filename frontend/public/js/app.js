@@ -1,5 +1,5 @@
 import { router } from "./router.js";
-import { bootstrapSession, logoutSession } from "./core/session.js";
+import { bootstrapSession, logoutSession, initSessionListeners } from "./core/session.js";
 
 function renderBootScreen() {
   const app = document.getElementById("app");
@@ -28,6 +28,7 @@ function renderBootError(message) {
 }
 
 async function startApp() {
+  initSessionListeners();
   renderBootScreen();
 
   try {

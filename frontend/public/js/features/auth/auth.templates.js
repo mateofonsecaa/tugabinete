@@ -343,3 +343,192 @@ export function resetPasswordFormTemplate() {
 export function resetPasswordPageTemplate() {
   return resetPasswordShellTemplate(resetPasswordLoadingTemplate());
 }
+
+/* ==================== Registro ==================== */
+
+/**
+ * Pantalla completa de registro: contiene el formulario Y la vista de
+ * exito/reenvio (oculta). 100% estatica: el email del usuario NO se
+ * interpola aca — la vista lo inyecta via .textContent (seguro por
+ * construccion) y via dataset.email, que ademas viaja de vuelta al
+ * backend en el reenvio: escaparlo corromperia el dato.
+ */
+export function registerPageTemplate() {
+  return `
+    <header>
+      <a class="logo" href="/" data-link>TuGabinete</a>
+    </header>
+
+    <section class="register-section">
+      <div class="register-card" id="register-card">
+        <div class="register-content">
+          <div class="register-form-view" id="register-form-view">
+            <h2>Crear una cuenta</h2>
+            <p>Completá tus datos para comenzar a usar TuGabinete.</p>
+
+            <form id="register-form" novalidate>
+              <div class="input-group">
+                <label for="name">Nombre completo</label>
+                <input type="text" id="name" placeholder="Juana Gomez" required />
+              </div>
+
+              <div class="input-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" placeholder="ejemplo@correo.com" required />
+              </div>
+
+              <div class="input-group show-password">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="••••••••" required />
+                <i class="fa-solid fa-eye toggle-password" id="toggleEye"></i>
+              </div>
+
+              <div class="input-group">
+                <label for="confirm-password">Confirmar contraseña</label>
+                <input type="password" id="confirm-password" placeholder="••••••••" required />
+              </div>
+
+              <div class="terms-check">
+                <label class="terms-label">
+                  <input type="checkbox" id="acceptTerms" />
+                  <span>
+                    Acepto
+                    <a href="/terms" target="_blank" rel="noopener" class="terms-link">
+                      términos y condiciones
+                    </a>
+                  </span>
+                </label>
+              </div>
+
+              <button type="submit" id="register-submit-btn">Registrarse</button>
+
+              <p class="login-link">
+                ¿Ya tenés cuenta?
+                <a href="/login" data-link>Iniciá sesión</a>
+              </p>
+            </form>
+          </div>
+
+          <div
+            class="register-success-view"
+            id="register-success-view"
+            hidden
+            aria-live="polite"
+          >
+            <div class="success-icon">
+              <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+
+            <h2 id="success-title">Verificá tu correo</h2>
+
+            <p class="success-lead" id="success-lead">
+              Te enviamos un enlace de verificación al siguiente correo:
+            </p>
+
+            <div class="success-email-pill" id="success-email"></div>
+
+            <div class="success-note" id="success-extra">
+              El enlace vence en 15 minutos. Si expira, podés reenviarlo desde esta misma pantalla.
+            </div>
+
+            <p class="success-footnote">
+              Hasta que no verifiques tu cuenta, no vas a poder iniciar sesión.
+            </p>
+
+            <div class="success-actions">
+              <button
+                type="button"
+                class="secondary-action-btn"
+                id="resend-verification-btn"
+              >
+                Reenviar correo
+              </button>
+
+              <div class="success-resend-hint" id="success-resend-hint">
+                Si no te llegó, podés reenviarlo.
+              </div>
+
+              <a href="/login" data-link class="success-login-link">
+                Ir a iniciar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-links">
+      <a href="/policies" data-link>Políticas</a>
+      <a href="/terms" data-link>Términos</a>
+      <a href="/help" data-link>Ayuda</a>
+      <div class="social">
+        <i class="fa-brands fa-facebook"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+    </div>
+
+    <div class="copyright">
+      © 2026 TuGabinete — Todos los derechos reservados.
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+  `;
+}
+
+/* ==================== Login ==================== */
+
+/**
+ * Pantalla completa de login. Estatica: el saludo con el nombre del
+ * usuario NO vive aca sino en el toast (components/toast.js), que ya
+ * escapa. Los toasts de esta pantalla usan el modo "body-single".
+ */
+export function loginPageTemplate() {
+  return `
+    <header>
+      <a class="logo" href="/" data-link>TuGabinete</a>
+    </header>
+
+    <section class="login-section">
+      <div class="login-card">
+        <h2>¡Bienvenid@!</h2>
+        <p>Ingrese a su cuenta.</p>
+
+        <form id="login-form">
+          <div class="input-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required />
+          </div>
+
+          <div class="input-group show-password">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required />
+            <i class="fa-solid fa-eye toggle-password" id="toggleEye"></i>
+          </div>
+
+          <div class="extra-links">
+            <a href="/recover" data-link>¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button type="submit">Ingresar</button>
+
+          <div class="extra-links">
+            ¿No tenés cuenta? <a href="/register" data-link>Registrate aquí</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <div class="bottom-links">
+      <a href="/policies" data-link>Políticas</a>
+      <a href="/terms" data-link>Términos</a>
+      <a href="/help" data-link>Ayuda</a>
+      <div class="social">
+        <i class="fa-brands fa-facebook"></i>
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+    </div>
+    <div class="copyright">
+      © 2026 TuGabinete — Todos los derechos reservados.
+    </div>
+  `;
+}

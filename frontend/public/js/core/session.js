@@ -8,8 +8,12 @@ const state = {
   refreshPromise: null,
 };
 
-const channel =
-  "BroadcastChannel" in window ? new BroadcastChannel("tg-auth") : null;
+// El canal y los listeners NO se crean al importar el modulo:
+// initSessionListeners() (llamada desde app.js) enciende el motor.
+// Esto elimina los efectos colaterales de import que hacian
+// intesteable todo modulo que tocara la sesion.
+let channel = null;
+let listenersInitialized = false;
 
 function clearLegacyStorage() {
   try {
@@ -64,6 +68,14 @@ async function request(url, options = {}) {
   return data;
 }
 
+function broadcastLogin() {
+  channel?.postMessage({ type: "LOGIN" });
+
+  try {
+    localStorage.setItem("tg_login", String(Date.now()));
+  } catch {}
+}
+
 function broadcastLogout() {
   channel?.postMessage({ type: "LOGOUT" });
 
@@ -84,17 +96,53 @@ function handleRemoteLogout() {
   redirectToLoginIfNeeded();
 }
 
-channel?.addEventListener("message", (event) => {
-  if (event.data?.type === "LOGOUT") {
-    handleRemoteLogout();
-  }
-});
+async function handleRemoteLogin() {
+  // Otra pestaña inició sesión: levantamos la cookie nueva.
+  if (isAuthenticated()) return;
 
-window.addEventListener("storage", (event) => {
-  if (event.key === "tg_logout") {
-    handleRemoteLogout();
-  }
-});
+  try {
+    await bootstrapSession();
+
+    // Solo movemos la pestaña si estaba esperando en /login;
+    // una pestaña en una página pública no se secuestra.
+    if (isAuthenticated() && window.location.pathname === "/login") {
+      history.pushState(null, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  } catch {}
+}
+
+/**
+ * Enciende el canal multipestaña y sus listeners. Idempotente.
+ * Debe llamarse una vez al arrancar la app (app.js), ANTES de
+ * bootstrapSession(), para no perder eventos de otras pestañas
+ * durante el propio bootstrap.
+ */
+export function initSessionListeners() {
+  if (listenersInitialized) return;
+  listenersInitialized = true;
+
+  channel =
+    "BroadcastChannel" in window ? new BroadcastChannel("tg-auth") : null;
+
+  channel?.addEventListener("message", (event) => {
+    if (event.data?.type === "LOGOUT") {
+      handleRemoteLogout();
+    }
+    if (event.data?.type === "LOGIN") {
+      handleRemoteLogin();
+    }
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key === "tg_logout") {
+      handleRemoteLogout();
+    }
+    if (event.key === "tg_login") {
+      handleRemoteLogin();
+    }
+  });
+}
 
 export function getAccessToken() {
   return state.accessToken;
@@ -151,6 +199,8 @@ export async function loginSession(email, password) {
       accessToken: data.accessToken,
       user: data.user,
     });
+
+    broadcastLogin();
 
     return data;
   } catch (error) {

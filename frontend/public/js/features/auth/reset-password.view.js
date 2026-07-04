@@ -1,4 +1,5 @@
 import * as api from "./auth.api.js";
+import { validatePasswordFields } from "./auth.validation.js";
 import {
   resetPasswordPageTemplate,
   resetPasswordFormTemplate,
@@ -8,54 +9,6 @@ import {
 
 let currentResetToken = "";
 let isSubmittingReset = false;
-
-const COMMON_PASSWORDS = new Set([
-  "12345678",
-  "123456789",
-  "1234567890",
-  "123123123",
-  "password",
-  "password123",
-  "qwerty123",
-  "qwertyuiop",
-  "admin123",
-  "contraseña",
-  "tucontraseña",
-  "abcdef123",
-]);
-
-function getByteLength(value) {
-  return new TextEncoder().encode(String(value)).length;
-}
-
-function isCommonPassword(value) {
-  return COMMON_PASSWORDS.has(String(value).toLowerCase().replace(/\s+/g, ""));
-}
-
-function validatePasswordFields(password, confirmPassword) {
-  const errors = {};
-
-  if (!password) {
-    errors.password = "Ingresá una nueva contraseña.";
-  } else if (/^\s+$/.test(password)) {
-    errors.password = "La contraseña no puede estar formada solo por espacios.";
-  } else if (password.length < 10) {
-    errors.password = "La contraseña debe tener al menos 10 caracteres.";
-  } else if (getByteLength(password) > 72) {
-    errors.password =
-      "La contraseña es demasiado larga para el sistema actual. Usá hasta 72 bytes UTF-8.";
-  } else if (isCommonPassword(password)) {
-    errors.password = "Esa contraseña es demasiado común. Elegí otra.";
-  }
-
-  if (!confirmPassword) {
-    errors.confirmPassword = "Confirmá la nueva contraseña.";
-  } else if (password !== confirmPassword) {
-    errors.confirmPassword = "Las contraseñas no coinciden.";
-  }
-
-  return errors;
-}
 
 function renderInsideCard(markup) {
   const card = document.getElementById("tg-reset-password-card");

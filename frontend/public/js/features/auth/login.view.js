@@ -1,5 +1,5 @@
-import { API_URL } from "../../core/config.js";
 import { loginSession } from "../../core/session.js";
+import { loginPageTemplate } from "./auth.templates.js";
 import { showNotification as showToast } from "../../components/toast.js";
 
 // Preserva la presentacion historica del login: toast unico colgado
@@ -9,54 +9,7 @@ function showNotification(message, type = "success") {
 }
 
 export function Login() {
-  return `
-    <header>
-      <a class="logo" href="/" data-link>TuGabinete</a>
-    </header>
-
-    <section class="login-section">
-      <div class="login-card">
-        <h2>¡Bienvenid@!</h2>
-        <p>Ingrese a su cuenta.</p>
-
-        <form id="login-form">
-          <div class="input-group">
-            <label for="email">Correo electrónico</label>
-            <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required />
-          </div>
-
-          <div class="input-group show-password">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required />
-            <i class="fa-solid fa-eye toggle-password" id="toggleEye"></i>
-          </div>
-
-          <div class="extra-links">
-            <a href="/recover" data-link>¿Olvidaste tu contraseña?</a>
-          </div>
-
-          <button type="submit">Ingresar</button>
-
-          <div class="extra-links">
-            ¿No tenés cuenta? <a href="/register" data-link>Registrate aquí</a>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <div class="bottom-links">
-      <a href="/policies" data-link>Políticas</a>
-      <a href="/terms" data-link>Términos</a>
-      <a href="/help" data-link>Ayuda</a>
-      <div class="social">
-        <i class="fa-brands fa-facebook"></i>
-        <i class="fa-brands fa-instagram"></i>
-      </div>
-    </div>
-    <div class="copyright">
-      © 2026 TuGabinete — Todos los derechos reservados.
-    </div>
-  `;
+  return loginPageTemplate();
 }
 
 function togglePassword() {
