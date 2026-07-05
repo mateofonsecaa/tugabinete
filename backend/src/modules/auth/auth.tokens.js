@@ -39,7 +39,7 @@ export function verifyAccessToken(token) {
     throw new Error("ACCESS_TOKEN_SECRET no está configurado.");
   }
 
-  return jwt.verify(token, secret);
+  return jwt.verify(token, secret, { algorithms: ["HS256"]});
 }
 
 export function generateRefreshToken() {

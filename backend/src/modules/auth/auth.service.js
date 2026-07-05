@@ -223,6 +223,22 @@ export const register = async (data) => {
   const password = String(data.password ?? "");
   const { firstName, lastName } = splitName(name);
 
+  // 🛡️ BLINDAJE DE SEGURIDAD (PASO 2): Validar la contraseña antes de procesar nada
+  // Le pasamos requireConfirmation: false porque en el registro el backend solo recibe 'password'
+  const passwordValidation = validatePasswordPolicy({ password, requireConfirmation: false });
+  
+  // Asumiendo que tu validador devuelve un objeto con errores o isValid: false
+  // Ajusta 'isValid' o 'fieldErrors' según la forma exacta que devuelva tu auth.validation.js
+  if (passwordValidation && !passwordValidation.isValid) {
+    return {
+      status: 400,
+      ok: false,
+      code: "VALIDATION_ERROR",
+      message: "Revisá los errores en el formulario.",
+      fieldErrors: passwordValidation.errors || passwordValidation.fieldErrors || passwordValidation
+    };
+  }
+
   const existingUser = await repo.findUserByEmail(email);
 
   if (existingUser?.isVerified) {
