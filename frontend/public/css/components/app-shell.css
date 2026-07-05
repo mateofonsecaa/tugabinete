@@ -1,42 +1,70 @@
+/* =============================================================================
+   app-shell.css — Top bar + Drawer (componente global del shell autenticado)
+   OPCIONAL: versión tokenizada. Mecánica IDÉNTICA a la tuya:
+     · drawer abre con   .open      (left: -320px → 0)
+     · overlay abre con  .show
+     · link activo con   .is-current
+     · el shortcut .drawer-feedback / .drawer-feedback-link lo inyecta drawer.js
+   Solo se unifican colores/sombras/espaciados con base.css y se pule el hover.
+   ========================================================================== */
+
 /* ===== TOP BAR ===== */
 .top-bar {
-  position: sticky;
+  position: sticky;              /* en páginas de app, layout.css lo pasa a fixed */
   top: 0;
   z-index: 1000;
   height: 60px;
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 0 20px;
-  background: rgba(255,255,255,0.95);
-  border-bottom: 1px solid rgba(255,173,173,0.3);
+  gap: var(--space-4);
+  padding: 0 var(--space-5);
+  background: var(--color-surface-translucent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-line);
+  box-shadow: var(--shadow-sm);
 }
 
 .app-title {
   font-weight: 700;
-  font-size: 20px;
-  color: #ffadad;
+  font-size: var(--text-lg);
+  letter-spacing: 0.2px;
+  color: var(--brand-700);   /* mismo #ffadad de siempre */
+  /* ¿Querés más contraste sobre el blanco? cambiá a var(--brand-700). */
 }
 
 .menu-btn,
 .close-btn {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  font-size: 22px;
-  color: #ffadad;
+  border-radius: var(--radius-sm);
+  font-size: 20px;
+  color: var(--brand-500);
   cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.menu-btn:hover,
+.close-btn:hover {
+  background: var(--brand-50);
+  color: var(--brand-600);
 }
 
 /* ===== DRAWER IZQUIERDO ===== */
 .drawer {
   position: fixed;
   top: 0;
-  left: -320px;
+  left: -320px;                  /* misma técnica: se desliza con `left` */
   width: 320px;
   height: 100%;
-  background: #fff;
-  box-shadow: 10px 0 25px rgba(0,0,0,0.15);
-  transition: left 0.3s ease;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  transition: left var(--dur) var(--ease);
   z-index: 3500;
   display: flex;
   flex-direction: column;
@@ -50,88 +78,98 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: var(--space-5);
   font-weight: 600;
-  border-bottom: 1px solid rgba(255,173,173,0.3);
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .drawer-nav {
-  padding: 20px;
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
   flex: 1;
   overflow-y: auto;
 }
 
 .drawer-nav a {
   text-decoration: none;
-  color: #333;
-  font-size: 15px;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
 }
 
 .drawer-nav a:hover {
-  background: rgba(255,243,194,0.42);
+  background: var(--brand-50);
+  color: var(--color-ink);
   transform: translateX(2px);
 }
 
 .drawer-nav a.is-current {
-  background: rgba(255,173,173,0.14);
-  color: #ff8f8f;
+  background: var(--brand-100);
+  color: var(--brand-700);
   font-weight: 700;
 }
 
 .drawer-nav i {
-  margin-right: 0;
-  width: 18px;
+  width: 20px;
   text-align: center;
-  color: #ffadad;
+  color: var(--brand-500);
   flex-shrink: 0;
+  transition: color var(--dur) var(--ease);
 }
 
+.drawer-nav a.is-current i {
+  color: var(--brand-600);
+}
+
+/* ===== Shortcut de feedback (lo inyecta drawer.js) ===== */
 .drawer-feedback {
-  margin: auto 20px 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,173,173,0.25);
+  margin: auto var(--space-5) var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
 }
 
 .drawer-feedback-link {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   text-decoration: none;
-  color: #333;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,243,194,0.78) 0%, rgba(255,255,255,0.96) 100%);
-  border: 1px solid rgba(255,173,173,0.28);
-  box-shadow: 0 8px 18px rgba(255,173,173,0.12);
+  color: var(--color-ink);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255, 243, 194, 0.78) 0%, rgba(255, 255, 255, 0.96) 100%);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-sm);
   font-weight: 700;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 
 .drawer-feedback-link:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(255,173,173,0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .drawer-feedback-link i {
-  width: 18px;
+  width: 20px;
   text-align: center;
-  color: #ffadad;
+  color: var(--brand-500);
 }
 
 .drawer-feedback-link.is-current {
-  background: #ffadad;
+  background: var(--brand-300);
   color: #fff;
-  border-color: #ffadad;
-  box-shadow: 0 10px 22px rgba(255,173,173,0.26);
+  border-color: var(--brand-300);
+  box-shadow: 0 10px 22px rgba(255, 173, 173, 0.26);
 }
 
 .drawer-feedback-link.is-current i {
@@ -142,10 +180,12 @@
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: var(--color-scrim);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   opacity: 0;
   pointer-events: none;
-  transition: 0.3s;
+  transition: opacity var(--dur) var(--ease);
   z-index: 3000;
 }
 
@@ -154,10 +194,11 @@
   pointer-events: all;
 }
 
+/* ===== Responsive ===== */
 @media (max-width: 480px) {
   .top-bar {
     height: 60px;
-    padding: 0 15px;
+    padding: 0 var(--space-4);
   }
 
   .drawer {
@@ -165,10 +206,10 @@
   }
 
   .drawer-feedback {
-    margin: auto 16px 16px;
+    margin: auto var(--space-4) var(--space-4);
   }
 
   .drawer-nav {
-    padding: 16px;
+    padding: var(--space-4);
   }
 }

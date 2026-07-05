@@ -1,0 +1,1092 @@
+/* =============================================================================
+   TuGabinete · Auth  (hoja UNIFICADA)
+   Fusiona login.css + register.css + recover.css + verify.css + reset-password.css
+
+   · login y register eran CSS GLOBAL (redefinían *, body, header, .input-group…).
+     Se scopean bajo body.is-login / body.is-register para no filtrar a la app,
+     y se DEDUPLICAN (compartían header, inputs, toggle, footer, notificaciones).
+   · recover/verify/reset ya venían scopeados por .tg-*-page: se tokenizan.
+   · Colores/radios tokenizados contra base.css (los washes pálidos de éxito/
+     aviso sin token equivalente se conservan). Hooks (ids/name/estado) intactos.
+   · A11y: inputs 16px, targets 44x44, toggle de contraseña accesible, foco visible.
+   · Contraste: títulos y links van a --color-ink / --brand-700 (el #ffadad como
+     texto no pasa AA); el rosa queda para acentos e íconos.
+   ========================================================================== */
+
+
+/* =============================================================================
+   LOGIN + REGISTER  (shell compartido)
+   ========================================================================== */
+body.is-login, body.is-register { display: flex; flex-direction: column; }
+
+body.is-login header, body.is-register header {
+  height: 80px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--space-5); position: sticky; top: 0; z-index: 100;
+}
+body.is-login .logo, body.is-register .logo {
+  font-size: 24px; font-weight: 700; color: var(--brand-600); text-decoration: none;
+}
+
+/* Centrado vertical del card en la SPA */
+body.is-login #app, body.is-register #app { min-height: 100vh; display: flex; flex-direction: column; }
+body.is-login #app > :first-child, body.is-register #app > :first-child { margin-top: auto; margin-bottom: auto; }
+
+body.is-login .login-section, body.is-register .register-section {
+  flex: 1; display: flex; justify-content: center; align-items: center; padding: var(--space-7) var(--space-5);
+}
+
+body.is-login .login-card, body.is-register .register-card {
+  width: 100%; max-width: 460px; text-align: center;
+  background: var(--color-surface-translucent);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-7) clamp(24px, 5vw, 50px);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+body.is-register .register-card { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+
+body.is-login .login-card h2, body.is-register .register-card h2 {
+  color: var(--color-ink); font-size: clamp(24px, 4vw, 28px);
+  margin-bottom: var(--space-2); line-height: var(--leading-tight);
+}
+body.is-login .login-card p, body.is-register .register-card p {
+  color: var(--color-muted); font-size: var(--text-base); margin-bottom: var(--space-5); line-height: var(--leading-normal);
+}
+
+/* Inputs (compartido) */
+body.is-login .input-group, body.is-register .input-group { margin-bottom: var(--space-5); text-align: left; }
+body.is-login .input-group label, body.is-register .input-group label {
+  display: block; font-weight: 600; color: var(--color-ink); margin-bottom: var(--space-2); font-size: var(--text-sm);
+}
+body.is-login .input-group input, body.is-register .input-group input {
+  width: 100%; min-height: var(--tap-min); padding: 12px 14px;
+  border-radius: var(--radius-md); border: 1.5px solid var(--brand-200); background: var(--color-surface);
+  font-size: 16px; color: var(--color-text);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+body.is-login .input-group input:focus, body.is-register .input-group input:focus {
+  border-color: var(--brand-300); box-shadow: 0 0 0 4px rgba(255, 173, 173, 0.18); outline: none;
+}
+body.is-register .input-group input:disabled { cursor: not-allowed; opacity: 0.85; }
+
+/* Toggle de contraseña: área 44x44 accesible, centrada sobre el input */
+body.is-login .show-password, body.is-register .show-password { position: relative; }
+body.is-login .toggle-password, body.is-register .toggle-password {
+  position: absolute; right: 6px; bottom: 0;
+  width: var(--tap-min); height: var(--tap-min);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--brand-500); cursor: pointer; font-size: 16px; border-radius: var(--radius-sm);
+}
+body.is-register .toggle-password.is-disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Botón primario (compartido) */
+body.is-login .login-card button[type="submit"], body.is-register .register-card button[type="submit"] {
+  width: 100%; min-height: 52px;
+  background: linear-gradient(180deg, var(--brand-300), var(--brand-400)); color: var(--color-surface);
+  border: none; border-radius: var(--radius-md); padding: 14px;
+  font-size: var(--text-base); font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+body.is-login .login-card button[type="submit"]:hover, body.is-register .register-card button[type="submit"]:hover {
+  background: linear-gradient(180deg, var(--brand-400), var(--brand-500)); transform: translateY(-2px);
+}
+body.is-register .register-card button[type="submit"]:disabled {
+  transform: none; cursor: not-allowed; background: var(--brand-200); color: var(--color-surface); box-shadow: none;
+}
+#register-form.is-loading { opacity: 0.78; pointer-events: none; }
+
+/* Links secundarios */
+body.is-login .extra-links, body.is-register .login-link {
+  text-align: center; margin-top: var(--space-4); font-size: var(--text-sm); color: var(--color-muted);
+}
+body.is-login .extra-links a, body.is-register .login-link a {
+  color: var(--brand-700); text-decoration: none; font-weight: 600;
+}
+body.is-login .extra-links a:hover, body.is-register .login-link a:hover { text-decoration: underline; }
+
+/* Términos (register) */
+body.is-register .terms-check { margin: var(--space-3) 0 var(--space-2); }
+body.is-register .terms-label { display: flex; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--color-muted); user-select: none; }
+body.is-register .terms-label input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--brand-500); cursor: pointer; }
+body.is-register .terms-link { color: var(--brand-700); font-weight: 700; text-decoration: none; }
+body.is-register .terms-link:hover { text-decoration: underline; }
+
+/* Spinner de submit (register) */
+body.is-register .submit-spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255, 255, 255, 0.45); border-top-color: var(--color-surface);
+  border-radius: 50%; animation: tg-auth-spin 0.75s linear infinite;
+}
+
+/* ===== Estado de éxito (register) ===== */
+body.is-register .register-form-view, body.is-register .register-success-view { animation: tg-auth-fade 0.25s ease; }
+body.is-register .register-success-view[hidden] { display: none !important; }
+body.is-register .success-icon {
+  width: 78px; height: 78px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-100), var(--color-secondary));
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 22px;
+  box-shadow: var(--shadow-sm);
+}
+body.is-register .success-icon i { font-size: 34px; color: var(--brand-500); }
+body.is-register .success-lead { color: var(--color-muted); font-size: var(--text-base); margin-bottom: 14px; }
+body.is-register .success-email-pill {
+  width: 100%; padding: 13px 16px; border-radius: var(--radius-md);
+  background: var(--brand-50); border: 1px solid var(--brand-200); color: var(--color-ink);
+  font-weight: 600; font-size: var(--text-sm); line-height: 1.45; word-break: break-word; margin-bottom: 18px;
+}
+body.is-register .success-note {
+  background: #fff8e8; border: 1px solid #ffe2a8; color: #5c4b25;
+  border-radius: var(--radius-md); padding: 14px 16px; font-size: var(--text-sm); line-height: 1.5; margin-bottom: 18px;
+}
+body.is-register .success-footnote { color: var(--color-muted); font-size: var(--text-sm); margin-bottom: 22px; }
+body.is-register .success-login-link {
+  display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 52px;
+  text-decoration: none; background: linear-gradient(180deg, var(--brand-300), var(--brand-400)); color: var(--color-surface);
+  border-radius: var(--radius-md); padding: 14px; font-size: var(--text-base); font-weight: 600;
+  box-shadow: var(--shadow-sm); transition: transform var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+body.is-register .success-login-link:hover { background: linear-gradient(180deg, var(--brand-400), var(--brand-500)); transform: translateY(-2px); }
+body.is-register .success-actions { display: flex; flex-direction: column; gap: 12px; }
+body.is-register .secondary-action-btn {
+  width: 100%; min-height: var(--tap-min); border: 1px solid var(--brand-200); background: var(--brand-50); color: var(--brand-700);
+  border-radius: var(--radius-md); padding: 14px; font-size: var(--text-sm); font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all var(--dur) var(--ease);
+}
+body.is-register .secondary-action-btn:hover:not(:disabled) { background: var(--brand-100); transform: translateY(-1px); }
+body.is-register .secondary-action-btn:disabled { cursor: not-allowed; opacity: 0.78; transform: none; }
+body.is-register .success-resend-hint { font-size: var(--text-xs); color: var(--color-muted); line-height: 1.45; }
+
+/* ===== Footer (compartido) ===== */
+body.is-login .bottom-links, body.is-register .bottom-links { text-align: center; padding: var(--space-5) 0; font-size: var(--text-sm); }
+body.is-login .bottom-links a, body.is-register .bottom-links a { color: var(--color-text); text-decoration: none; margin: 0 12px; transition: color var(--dur) var(--ease); }
+body.is-login .bottom-links a:hover, body.is-register .bottom-links a:hover { color: var(--brand-600); }
+body.is-login .social, body.is-register .social { margin-top: 10px; }
+body.is-login .social i, body.is-register .social i { font-size: 22px; color: var(--brand-500); margin: 0 10px; transition: transform var(--dur) var(--ease); }
+body.is-login .social i:hover, body.is-register .social i:hover { transform: scale(1.15); }
+body.is-login .copyright, body.is-register .copyright {
+  text-align: center; font-size: var(--text-xs); color: var(--color-muted);
+  margin: var(--space-6) auto var(--space-4); padding-top: 10px; border-top: 1px solid var(--color-line); max-width: 460px;
+}
+
+/* ===== Notificaciones (register/global) ===== */
+.notification-container { position: fixed; top: 25px; right: 25px; display: flex; flex-direction: column; gap: 12px; z-index: 9999; max-width: 340px; }
+.notification-toast {
+  display: flex; align-items: center; gap: 12px; background: var(--color-surface-translucent);
+  backdrop-filter: blur(10px); border-left: 6px solid var(--brand-300); color: var(--color-text);
+  padding: 14px 18px; border-radius: var(--radius-md); box-shadow: var(--shadow-md);
+  opacity: 0; transform: translateY(-15px); transition: all 0.4s var(--ease); font-weight: 500;
+}
+.notification-toast.show { opacity: 1; transform: translateY(0); }
+.notification-toast.success { border-left-color: var(--color-success); }
+.notification-toast.error { border-left-color: var(--color-danger); }
+.notification-toast i { font-size: 20px; }
+.notification-toast.success i { color: var(--color-success); }
+.notification-toast.error i { color: var(--color-danger); }
+
+@keyframes tg-auth-spin { to { transform: rotate(360deg); } }
+@keyframes tg-auth-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive login/register */
+@media (max-width: 480px) {
+  body.is-login header, body.is-register header { height: 60px; padding: 0 15px; }
+  body.is-login .logo, body.is-register .logo { font-size: 20px; }
+  body.is-login .login-section, body.is-register .register-section { padding: 20px 15px; }
+  body.is-login .login-card, body.is-register .register-card { padding: 26px 20px; border-radius: var(--radius-lg); }
+  body.is-login .login-card h2, body.is-register .register-card h2 { font-size: 22px; }
+  .notification-container { right: 10px; top: 10px; max-width: 90%; }
+}
+
+
+/* ===================== RECUPERAR CONTRASEÑA ===================== */
+.tg-recover-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.tg-recover-shell {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tg-recover-brand {
+  display: inline-flex;
+  align-self: center;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--brand-300);
+}
+
+.tg-recover-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+  padding: 34px 30px;
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.tg-recover-card__icon {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--brand-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.tg-recover-card__icon.is-success {
+  background: #eefae8;
+}
+
+.tg-recover-card__icon i {
+  font-size: 32px;
+  color: var(--brand-300);
+}
+
+.tg-recover-card__icon.is-success i {
+  color: var(--color-success);
+}
+
+.tg-recover-card__title {
+  font-size: 28px;
+  color: var(--brand-300);
+  margin-bottom: 10px;
+}
+
+.tg-recover-card__text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+
+.tg-recover-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tg-recover-field {
+  text-align: left;
+}
+
+.tg-recover-label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.tg-recover-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-100);
+  background: var(--color-bg);
+  font-size: 15px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.tg-recover-input:focus {
+  border-color: var(--brand-300);
+  box-shadow: 0 0 6px rgba(255, 173, 173, 0.35);
+  outline: none;
+}
+
+.tg-recover-input.is-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(255, 113, 113, 0.12);
+}
+
+.tg-recover-field-error {
+  margin-top: 7px;
+  font-size: 13px;
+  color: var(--color-danger);
+  line-height: 1.45;
+}
+
+.tg-recover-alert {
+  margin-bottom: 18px;
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.tg-recover-alert.is-error {
+  background: var(--brand-50);
+  border: 1px solid var(--brand-200);
+  color: var(--color-danger);
+}
+
+.tg-recover-alert.is-success {
+  background: #eefae8;
+  border: 1px solid #cfe7c5;
+  color: var(--color-success);
+}
+
+.tg-recover-submit,
+.tg-recover-primary-link,
+.tg-recover-secondary-btn {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.tg-recover-submit,
+.tg-recover-primary-link {
+  background: var(--brand-300);
+  color: var(--color-surface);
+  box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+}
+
+.tg-recover-submit:hover,
+.tg-recover-primary-link:hover {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  transform: translateY(-2px);
+}
+
+.tg-recover-submit:disabled,
+.tg-recover-secondary-btn:disabled {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.tg-recover-secondary-btn,
+.tg-recover-secondary-link {
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-200);
+  color: var(--brand-600);
+  transition: all 0.25s ease;
+}
+
+.tg-recover-secondary-btn:hover,
+.tg-recover-secondary-link:hover {
+  background: var(--brand-50);
+  transform: translateY(-1px);
+}
+
+.tg-recover-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tg-recover-info-box {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: #fff8e8;
+  border: 1px solid #ffe2a8;
+  color: #5c4b25;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.tg-recover-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: var(--color-surface);
+  border-radius: 50%;
+  animation: tg-recover-spin 0.75s linear infinite;
+}
+
+.tg-recover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+.tg-recover-footer a {
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.tg-recover-footer a:hover {
+  color: var(--brand-300);
+}
+
+@keyframes tg-recover-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .tg-recover-page {
+    padding: 20px 14px;
+  }
+
+  .tg-recover-brand {
+    font-size: 24px;
+  }
+
+  .tg-recover-card {
+    padding: 28px 20px;
+    border-radius: var(--radius);
+  }
+
+  .tg-recover-card__title {
+    font-size: 24px;
+  }
+
+  .tg-recover-card__text,
+  .tg-recover-input,
+  .tg-recover-info-box {
+    font-size: 14px;
+  }
+
+  .tg-recover-submit,
+  .tg-recover-primary-link,
+  .tg-recover-secondary-btn,
+  .tg-recover-secondary-link {
+    min-height: 48px;
+    font-size: 15px;
+    padding: 12px;
+  }
+}
+
+/* ===================== VERIFICAR CORREO ===================== */
+.tg-verify-page {
+  min-height: 100vh;
+  background: url("../../images/body.png") no-repeat center center fixed;
+  background-size: cover;
+  background-color: var(--brand-300);
+  color: var(--color-text);
+}
+
+.tg-verify-page .tg-verify-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.tg-verify-page .tg-verify-card {
+  width: 100%;
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  padding: 36px 30px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+
+.tg-verify-page .tg-verify-icon {
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-50);
+}
+
+.tg-verify-page .tg-verify-card.is-success .tg-verify-icon {
+  background: #eefae8;
+}
+
+.tg-verify-page .tg-verify-card.is-warning .tg-verify-icon {
+  background: #fff7e8;
+}
+
+.tg-verify-page .tg-verify-card.is-error .tg-verify-icon {
+  background: var(--brand-50);
+}
+
+.tg-verify-page .tg-verify-icon i {
+  font-size: 32px;
+}
+
+.tg-verify-page .tg-verify-card.is-success .tg-verify-icon i {
+  color: var(--color-success);
+}
+
+.tg-verify-page .tg-verify-card.is-warning .tg-verify-icon i {
+  color: #d89b28;
+}
+
+.tg-verify-page .tg-verify-card.is-error .tg-verify-icon i {
+  color: var(--color-danger);
+}
+
+.tg-verify-page .tg-verify-card h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: var(--brand-300);
+}
+
+.tg-verify-page .tg-verify-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+
+.tg-verify-page .tg-verify-dynamic-content {
+  width: 100%;
+}
+
+.tg-verify-page .tg-verify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.tg-verify-page .tg-verify-input-group {
+  text-align: left;
+}
+
+.tg-verify-page .tg-verify-input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.tg-verify-page .tg-verify-input-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-100);
+  background: var(--color-bg);
+  font-size: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.tg-verify-page .tg-verify-input-group input:focus {
+  border-color: var(--brand-300);
+  box-shadow: 0 0 6px rgba(255, 173, 173, 0.4);
+  outline: none;
+}
+
+.tg-verify-page .tg-verify-input-group input:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.tg-verify-page .tg-verify-primary-btn,
+.tg-verify-page .tg-verify-secondary-btn {
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.tg-verify-page .tg-verify-primary-btn {
+  background: var(--brand-300);
+  color: var(--color-surface);
+  box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+}
+
+.tg-verify-page .tg-verify-primary-btn:hover {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  transform: translateY(-2px);
+}
+
+.tg-verify-page .tg-verify-primary-btn:disabled {
+  background: var(--brand-400);
+  color: var(--color-surface);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.tg-verify-page .tg-verify-secondary-btn {
+  background: var(--brand-50);
+  color: var(--brand-600);
+  border: 1px solid var(--brand-200);
+}
+
+.tg-verify-page .tg-verify-secondary-btn:hover {
+  background: var(--brand-50);
+  transform: translateY(-1px);
+}
+
+.tg-verify-page .tg-verify-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tg-verify-page .tg-verify-submit-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: var(--color-surface);
+  border-radius: 50%;
+  animation: tg-verify-spin 0.75s linear infinite;
+}
+
+.tg-verify-page .tg-verify-notification-container {
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  max-width: 340px;
+}
+
+.tg-verify-page .tg-verify-notification-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-left: 6px solid var(--brand-300);
+  color: var(--color-text);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(-15px);
+  transition: all 0.4s ease;
+  font-weight: 500;
+}
+
+.tg-verify-page .tg-verify-notification-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tg-verify-page .tg-verify-notification-toast.success {
+  border-left-color: var(--color-success);
+}
+
+.tg-verify-page .tg-verify-notification-toast.error {
+  border-left-color: var(--color-danger);
+}
+
+.tg-verify-page .tg-verify-notification-toast.success i {
+  color: var(--color-success);
+}
+
+.tg-verify-page .tg-verify-notification-toast.error i {
+  color: var(--color-danger);
+}
+
+@keyframes tg-verify-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .tg-verify-page .tg-verify-card {
+    padding: 28px 20px;
+    border-radius: var(--radius);
+  }
+
+  .tg-verify-page .tg-verify-card h2 {
+    font-size: 23px;
+  }
+
+  .tg-verify-page .tg-verify-card p,
+  .tg-verify-page .tg-verify-input-group input {
+    font-size: 14px;
+  }
+
+  .tg-verify-page .tg-verify-primary-btn,
+  .tg-verify-page .tg-verify-secondary-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .tg-verify-page .tg-verify-notification-container {
+    right: 10px;
+    top: 10px;
+    max-width: 90%;
+  }
+}
+
+/* ===================== RESET PASSWORD ===================== */
+.tg-reset-password-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+.tg-reset-password-shell {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tg-reset-password-brand {
+  display: inline-flex;
+  align-self: center;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--brand-300);
+}
+
+.tg-reset-password-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+  padding: 34px 30px;
+  backdrop-filter: blur(8px);
+  text-align: center;
+}
+
+.tg-reset-password-icon {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--brand-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.tg-reset-password-icon.is-success {
+  background: #eefae8;
+}
+
+.tg-reset-password-icon.is-error {
+  background: var(--brand-50);
+}
+
+.tg-reset-password-icon i {
+  font-size: 32px;
+  color: var(--brand-300);
+}
+
+.tg-reset-password-icon.is-success i {
+  color: var(--color-success);
+}
+
+.tg-reset-password-icon.is-error i {
+  color: var(--color-danger);
+}
+
+.tg-reset-password-title {
+  font-size: 28px;
+  color: var(--brand-300);
+  margin-bottom: 10px;
+}
+
+.tg-reset-password-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+
+.tg-reset-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tg-reset-password-field {
+  text-align: left;
+}
+
+.tg-reset-password-label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.tg-reset-password-input-wrap {
+  position: relative;
+}
+
+.tg-reset-password-input {
+  width: 100%;
+  padding: 12px 46px 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-100);
+  background: var(--color-bg);
+  font-size: 15px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.tg-reset-password-input:focus {
+  border-color: var(--brand-300);
+  box-shadow: 0 0 6px rgba(255, 173, 173, 0.35);
+  outline: none;
+}
+
+.tg-reset-password-input.is-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(255, 113, 113, 0.12);
+}
+
+.tg-reset-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--brand-300);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px;
+}
+
+.tg-reset-password-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tg-reset-password-hint {
+  margin-top: 7px;
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
+.tg-reset-password-field-error {
+  margin-top: 7px;
+  font-size: 13px;
+  color: var(--color-danger);
+  line-height: 1.45;
+}
+
+.tg-reset-password-alert {
+  margin-bottom: 18px;
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.tg-reset-password-alert.is-error {
+  background: var(--brand-50);
+  border: 1px solid var(--brand-200);
+  color: var(--color-danger);
+}
+
+.tg-reset-password-alert.is-success {
+  background: #eefae8;
+  border: 1px solid #cfe7c5;
+  color: var(--color-success);
+}
+
+.tg-reset-password-submit,
+.tg-reset-password-primary-link,
+.tg-reset-password-secondary-link {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.tg-reset-password-submit,
+.tg-reset-password-primary-link {
+  background: var(--brand-300);
+  color: var(--color-surface);
+  box-shadow: 0 4px 10px rgba(255, 173, 173, 0.3);
+  cursor: pointer;
+}
+
+.tg-reset-password-submit:hover,
+.tg-reset-password-primary-link:hover {
+  background: var(--color-secondary);
+  color: var(--color-text);
+  transform: translateY(-2px);
+}
+
+.tg-reset-password-submit:disabled {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.tg-reset-password-secondary-link {
+  background: var(--brand-50);
+  border: 1px solid var(--brand-200);
+  color: var(--brand-600);
+}
+
+.tg-reset-password-secondary-link:hover {
+  background: var(--brand-50);
+  transform: translateY(-1px);
+}
+
+.tg-reset-password-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tg-reset-password-spinner,
+.tg-reset-password-big-spinner {
+  border-radius: 50%;
+  animation: tg-reset-password-spin 0.75s linear infinite;
+}
+
+.tg-reset-password-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: var(--color-surface);
+}
+
+.tg-reset-password-big-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(255, 173, 173, 0.3);
+  border-top-color: var(--brand-300);
+}
+
+.tg-reset-password-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+.tg-reset-password-footer a {
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.tg-reset-password-footer a:hover {
+  color: var(--brand-300);
+}
+
+@keyframes tg-reset-password-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .tg-reset-password-page {
+    padding: 20px 14px;
+  }
+
+  .tg-reset-password-brand {
+    font-size: 24px;
+  }
+
+  .tg-reset-password-card {
+    padding: 28px 20px;
+    border-radius: var(--radius);
+  }
+
+  .tg-reset-password-title {
+    font-size: 24px;
+  }
+
+  .tg-reset-password-text,
+  .tg-reset-password-input {
+    font-size: 14px;
+  }
+
+  .tg-reset-password-submit,
+  .tg-reset-password-primary-link,
+  .tg-reset-password-secondary-link {
+    min-height: 48px;
+    font-size: 15px;
+    padding: 12px;
+  }
+}
+
+/* =============================================================================
+   ACCESIBILIDAD TRANSVERSAL (recover / verify / reset): inputs 16px + 44px
+   ========================================================================== */
+.tg-recover-input, .tg-verify-page .tg-verify-input-group input, .tg-reset-password-input {
+  font-size: 16px; min-height: var(--tap-min);
+}
+.tg-reset-password-toggle { min-width: var(--tap-min); min-height: var(--tap-min); display: inline-flex; align-items: center; justify-content: center; }
+
+/* Foco visible coherente en toda la vista de auth */
+body.is-login a:focus-visible, body.is-login button:focus-visible, body.is-login input:focus-visible,
+body.is-register a:focus-visible, body.is-register button:focus-visible, body.is-register input:focus-visible,
+.tg-recover-page a:focus-visible, .tg-recover-page button:focus-visible, .tg-recover-page input:focus-visible,
+.tg-verify-page a:focus-visible, .tg-verify-page button:focus-visible, .tg-verify-page input:focus-visible,
+.tg-reset-password-page a:focus-visible, .tg-reset-password-page button:focus-visible, .tg-reset-password-page input:focus-visible {
+  outline: 2px solid var(--brand-400); outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.is-login *, body.is-register *,
+  .tg-recover-page *, .tg-verify-page *, .tg-reset-password-page * {
+    animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important;
+  }
+}
+

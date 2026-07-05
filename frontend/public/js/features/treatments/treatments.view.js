@@ -906,7 +906,7 @@ async function loadTreatments() {
     allTreatments = [];
     const list = document.getElementById("treatmentsList");
     if (list) {
-      list.innerHTML = `<div class="tg-empty" style="text-align:center;color:#777;">
+      list.innerHTML = `<div class="tg-empty">
         Error al cargar tratamientos
       </div>`;
     }
@@ -1024,7 +1024,7 @@ function renderResults(items) {
   if (!list) return;
 
   if (!items.length) {
-    list.innerHTML = `<div class="tg-empty" style="text-align:center;">No hay resultados</div>`;
+    list.innerHTML = `<div class="tg-empty">No hay resultados</div>`;
     return;
   }
 

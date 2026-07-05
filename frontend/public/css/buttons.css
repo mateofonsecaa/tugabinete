@@ -1,0 +1,81 @@
+/* =============================================================================
+   TuGabinete · buttons.css  —  CONTRASTE AA GLOBAL (cargar ÚLTIMO)
+   -----------------------------------------------------------------------------
+   Los botones primarios de cada módulo hardcodean su propio fondo (degradés
+   brand-300/400) con texto blanco, que da ~1.8:1 (falla WCAG AA).
+   Esta hoja los reapunta a los tokens accesibles de base.css:
+     --btn-primary-bg (700→800, 5.55:1+)  ·  --btn-primary-bg-hover (800, 7.2:1)
+
+   IMPORTANTE: incluí este archivo como la ÚLTIMA hoja en index.html, después
+   de todos los CSS de módulo. El !important está acotado a background/color y
+   es una excepción legítima por accesibilidad (garantiza AA sin importar el
+   orden de carga o la especificidad de cada módulo).
+   ========================================================================== */
+
+/* ---- Botones primarios rellenos (texto blanco) ---- */
+.treatments-page .btn-patient,
+.treatments-page .btn-save-treatment,
+.treatments-page .btn-edit-treatment-save,
+.treatments-page .modal-actions .btn-save,
+.patients-page .btn-add,
+.patients-page .btn-edit-treatment-save,
+.patients-page .patient-form-actions .btn-save,
+body.is-login .login-card button[type="submit"],
+body.is-register .register-card button[type="submit"],
+body.is-register .success-login-link,
+.tg-recover-submit,
+.tg-recover-primary-link,
+.tg-verify-page .tg-verify-primary-btn,
+.tg-reset-password-submit,
+.tg-reset-password-primary-link {
+  background: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-text) !important;
+  border-color: transparent !important;
+}
+
+/* Hover: se oscurece (mantiene texto blanco AA). Sólo tocamos color/fondo;
+   la elevación (translateY) de cada módulo se conserva. */
+.treatments-page .btn-patient:hover,
+.treatments-page .btn-save-treatment:hover,
+.treatments-page .btn-edit-treatment-save:hover,
+.treatments-page .modal-actions .btn-save:hover,
+.patients-page .btn-add:hover,
+.patients-page .btn-edit-treatment-save:hover,
+.patients-page .patient-form-actions .btn-save:hover,
+body.is-login .login-card button[type="submit"]:hover,
+body.is-register .register-card button[type="submit"]:hover,
+body.is-register .success-login-link:hover,
+.tg-recover-submit:hover,
+.tg-recover-primary-link:hover,
+.tg-verify-page .tg-verify-primary-btn:hover,
+.tg-reset-password-submit:hover,
+.tg-reset-password-primary-link:hover {
+  background: var(--btn-primary-bg-hover) !important;
+  color: var(--btn-primary-text) !important;
+}
+
+/* Estados deshabilitados: fondo tenue pero legible (texto blanco sobre brand-400
+   no es AA; usamos brand-600, que como control deshabilitado es aceptable). */
+.treatments-page .btn-save-treatment:disabled,
+.patients-page .btn-add:disabled,
+body.is-register .register-card button[type="submit"]:disabled,
+.tg-recover-submit:disabled,
+.tg-verify-page .tg-verify-primary-btn:disabled,
+.tg-reset-password-submit:disabled {
+  background: var(--brand-600) !important;
+  color: var(--btn-primary-text) !important;
+  opacity: 0.9;
+}
+
+/* ---- Botones OUTLINE (texto/borde de marca) ----
+   brand-300 como texto da 1.77:1. Se llevan a --brand-700 (5.55:1). */
+.patients-page .btn-back,
+.treatments-page .btn-cancel-treatment {
+  color: var(--btn-outline-fg) !important;
+  border-color: var(--btn-outline-fg) !important;
+}
+.patients-page .btn-back:hover,
+.treatments-page .btn-cancel-treatment:hover {
+  background: var(--btn-outline-fg) !important;
+  color: var(--color-surface) !important;
+}

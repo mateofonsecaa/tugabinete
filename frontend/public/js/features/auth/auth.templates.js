@@ -22,7 +22,7 @@ import { escapeHtml } from "../../core/utils/security.js";
 export function recoverFormTemplate() {
   return `
     <div class="tg-recover-card__icon">
-      <i class="fa-solid fa-key"></i>
+      <i class="fa-solid fa-key" aria-hidden="true"></i>
     </div>
 
     <h1 class="tg-recover-card__title">Recuperar contraseña</h1>
@@ -30,7 +30,7 @@ export function recoverFormTemplate() {
       Ingresá tu correo electrónico y, si está registrado, te vamos a enviar un enlace para restablecer tu contraseña.
     </p>
 
-    <div id="tg-recover-alert" class="tg-recover-alert" hidden></div>
+    <div id="tg-recover-alert" class="tg-recover-alert" role="alert" hidden></div>
 
     <form id="tg-recover-form" class="tg-recover-form" novalidate>
       <div class="tg-recover-field">
@@ -44,7 +44,7 @@ export function recoverFormTemplate() {
           autocomplete="email"
           required
         />
-        <p id="tg-recover-email-error" class="tg-recover-field-error" hidden></p>
+        <p id="tg-recover-email-error" class="tg-recover-field-error" aria-live="polite" hidden></p>
       </div>
 
       <button type="submit" id="tg-recover-submit" class="tg-recover-submit">
@@ -62,7 +62,7 @@ export function recoverFormTemplate() {
 export function recoverSuccessTemplate() {
   return `
     <div class="tg-recover-card__icon is-success">
-      <i class="fa-solid fa-envelope-circle-check"></i>
+      <i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i>
     </div>
 
     <h1 class="tg-recover-card__title">Revisá tu correo</h1>
@@ -176,7 +176,7 @@ export function verifyPageTemplate(status) {
       <div class="tg-verify-section">
         <div class="${view.cardClass}">
           <div class="tg-verify-icon">
-            <i class="fa-solid ${view.icon}"></i>
+            <i class="fa-solid ${view.icon}" aria-hidden="true"></i>
           </div>
 
           <h2>${escapeHtml(view.title)}</h2>
@@ -238,7 +238,7 @@ export function resetPasswordLoadingTemplate() {
 export function resetPasswordStatusTemplate({ title, text, icon, variant = "error" }) {
   return `
     <div class="tg-reset-password-icon ${variant === "success" ? "is-success" : "is-error"}">
-      <i class="fa-solid ${icon}"></i>
+      <i class="fa-solid ${icon}" aria-hidden="true"></i>
     </div>
 
     <h1 class="tg-reset-password-title">${escapeHtml(title)}</h1>
@@ -254,7 +254,7 @@ export function resetPasswordStatusTemplate({ title, text, icon, variant = "erro
 export function resetPasswordSuccessTemplate() {
   return `
     <div class="tg-reset-password-icon is-success">
-      <i class="fa-solid fa-circle-check"></i>
+      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
     </div>
 
     <h1 class="tg-reset-password-title">Contraseña actualizada</h1>
@@ -271,7 +271,7 @@ export function resetPasswordSuccessTemplate() {
 export function resetPasswordFormTemplate() {
   return `
     <div class="tg-reset-password-icon">
-      <i class="fa-solid fa-lock"></i>
+      <i class="fa-solid fa-lock" aria-hidden="true"></i>
     </div>
 
     <h1 class="tg-reset-password-title">Restablecer contraseña</h1>
@@ -279,7 +279,7 @@ export function resetPasswordFormTemplate() {
       Elegí una nueva contraseña. Podés usar una frase larga. Evitá contraseñas comunes.
     </p>
 
-    <div id="tg-reset-password-alert" class="tg-reset-password-alert" hidden></div>
+    <div id="tg-reset-password-alert" class="tg-reset-password-alert" role="alert" hidden></div>
 
     <form id="tg-reset-password-form" class="tg-reset-password-form" novalidate>
       <div class="tg-reset-password-field">
@@ -299,13 +299,13 @@ export function resetPasswordFormTemplate() {
             data-target="new-password"
             aria-label="Mostrar u ocultar contraseña"
           >
-            <i class="fa-solid fa-eye"></i>
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
           </button>
         </div>
         <p class="tg-reset-password-hint">
           Mínimo 10 caracteres.
         </p>
-        <p id="tg-reset-password-error-password" class="tg-reset-password-field-error" hidden></p>
+        <p id="tg-reset-password-error-password" class="tg-reset-password-field-error" aria-live="polite" hidden></p>
       </div>
 
       <div class="tg-reset-password-field">
@@ -325,10 +325,10 @@ export function resetPasswordFormTemplate() {
             data-target="confirm-password"
             aria-label="Mostrar u ocultar contraseña"
           >
-            <i class="fa-solid fa-eye"></i>
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
           </button>
         </div>
-        <p id="tg-reset-password-error-confirm" class="tg-reset-password-field-error" hidden></p>
+        <p id="tg-reset-password-error-confirm" class="tg-reset-password-field-error" aria-live="polite" hidden></p>
       </div>
 
       <button type="submit" id="tg-reset-password-submit" class="tg-reset-password-submit">
@@ -380,7 +380,7 @@ export function registerPageTemplate() {
               <div class="input-group show-password">
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" placeholder="••••••••" required />
-                <i class="fa-solid fa-eye toggle-password" id="toggleEye"></i>
+                <i class="fa-solid fa-eye toggle-password" id="toggleEye" role="button" tabindex="0" aria-label="Mostrar u ocultar contraseña"></i>
               </div>
 
               <div class="input-group">
@@ -416,7 +416,7 @@ export function registerPageTemplate() {
             aria-live="polite"
           >
             <div class="success-icon">
-              <i class="fa-solid fa-envelope-circle-check"></i>
+              <i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i>
             </div>
 
             <h2 id="success-title">Verificá tu correo</h2>
@@ -462,8 +462,8 @@ export function registerPageTemplate() {
       <a href="/terms" data-link>Términos</a>
       <a href="/help" data-link>Ayuda</a>
       <div class="social">
-        <i class="fa-brands fa-facebook"></i>
-        <i class="fa-brands fa-instagram"></i>
+        <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
       </div>
     </div>
 
@@ -502,7 +502,7 @@ export function loginPageTemplate() {
           <div class="input-group show-password">
             <label for="password">Contraseña</label>
             <input type="password" id="password" name="password" placeholder="••••••••" required />
-            <i class="fa-solid fa-eye toggle-password" id="toggleEye"></i>
+            <i class="fa-solid fa-eye toggle-password" id="toggleEye" role="button" tabindex="0" aria-label="Mostrar u ocultar contraseña"></i>
           </div>
 
           <div class="extra-links">
@@ -523,8 +523,8 @@ export function loginPageTemplate() {
       <a href="/terms" data-link>Términos</a>
       <a href="/help" data-link>Ayuda</a>
       <div class="social">
-        <i class="fa-brands fa-facebook"></i>
-        <i class="fa-brands fa-instagram"></i>
+        <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
       </div>
     </div>
     <div class="copyright">

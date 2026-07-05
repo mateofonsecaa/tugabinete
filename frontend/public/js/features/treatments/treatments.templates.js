@@ -383,8 +383,8 @@ export function treatmentsPageTemplate() {
 
       <!-- MODAL NUEVO PACIENTE -->
       <div id="newPatientModal" class="modal-overlay">
-        <div class="modal-box">
-          <h2>Registrar nuevo paciente</h2>
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="newPatientModalTitle">
+          <h2 id="newPatientModalTitle">Registrar nuevo paciente</h2>
 
           <form id="newPatientForm" class="modal-grid">
             <div class="form-column">
@@ -416,9 +416,9 @@ export function treatmentsPageTemplate() {
 
       <!-- MODAL EDITAR -->
       <div id="editTreatmentModal" class="modal-overlay">
-        <div class="modal-box modal-edit-pro">
-          <button class="close-btn" id="closeEditTreatmentBtn">&times;</button>
-          <h2><i class="fa-solid fa-pen-to-square"></i> Editar Tratamiento</h2>
+        <div class="modal-box modal-edit-pro" role="dialog" aria-modal="true" aria-labelledby="editTreatmentModalTitle">
+          <button class="close-btn" id="closeEditTreatmentBtn" type="button" aria-label="Cerrar">&times;</button>
+          <h2 id="editTreatmentModalTitle"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Editar Tratamiento</h2>
 
           <form id="editTreatmentForm" class="edit-grid">
             <div class="edit-column">
@@ -525,9 +525,9 @@ export function treatmentsPageTemplate() {
 
       <!-- MODAL EDITAR VENTA -->
       <div id="editSaleModal" class="modal-overlay">
-        <div class="modal-box modal-edit-pro">
-          <button class="close-btn" id="closeEditSaleBtn">&times;</button>
-          <h2><i class="fa-solid fa-pen-to-square"></i> Editar Venta</h2>
+        <div class="modal-box modal-edit-pro" role="dialog" aria-modal="true" aria-labelledby="editSaleModalTitle">
+          <button class="close-btn" id="closeEditSaleBtn" type="button" aria-label="Cerrar">&times;</button>
+          <h2 id="editSaleModalTitle"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Editar Venta</h2>
 
           <form id="editSaleForm" class="edit-grid">
             <div class="edit-column">
@@ -581,20 +581,20 @@ export function treatmentsPageTemplate() {
 
       <!-- MODAL VER -->
       <div id="viewTreatmentModal" class="modal-overlay">
-        <div class="modal-box modal-detail-pro">
-          <button class="close-btn" id="closeViewTreatmentBtn">&times;</button>
-          <h2><i class="fa-solid fa-file-medical"></i> Detalle del Tratamiento</h2>
+        <div class="modal-box modal-detail-pro" role="dialog" aria-modal="true" aria-labelledby="viewTreatmentModalTitle">
+          <button class="close-btn" id="closeViewTreatmentBtn" type="button" aria-label="Cerrar">&times;</button>
+          <h2 id="viewTreatmentModalTitle"><i class="fa-solid fa-file-medical" aria-hidden="true"></i> Detalle del Tratamiento</h2>
 
           <div class="detail-grid">
             <div class="detail-card">
-              <h3><i class="fa-solid fa-user"></i> Paciente</h3>
+              <h3><i class="fa-solid fa-user" aria-hidden="true"></i> Paciente</h3>
               <p><strong>Nombre:</strong> <span id="viewName">—</span></p>
               <p><strong>Teléfono:</strong> <span id="viewPhone">—</span></p>
               <p><strong>Dirección:</strong> <span id="viewAddress">—</span></p>
             </div>
 
             <div class="detail-card">
-              <h3><i class="fa-solid fa-spa"></i> Tratamiento</h3>
+              <h3><i class="fa-solid fa-spa" aria-hidden="true"></i> Tratamiento</h3>
               <p><strong>Tipo:</strong> <span id="viewType">—</span></p>
               <p><strong>Fecha:</strong> <span id="viewDate">—</span></p>
               <p><strong>Monto:</strong> <span id="viewAmount">—</span></p>
@@ -604,7 +604,7 @@ export function treatmentsPageTemplate() {
           </div>
 
           <div class="detail-notes">
-            <h3><i class="fa-solid fa-pen"></i> Notas</h3>
+            <h3><i class="fa-solid fa-pen" aria-hidden="true"></i> Notas</h3>
             <p id="viewNotes">—</p>
           </div>
 
@@ -631,20 +631,20 @@ export function treatmentsPageTemplate() {
 
       <!-- MODAL VER VENTA -->
       <div id="viewSaleModal" class="modal-overlay">
-        <div class="modal-box modal-detail-pro">
-          <button class="close-btn" id="closeViewSaleBtn">&times;</button>
-          <h2><i class="fa-solid fa-receipt"></i> Detalle de la Venta</h2>
+        <div class="modal-box modal-detail-pro" role="dialog" aria-modal="true" aria-labelledby="viewSaleModalTitle">
+          <button class="close-btn" id="closeViewSaleBtn" type="button" aria-label="Cerrar">&times;</button>
+          <h2 id="viewSaleModalTitle"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Detalle de la Venta</h2>
 
           <div class="detail-grid">
             <div class="detail-card">
-              <h3><i class="fa-solid fa-user"></i> Paciente</h3>
+              <h3><i class="fa-solid fa-user" aria-hidden="true"></i> Paciente</h3>
               <p><strong>Nombre:</strong> <span id="viewSaleName">—</span></p>
               <p><strong>Teléfono:</strong> <span id="viewSalePhone">—</span></p>
               <p><strong>Dirección:</strong> <span id="viewSaleAddress">—</span></p>
             </div>
 
             <div class="detail-card">
-              <h3><i class="fa-solid fa-bag-shopping"></i> Venta</h3>
+              <h3><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> Venta</h3>
               <p><strong>Producto:</strong> <span id="viewSaleProduct">—</span></p>
               <p><strong>Cantidad:</strong> <span id="viewSaleQuantity">—</span></p>
               <p><strong>Precio:</strong> <span id="viewSaleAmount">—</span></p>
@@ -652,21 +652,21 @@ export function treatmentsPageTemplate() {
           </div>
 
           <div class="detail-notes">
-            <h3><i class="fa-solid fa-pen"></i> Nota</h3>
+            <h3><i class="fa-solid fa-pen" aria-hidden="true"></i> Nota</h3>
             <p id="viewSaleNotes">—</p>
           </div>
         </div>
       </div>
 
       <!-- MODAL IMAGEN AMPLIADA -->
-      <div id="imagePreviewModal"
+      <div id="imagePreviewModal" role="dialog" aria-modal="true" aria-label="Vista ampliada de la foto"
         style="display:none; position:fixed; inset:0; background:rgba(255,245,245,0.85);
               backdrop-filter:blur(10px); z-index:7000; justify-content:center; align-items:center; overflow:hidden;">
         <div id="imagePreviewContainer"
           style="position:relative; display:flex; justify-content:center; align-items:center; max-width:95vw; max-height:95vh;">
-          <button id="closeImageBtn"
+          <button id="closeImageBtn" type="button" aria-label="Cerrar"
             style="position:absolute; top:-20px; right:-20px; background:#ffadad; color:#fff; border:none;
-                  border-radius:50%; width:42px; height:42px; font-size:26px; font-weight:bold; cursor:pointer;
+                  border-radius:50%; width:44px; height:44px; font-size:26px; font-weight:bold; cursor:pointer;
                   box-shadow:0 4px 14px rgba(0,0,0,0.25); transition:all .2s ease; z-index:9999;">
             &times;
           </button>

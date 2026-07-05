@@ -1,4 +1,5 @@
 // /public/js/agenda/calendar.js
+import { dayCellTemplate, appointmentChipInner, dayModalBodyTemplate } from "./agenda.templates.js";
 
 let currentDate = new Date(); // mes que se está mostrando
 let selectedDayEl = null;
@@ -23,19 +24,6 @@ function isSameDay(a, b) {
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate()
   );
-}
-
-function buildDayCell({ dayNumber, dateStr, isOtherMonth, isToday }) {
-  const classes = ["day"];
-  if (isOtherMonth) classes.push("is-outside-month");
-  if (isToday) classes.push("today");
-
-  return `
-    <div class="${classes.join(" ")}" data-date="${dateStr}" data-other="${isOtherMonth ? "1" : "0"}">
-      <div class="day-number">${dayNumber}</div>
-      <div class="day-content"></div>
-    </div>
-  `;
 }
 
 export function renderCalendar() {
@@ -71,7 +59,7 @@ export function renderCalendar() {
     const isOtherMonth = cellDate.getMonth() !== month;
     const isToday = isSameDay(cellDate, today);
 
-    html += buildDayCell({
+    html += dayCellTemplate({
       dayNumber: cellDate.getDate(),
       dateStr,
       isOtherMonth,
@@ -84,6 +72,10 @@ export function renderCalendar() {
 
   calendarEl.removeEventListener("click", onDayClick);
   calendarEl.addEventListener("click", onDayClick);
+
+  // A11y Fase 1: Enter/Espacio sobre un día enfocado lo abre (igual que el click)
+  calendarEl.removeEventListener("keydown", onDayKeydown);
+  calendarEl.addEventListener("keydown", onDayKeydown);
   
   if (window.__agendaAppointments) {
     paintAppointments(window.__agendaAppointments);
@@ -128,6 +120,14 @@ export function initCalendar() {
 
   prevBtn?.addEventListener("click", goPrevMonth);
   nextBtn?.addEventListener("click", goNextMonth);
+}
+
+function onDayKeydown(e) {
+  if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+  const dayEl = e.target.closest(".day");
+  if (!dayEl || dayEl.dataset.other === "1") return;
+  e.preventDefault(); // evita el scroll con Espacio
+  onDayClick(e);
 }
 
 function onDayClick(e) {
@@ -176,28 +176,8 @@ function openDayModal(dateStr, isOtherMonth) {
   const totalEl = document.getElementById("totalAppointments");
   if (totalEl) totalEl.textContent = `Turnos del día: ${dayApps.length}`;
 
-  // Render
-  if (dayApps.length === 0) {
-    body.innerHTML = ``;
-  } else {
-    body.innerHTML = `
-      <div class="appointments-list">
-        ${dayApps
-          .sort((a, b) => a.time.localeCompare(b.time))
-          .map(a => `
-            <div class="item">
-              <div><strong>${a.time}</strong> — ${a.name}</div>
-              <div class="app-buttons">
-                <button class="delete-appointment" data-id="${a.id}" title="Eliminar">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          `)
-          .join("")}
-      </div>
-    `;
-  }
+  // Render (template unificado)
+  body.innerHTML = dayModalBodyTemplate(dayApps);
 
   modal.classList.remove("hidden");
 }
@@ -209,7 +189,7 @@ export function paintAppointments(appointments = []) {
 
     const div = document.createElement("div");
     div.className = "appointment";
-    div.innerHTML = `<strong>${a.time}</strong> ${a.name}`;
+    div.innerHTML = appointmentChipInner(a);
     cell.appendChild(div);
   });
 }

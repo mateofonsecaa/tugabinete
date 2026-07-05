@@ -12,16 +12,27 @@ export function Login() {
   return loginPageTemplate();
 }
 
-function togglePassword() {
-  const input = document.getElementById("password");
-  const eye = document.getElementById("toggleEye");
-  if (input.type === "password") {
-    input.type = "text";
-    eye.classList.replace("fa-eye", "fa-eye-slash");
-  } else {
-    input.type = "password";
-    eye.classList.replace("fa-eye-slash", "fa-eye");
-  }
+// NUEVO: Helper de accesibilidad que reemplaza al viejo togglePassword()
+function wirePasswordToggle(eyeId = "toggleEye", inputId = "password") {
+  const eye = document.getElementById(eyeId);
+  const input = document.getElementById(inputId);
+  if (!eye || !input) return;
+
+  const toggle = () => {
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    eye.classList.toggle("fa-eye-slash", show);
+    eye.classList.toggle("fa-eye", !show);
+    eye.setAttribute("aria-pressed", String(show)); // comunica el estado al lector
+  };
+
+  eye.addEventListener("click", toggle);
+  eye.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault(); // Evita que la barra espaciadora haga scroll
+      toggle();
+    }
+  });
 }
 
 async function loginUser(event) {
@@ -65,6 +76,6 @@ export function initLogin() {
 
   form.addEventListener("submit", loginUser);
 
-  const eye = document.getElementById("toggleEye");
-  if (eye) eye.addEventListener("click", togglePassword);
+  // NUEVO: Llamamos a la función helper para activar el ojo con clic y teclado
+  wirePasswordToggle("toggleEye", "password");
 }

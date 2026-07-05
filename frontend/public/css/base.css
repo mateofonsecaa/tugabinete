@@ -1,13 +1,98 @@
 /* public/css/base.css */
 
-/* ====== Variables globales ====== */
+/* ============================================================================
+   Variables globales (ÚNICA fuente de verdad de los tokens)
+   Se conservan tus variables originales y se amplía el sistema para que el
+   dashboard y el shell tomen todo de acá. --color-primary sigue siendo #ffadad.
+   ========================================================================== */
 :root {
-  --color-primary: #ffadad;
+  /* ===== Marca (blush / rosa) ===== */
+  --brand-50:  #fff5f6;
+  --brand-100: #ffe4e6;
+  --brand-200: #ffc9cf;
+  --brand-300: #ffadad;   /* color de marca histórico */
+  --brand-400: #ff8fa3;
+  --brand-500: #f76d8e;
+  --brand-600: #e14d6f;
+  --brand-700: #b83a58;   /* acento accesible sobre fondos claros */
+
+  /* ===== Alias heredados (compatibilidad con el CSS existente) ===== */
+  --color-primary:   var(--brand-300);   /* = #ffadad, sin cambios visuales */
   --color-secondary: #fff3c2;
-  --color-bg: #fffdf9;
-  --color-text: #333;
-  --radius: 14px;
-  --shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+  --color-bg:        #fffdf9;
+  --color-text:      #333;                /* se mantiene tu valor original */
+
+  /* ===== Neutros extendidos ===== */
+  --color-ink:                #2c2430;    /* títulos: buen contraste */
+  --color-muted:              #8a808f;    /* texto secundario */
+  --color-surface:            #ffffff;
+  --color-surface-translucent: rgba(255, 255, 255, 0.92);
+  --color-line:               rgba(184, 58, 88, 0.14);
+  --color-scrim:              rgba(44, 36, 48, 0.45);
+
+  /* ===== Semánticos ===== */
+  --color-success: #4caf7d;
+  --color-danger:  #e5484d;
+
+  /* ===== Espaciado (base 4px) ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ===== Radios ===== */
+  --radius:      14px;   /* heredado */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+
+  /* ===== Sombras ===== */
+  --shadow:    0 5px 15px rgba(255, 173, 173, 0.25); /* heredado */
+  --shadow-sm: 0 1px 2px rgba(44, 36, 48, 0.06);
+  --shadow-md: 0 6px 18px rgba(44, 36, 48, 0.08);
+  --shadow-lg: 0 16px 40px rgba(184, 58, 88, 0.16);
+
+  /* ===== Tipografía ===== */
+  --text-xs:   13px;
+  --text-sm:   15px;
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-3xl:  clamp(26px, 3.2vw, 34px);
+  --leading-tight:  1.2;
+  --leading-normal: 1.55;
+
+  /* ===== Movimiento ===== */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur:  0.25s;
+
+  /* ===== Accesibilidad / Modales (baja visión, adultos mayores) ===== */
+  --tap-min: 44px;                       /* área mínima de clic (WCAG 2.5.5) */
+  --modal-max: 860px;                    /* modales estándar */
+  --modal-max-wide: 1040px;              /* modales pro (detalle / edición) */
+  --modal-pad: clamp(24px, 4vw, 40px);   /* padding interno holgado */
+  --modal-radius: var(--radius-xl);
+  --modal-title: clamp(24px, 3vw, 30px); /* h2 del modal */
+  --modal-subtitle: 20px;                /* h3 de sección */
+  --modal-text: 17px;                    /* texto base cómodo de leer */
+  --modal-text-lg: 19px;                 /* valores destacados */
+  --modal-leading: 1.65;                 /* interlineado que "descansa" */
+  --color-scrim-strong: rgba(44, 36, 48, 0.62);      /* overlay oscuro moderno */
+  --shadow-modal: 0 30px 80px rgba(44, 36, 48, 0.28); /* profundidad amplia */
+
+  /* ===== Botones primarios accesibles (WCAG AA) =====
+     El texto blanco solo alcanza AA (>=4.5:1) a partir de --brand-700 (5.55:1).
+     Los degradés claros (brand-300/400) daban ~1.8:1. Estos tokens son la
+     fuente única para botones con texto blanco; los consume buttons.css. */
+  --brand-800: #9c2f49;  /* blanco encima: 7.2:1 (AAA) — usado en hover */
+  --btn-primary-bg:       linear-gradient(180deg, var(--brand-700), var(--brand-800));
+  --btn-primary-bg-hover: var(--brand-800);
+  --btn-primary-text:     #ffffff;
+  --btn-outline-fg:       var(--brand-700);  /* texto/borde de botones outline (5.55:1) */
 }
 
 /* ====== Reset / Base ====== */
@@ -24,6 +109,13 @@ body {
   background-color: #fff5f5;
   color: var(--color-text);
   min-height: 100vh;
+}
+
+/* Foco visible y accesible en toda la app (mejora de teclado) */
+:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
 .app-boot.app-boot--silent {

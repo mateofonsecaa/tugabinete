@@ -69,7 +69,7 @@ export function patientCreatePageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="fullName"
+                  id="fullName" aria-required="true" aria-describedby="fullName-help fullName-error"
                   type="text"
                   required
                   maxlength="60"
@@ -77,7 +77,7 @@ export function patientCreatePageTemplate({ today }) {
                   placeholder="Ej.: María Fernández"
                 />
 
-                <p class="patient-field-help">Ingresá nombre y apellido del paciente.</p>
+                <p class="patient-field-help" id="fullName-help">Ingresá nombre y apellido del paciente.</p>
                 <p class="patient-field-error" id="fullName-error" aria-live="polite"></p>
               </div>
 
@@ -89,7 +89,7 @@ export function patientCreatePageTemplate({ today }) {
 
                 <div class="patient-input-wrap patient-input-wrap--date">
                   <input
-                    id="birthDate"
+                    id="birthDate" aria-describedby="birthDate-help birthDate-error"
                     type="date"
                     max="${escapeHtml(today)}"
                     autocomplete="bday"
@@ -98,7 +98,7 @@ export function patientCreatePageTemplate({ today }) {
                   <i class="fa-regular fa-calendar patient-input-icon" aria-hidden="true"></i>
                 </div>
 
-                <p class="patient-field-help">Hacé clic en cualquier parte del campo para abrir el calendario.</p>
+                <p class="patient-field-help" id="birthDate-help">Hacé clic en cualquier parte del campo para abrir el calendario.</p>
                 <p class="patient-field-error" id="birthDate-error" aria-live="polite"></p>
               </div>
 
@@ -109,7 +109,7 @@ export function patientCreatePageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="phone"
+                  id="phone" aria-describedby="phone-help phone-error"
                   type="text"
                   maxlength="25"
                   inputmode="tel"
@@ -117,7 +117,7 @@ export function patientCreatePageTemplate({ today }) {
                   placeholder="Ej.: +54 351 123 4567"
                 />
 
-                <p class="patient-field-help">Podés escribirlo con espacios, guiones o código de país.</p>
+                <p class="patient-field-help" id="phone-help">Podés escribirlo con espacios, guiones o código de país.</p>
                 <p class="patient-field-error" id="phone-error" aria-live="polite"></p>
               </div>
 
@@ -128,14 +128,14 @@ export function patientCreatePageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="address"
+                  id="address" aria-describedby="address-help address-error"
                   type="text"
                   maxlength="80"
                   autocomplete="street-address"
                   placeholder="Ej.: Av. Colón 1234"
                 />
 
-                <p class="patient-field-help">Usá una referencia breve y clara.</p>
+                <p class="patient-field-help" id="address-help">Usá una referencia breve y clara.</p>
                 <p class="patient-field-error" id="address-error" aria-live="polite"></p>
               </div>
 
@@ -146,14 +146,14 @@ export function patientCreatePageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="profession"
+                  id="profession" aria-describedby="profession-help profession-error"
                   type="text"
                   maxlength="50"
                   autocomplete="organization-title"
                   placeholder="Ej.: Cosmetóloga"
                 />
 
-                <p class="patient-field-help">Campo libre para registrar ocupación o profesión.</p>
+                <p class="patient-field-help" id="profession-help">Campo libre para registrar ocupación o profesión.</p>
                 <p class="patient-field-error" id="profession-error" aria-live="polite"></p>
               </div>
 
@@ -163,7 +163,7 @@ export function patientCreatePageTemplate({ today }) {
                 </button>
 
                 <button class="btn-cancel" id="cancel-create-patient" type="button">
-                  <i class="fa-solid fa-xmark"></i> Cancelar
+                  <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancelar
                 </button>
               </div>
             </form>
@@ -242,7 +242,7 @@ export function patientEditPageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="fullName"
+                  id="fullName" aria-required="true" aria-describedby="fullName-help fullName-error"
                   type="text"
                   required
                   maxlength="60"
@@ -251,7 +251,7 @@ export function patientEditPageTemplate({ today }) {
                   disabled
                 />
 
-                <p class="patient-field-help">Ingresá nombre y apellido del paciente.</p>
+                <p class="patient-field-help" id="fullName-help">Ingresá nombre y apellido del paciente.</p>
                 <p class="patient-field-error" id="fullName-error" aria-live="polite"></p>
               </div>
 
@@ -263,7 +263,7 @@ export function patientEditPageTemplate({ today }) {
 
                 <div class="patient-input-wrap patient-input-wrap--date">
                   <input
-                    id="birthDate"
+                    id="birthDate" aria-describedby="birthDate-help birthDate-error"
                     type="date"
                     max="${escapeHtml(today)}"
                     autocomplete="bday"
@@ -273,7 +273,7 @@ export function patientEditPageTemplate({ today }) {
                   <i class="fa-regular fa-calendar patient-input-icon" aria-hidden="true"></i>
                 </div>
 
-                <p class="patient-field-help">Hacé clic en cualquier parte del campo para abrir el calendario.</p>
+                <p class="patient-field-help" id="birthDate-help">Hacé clic en cualquier parte del campo para abrir el calendario.</p>
                 <p class="patient-field-error" id="birthDate-error" aria-live="polite"></p>
               </div>
 
@@ -284,7 +284,7 @@ export function patientEditPageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="phone"
+                  id="phone" aria-describedby="phone-help phone-error"
                   type="text"
                   maxlength="25"
                   inputmode="tel"
@@ -293,7 +293,7 @@ export function patientEditPageTemplate({ today }) {
                   disabled
                 />
 
-                <p class="patient-field-help">Podés escribirlo con espacios, guiones o código de país.</p>
+                <p class="patient-field-help" id="phone-help">Podés escribirlo con espacios, guiones o código de país.</p>
                 <p class="patient-field-error" id="phone-error" aria-live="polite"></p>
               </div>
 
@@ -304,7 +304,7 @@ export function patientEditPageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="address"
+                  id="address" aria-describedby="address-help address-error"
                   type="text"
                   maxlength="80"
                   autocomplete="street-address"
@@ -312,7 +312,7 @@ export function patientEditPageTemplate({ today }) {
                   disabled
                 />
 
-                <p class="patient-field-help">Usá una referencia breve y clara.</p>
+                <p class="patient-field-help" id="address-help">Usá una referencia breve y clara.</p>
                 <p class="patient-field-error" id="address-error" aria-live="polite"></p>
               </div>
 
@@ -323,7 +323,7 @@ export function patientEditPageTemplate({ today }) {
                 </div>
 
                 <input
-                  id="profession"
+                  id="profession" aria-describedby="profession-help profession-error"
                   type="text"
                   maxlength="50"
                   autocomplete="organization-title"
@@ -331,7 +331,7 @@ export function patientEditPageTemplate({ today }) {
                   disabled
                 />
 
-                <p class="patient-field-help">Campo libre para registrar ocupación o profesión.</p>
+                <p class="patient-field-help" id="profession-help">Campo libre para registrar ocupación o profesión.</p>
                 <p class="patient-field-error" id="profession-error" aria-live="polite"></p>
               </div>
 
@@ -429,7 +429,7 @@ export function patientRowTemplate(p) {
       <td data-label="Edad">${escapeHtml(p.age ?? "-")}</td>
       <td data-label="Último trat.">${escapeHtml(p.lastTreatment ?? "-")}</td>
       <td class="actions" data-id="${escapeHtml(p.id)}">
-        <button class="btn-view" title="Ver Ficha"><i class="fa-solid fa-clipboard-list"></i></button>
+        <button class="btn-view" title="Ver Ficha"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></button>
         <button class="btn-edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
         <button class="btn-delete" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
       </td>
@@ -516,7 +516,7 @@ export function patientDetailsPageTemplate() {
 
             <div class="right-actions">
               <button id="view-interview-btn" class="btn-add">
-                <i class="fa-solid fa-clipboard-list"></i> Ver entrevista
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i> Ver entrevista
               </button>
 
             </div>
@@ -623,19 +623,19 @@ export function patientDetailsPageTemplate() {
       </main>
 
       <!-- MODAL RUTINA EN CASA -->
-      <div id="homecare-modal" class="modal-overlay">
+      <div id="homecare-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="homecare-modal-title">
         <div class="modal-box modal-edit-pro">
-          <button class="close-btn" id="close-homecare-modal-btn">&times;</button>
+          <button class="close-btn" id="close-homecare-modal-btn" type="button" aria-label="Cerrar">&times;</button>
 
-          <h2>
-            <i class="fa-solid fa-house-medical"></i>
+          <h2 id="homecare-modal-title">
+            <i class="fa-solid fa-house-medical" aria-hidden="true"></i>
             Rutina en casa
           </h2>
 
           <form id="homecare-form" class="homecare-form-stack">
             <section class="edit-column homecare-main-card">
               <h3 class="homecare-card-title">
-                <i class="fa-solid fa-clipboard-list"></i>
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
                 Información de la rutina
               </h3>
 
@@ -680,12 +680,12 @@ export function patientDetailsPageTemplate() {
             <section class="edit-column homecare-steps-card">
               <div class="homecare-steps-header">
                 <h3 class="homecare-card-title">
-                  <i class="fa-solid fa-list-check"></i>
+                  <i class="fa-solid fa-list-check" aria-hidden="true"></i>
                   Pasos de la rutina
                 </h3>
 
                 <button type="button" class="btn-add" id="homecare-add-item-btn">
-                  <i class="fa-solid fa-plus"></i> Agregar paso
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar paso
                 </button>
               </div>
 
@@ -695,11 +695,11 @@ export function patientDetailsPageTemplate() {
 
           <div class="modal-actions edit-treatment-actions">
             <button type="submit" form="homecare-form" class="btn-edit-treatment-save" id="save-homecare-btn">
-              <i class="fa-solid fa-floppy-disk"></i> Guardar rutina
+              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Guardar rutina
             </button>
 
             <button type="button" class="btn-edit-treatment-cancel" id="cancel-homecare-btn">
-              <i class="fa-solid fa-xmark"></i> Cancelar
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancelar
             </button>
           </div>
         </div>
