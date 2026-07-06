@@ -31,10 +31,11 @@ body.is-register .success-login-link,
   background: var(--btn-primary-bg) !important;
   color: var(--btn-primary-text) !important;
   border-color: transparent !important;
+  /* Sobrescribimos la transición para excluir el fondo. Esto evita el "parpadeo" de los degradés */
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-/* Hover: se oscurece (mantiene texto blanco AA). Sólo tocamos color/fondo;
-   la elevación (translateY) de cada módulo se conserva. */
+/* Hover: se oscurece (mantiene texto blanco AA). */
 .treatments-page .btn-patient:hover,
 .treatments-page .btn-save-treatment:hover,
 .treatments-page .btn-edit-treatment-save:hover,
@@ -52,10 +53,10 @@ body.is-register .success-login-link:hover,
 .tg-reset-password-primary-link:hover {
   background: var(--btn-primary-bg-hover) !important;
   color: var(--btn-primary-text) !important;
+  border-color: transparent !important;
 }
 
-/* Estados deshabilitados: fondo tenue pero legible (texto blanco sobre brand-400
-   no es AA; usamos brand-600, que como control deshabilitado es aceptable). */
+/* Estados deshabilitados */
 .treatments-page .btn-save-treatment:disabled,
 .patients-page .btn-add:disabled,
 body.is-register .register-card button[type="submit"]:disabled,
@@ -64,18 +65,23 @@ body.is-register .register-card button[type="submit"]:disabled,
 .tg-reset-password-submit:disabled {
   background: var(--brand-600) !important;
   color: var(--btn-primary-text) !important;
+  border-color: transparent !important;
   opacity: 0.9;
 }
 
-/* ---- Botones OUTLINE (texto/borde de marca) ----
-   brand-300 como texto da 1.77:1. Se llevan a --brand-700 (5.55:1). */
+/* ---- Botones OUTLINE (texto/borde de marca) ---- */
 .patients-page .btn-back,
 .treatments-page .btn-cancel-treatment {
   color: var(--btn-outline-fg) !important;
   border-color: var(--btn-outline-fg) !important;
+  /* Al ser outline, el fondo suele ser transparente, lo forzamos por las dudas */
+  background: transparent !important; 
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease !important;
 }
+
 .patients-page .btn-back:hover,
 .treatments-page .btn-cancel-treatment:hover {
   background: var(--btn-outline-fg) !important;
   color: var(--color-surface) !important;
+  border-color: var(--btn-outline-fg) !important;
 }

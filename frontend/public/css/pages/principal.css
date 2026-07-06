@@ -254,7 +254,6 @@
     display: none !important;
   }
 
-  .public-header nav .btn-login,
   .public-header nav .btn-register {
     display: inline-flex !important;
     align-items: center;
@@ -505,7 +504,6 @@
     gap: 6px;
   }
 
-  .public-header nav .btn-login,
   .public-header nav .btn-register {
     min-height: 38px;
     padding: 8px 12px;
@@ -668,7 +666,6 @@
     gap: 5px;
   }
 
-  .public-header nav .btn-login,
   .public-header nav .btn-register {
     min-height: 36px;
     padding: 8px 10px;

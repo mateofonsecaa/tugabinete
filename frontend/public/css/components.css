@@ -1,14 +1,14 @@
-/* public/css/components.css */
+
 
 /* ==============================
-   🌸 BOTONES (reusables)
+   🌸 BOTONES (reusables) — AA
 ============================== */
 .btn-save,
 .btn-cancel,
 .btn-login,
 .btn-register {
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
   font-size: 16px;
@@ -18,38 +18,39 @@
   justify-content: center;
   gap: 8px;
   padding: 14px 28px;
-  box-shadow: 0 5px 15px rgba(255, 173, 173, 0.25);
+  min-height: var(--tap-min);
+  box-shadow: var(--shadow);
   font-family: "Poppins", sans-serif;
   text-decoration: none;
 }
 
-/* Principal (Guardar / Confirmar / etc) */
+/* Principal (Guardar / Confirmar / etc) — texto blanco sobre fondo AA */
 .btn-save,
 .btn-login,
 .btn-register {
-  background: linear-gradient(180deg, #ffadad 0%, #ff9b9b 100%);
-  color: #fff;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
 }
 .btn-save:hover,
 .btn-login:hover,
 .btn-register:hover {
-  background: linear-gradient(180deg, #fff3c2 0%, #ffe4a0 100%);
-  color: #333;
+  background: var(--btn-primary-bg-hover);
+  color: var(--btn-primary-text);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(255, 173, 173, 0.35);
+  box-shadow: var(--shadow-md);
 }
 
-/* Secundario (Cancelar / Volver / Cerrar) */
+/* Secundario (Cancelar / Volver / Cerrar) — outline accesible */
 .btn-cancel {
   background: transparent;
-  border: 2px solid #ffadad;
-  color: #ffadad;
+  border: 2px solid var(--btn-outline-fg);
+  color: var(--btn-outline-fg);
 }
 .btn-cancel:hover {
-  background: #ffadad;
-  color: #fff;
+  background: var(--btn-outline-fg);
+  color: var(--color-surface);
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255, 173, 173, 0.25);
+  box-shadow: var(--shadow);
 }
 
 /* Íconos dentro del botón */
@@ -68,7 +69,7 @@
 }
 
 /* ==============================
-   🌸 SISTEMA DE MODALES UNIFICADO
+   🌸 SISTEMA DE MODALES UNIFICADO  (infraestructura — no borrar)
 ============================== */
 .modal-overlay {
   display: none;
@@ -83,21 +84,21 @@
 }
 
 .modal-overlay.active {
-  display: flex !important;
+  display: flex !important;   /* toggle real de apertura (lo usa el JS) */
   overflow: hidden;
   padding: 0;
 }
 
 .modal-box,
 .modal-content {
-  background: #fffdf9;
-  border-radius: 18px;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
   padding: 40px 45px;
   width: 90%;
   max-width: 800px;
-  color: #333;
+  color: var(--color-text);
   font-family: "Poppins", sans-serif;
-  box-shadow: 0 10px 25px rgba(255, 173, 173, 0.25);
+  box-shadow: var(--shadow);
   animation: slideUp 0.3s ease;
   overflow-y: auto;
   max-height: 90vh;
@@ -119,7 +120,7 @@
 
 /* Título y cuerpo del modal */
 .modal-content h2 {
-  color: #ff9b9b;
+  color: var(--color-ink);           /* antes #ff9b9b: no pasaba AA como texto */
   font-weight: 700;
   font-size: 22px;
   text-align: center;
@@ -130,7 +131,7 @@
   margin: 6px 0;
   font-size: 15px;
   line-height: 1.5;
-  color: #444;
+  color: var(--color-text);
 }
 
 .modal-actions {
@@ -184,7 +185,7 @@
   width: 190px;
   height: 190px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: var(--radius);
   border: 2px solid rgba(255, 173, 173, 0.3);
   box-shadow: 0 3px 12px rgba(255, 173, 173, 0.25);
   transition: transform 0.2s ease;
@@ -238,7 +239,9 @@
 
 /* ============================================================
    TuGabinete — Detalle (Observar) Tratamiento / Venta
-   Solo afecta a #viewTreatmentModal y #viewSaleModal
+   Solo afecta a #viewTreatmentModal y #viewSaleModal.
+   Tipografía elevada a --modal-text (17px) y cierre a 44px para
+   NO pisar la accesibilidad de treatments.css. Layout conservado.
    ============================================================ */
 
 /* Overlay: padding + z-index alto para que no quede debajo del top-bar/drawer */
@@ -255,9 +258,9 @@
   max-height: 86vh !important;
   overflow: auto !important;
   padding: 22px 22px 18px !important;
-  border-radius: 20px !important;
+  border-radius: var(--radius-xl) !important;
   border: 1.5px solid rgba(255, 173, 173, 0.30) !important;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.12) !important;
+  box-shadow: var(--shadow-modal) !important;
   position: relative !important;
 }
 
@@ -265,9 +268,9 @@
 #viewTreatmentModal h2,
 #viewSaleModal h2{
   margin: 4px 0 14px !important;
-  font-size: 20px !important;
+  font-size: var(--modal-subtitle) !important;
   font-weight: 800 !important;
-  color: #333 !important;
+  color: var(--color-ink) !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -277,21 +280,21 @@
 
 #viewTreatmentModal h2 i,
 #viewSaleModal h2 i{
-  color: #ffadad !important;
+  color: var(--brand-500) !important;
 }
 
-/* X cerrar: arriba derecha, visible */
+/* X cerrar: arriba derecha, target 44x44 */
 #viewTreatmentModal .modal-box > .close-btn,
 #viewSaleModal .modal-box > .close-btn{
   position: absolute !important;
   top: 12px !important;
   right: 14px !important;
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 12px !important;
-  background: rgba(255, 173, 173, 0.14) !important;
-  border: 1px solid rgba(255, 173, 173, 0.30) !important;
-  color: #ffadad !important;
+  width: var(--tap-min) !important;
+  height: var(--tap-min) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--brand-50) !important;
+  border: 1px solid var(--color-line) !important;
+  color: var(--brand-600) !important;
   display: grid !important;
   place-items: center !important;
   font-size: 22px !important;
@@ -301,7 +304,7 @@
 
 #viewTreatmentModal .modal-box > .close-btn:hover,
 #viewSaleModal .modal-box > .close-btn:hover{
-  background: rgba(255, 173, 173, 0.22) !important;
+  background: var(--brand-100) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -317,19 +320,19 @@
 /* Tarjetas */
 #viewTreatmentModal .detail-card,
 #viewSaleModal .detail-card{
-  background: rgba(255,255,255,0.82) !important;
-  border: 1px solid rgba(255, 173, 173, 0.25) !important;
-  border-radius: 16px !important;
-  padding: 14px 14px 12px !important;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.06) !important;
+  background: var(--color-surface-translucent) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 16px 16px 14px !important;
+  box-shadow: var(--shadow-sm) !important;
 }
 
 #viewTreatmentModal .detail-card h3,
 #viewSaleModal .detail-card h3{
   margin: 0 0 10px !important;
-  font-size: 14px !important;
+  font-size: var(--modal-subtitle) !important;
   font-weight: 800 !important;
-  color: #444 !important;
+  color: var(--color-ink) !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -337,30 +340,32 @@
 
 #viewTreatmentModal .detail-card h3 i,
 #viewSaleModal .detail-card h3 i{
-  color: #ffadad !important;
+  color: var(--brand-500) !important;
 }
 
-/* Líneas label/valor: deja de verse todo “pegado” */
+/* Líneas label/valor: cómodas de leer (17px) */
 #viewTreatmentModal .detail-card p,
 #viewSaleModal .detail-card p{
-  margin: 8px 0 !important;
-  font-size: 13.5px !important;
-  color: #444 !important;
-  line-height: 1.5 !important;
+  margin: 10px 0 !important;
+  font-size: var(--modal-text) !important;
+  color: var(--color-text) !important;
+  line-height: var(--modal-leading) !important;
   display: grid !important;
-  grid-template-columns: 90px 1fr !important;
+  grid-template-columns: 120px 1fr !important;
   column-gap: 10px !important;
   align-items: baseline !important;
 }
 
 #viewTreatmentModal .detail-card p strong,
 #viewSaleModal .detail-card p strong{
-  opacity: .75 !important;
+  opacity: 1 !important;
+  color: var(--color-muted) !important;
   font-weight: 700 !important;
 }
 
 #viewTreatmentModal .detail-card span,
 #viewSaleModal .detail-card span{
+  color: var(--color-ink) !important;
   overflow-wrap: anywhere !important;
   word-break: break-word !important;
 }
@@ -369,18 +374,18 @@
 #viewTreatmentModal .detail-notes,
 #viewSaleModal .detail-notes{
   margin-top: 14px !important;
-  background: rgba(255,255,255,0.78) !important;
-  border: 1px solid rgba(255, 173, 173, 0.22) !important;
-  border-radius: 16px !important;
+  background: var(--color-surface-translucent) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: var(--radius-lg) !important;
   padding: 14px !important;
 }
 
 #viewTreatmentModal .detail-notes h3,
 #viewSaleModal .detail-notes h3{
   margin: 0 0 8px !important;
-  font-size: 14px !important;
+  font-size: var(--modal-subtitle) !important;
   font-weight: 800 !important;
-  color: #444 !important;
+  color: var(--color-ink) !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -388,18 +393,18 @@
 
 #viewTreatmentModal .detail-notes h3 i,
 #viewSaleModal .detail-notes h3 i{
-  color: #ffadad !important;
+  color: var(--brand-500) !important;
 }
 
 #viewTreatmentModal .detail-notes p,
 #viewSaleModal .detail-notes p{
   margin: 0 !important;
-  font-size: 13.5px !important;
-  color: #444 !important;
-  line-height: 1.5 !important;
+  font-size: var(--modal-text) !important;
+  color: var(--color-text) !important;
+  line-height: var(--modal-leading) !important;
   white-space: pre-wrap !important;
   overflow-wrap: anywhere !important;
-  max-height: 220px !important;
+  max-height: 320px !important;
   overflow: auto !important;
 }
 
@@ -412,9 +417,9 @@
 }
 
 #viewTreatmentModal .detail-photos > div{
-  background: rgba(255,255,255,0.78) !important;
-  border: 1px solid rgba(255, 173, 173, 0.22) !important;
-  border-radius: 16px !important;
+  background: var(--color-surface-translucent) !important;
+  border: 1px solid var(--color-line) !important;
+  border-radius: var(--radius-lg) !important;
   padding: 12px !important;
 }
 
@@ -423,7 +428,7 @@
   height: 240px !important;
   max-height: 240px !important;
   object-fit: cover !important;
-  border-radius: 14px !important;
+  border-radius: var(--radius) !important;
   box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
   cursor: zoom-in !important;
 }
@@ -455,21 +460,22 @@
 }
 
 #newPatientModal label {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
-  color: #555;
+  color: var(--color-ink);
   display: block;
   margin-bottom: 4px;
 }
 
 #newPatientModal input {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,173,173,0.35);
-  background: #fff;
+  min-height: var(--tap-min);
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--brand-200);
+  background: var(--color-surface);
   font-family: "Poppins", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* campos que ocupan todo el ancho */

@@ -45,7 +45,6 @@
 
 /* ===== BLOQUE BIENVENIDA ===== */
 .welcome {
-  width: 100%;
   max-width: 860px;
   padding: var(--space-7);
   background: var(--color-surface-translucent);

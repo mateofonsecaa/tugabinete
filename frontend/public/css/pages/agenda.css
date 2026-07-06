@@ -1,20 +1,4 @@
-/* =============================================================================
-   TuGabinete · Agenda  (hoja UNIFICADA)
-   Fusiona agenda.css + agenda-mobile.css (mobile como @media al final).
 
-   · Todo scopeado bajo .agenda-page (incluidas .field/.patient-row/.small-btn/
-     .dropdown-* que antes eran GLOBALES y filtraban a la app).
-   · Colores/radios tokenizados contra base.css (grises neutros de días fuera de
-     mes se conservan). Hooks (ids/data-*/.hidden/.today/.selected/.day) intactos.
-   · Sin !important salvo: .hidden (toggle real de los modales), flatpickr
-     (DOM de terceros) y .swal2-container (SweetAlert).
-   · Los dos bloques `main` en conflicto se unificaron en un grid limpio sin
-     !important (la tarjeta global se neutraliza por especificidad).
-   · Top-bar fijo self-contained (no depende del orden de carga de layout.css).
-   · A11y: inputs 16px, targets 44px, foco de teclado en los días, contraste AA.
-   ========================================================================== */
-
-/* Top-bar fijo, self-contained (independiente de .is-agenda / orden de carga) */
 .agenda-page .top-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 3000; }
 
 .agenda-page main{
@@ -286,43 +270,6 @@
 .agenda-page input[type="date"]::-webkit-calendar-picker-indicator:hover,
 .agenda-page input[type="time"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
-}
-
-/* ===== Corrección visual de Flatpickr dentro de inputs ===== */
-
-/* El input visual (altInput) que Flatpickr genera */
-.agenda-page .flatpickr-input[readonly],
-.agenda-page input.flatpickr-input[readonly] {
-  background-color: var(--color-bg) !important;
-  color: var(--color-text) !important;
-  border: 1px solid rgba(255, 173, 173, 0.5) !important;
-  border-radius: var(--radius-md) !important;
-  padding: 10px 14px !important;
-  font-family: "Poppins", sans-serif !important;
-  font-size: 15px !important;
-  box-shadow: 0 2px 6px rgba(255, 173, 173, 0.15) !important;
-  width: 100% !important;
-  cursor: pointer !important;
-}
-
-/* Al enfocar (abrir calendario) */
-.agenda-page .flatpickr-input[readonly]:focus {
-  outline: none !important;
-  border-color: var(--brand-300) !important;
-  box-shadow: 0 0 0 3px rgba(255, 173, 173, 0.25) !important;
-}
-
-/* Oculta el input “original” que Flatpickr reemplaza */
-.agenda-page input[type="date"].flatpickr-input,
-.agenda-page input[type="time"].flatpickr-input {
-  opacity: 0;
-  position: absolute;
-  pointer-events: none;
-}
-
-/* Corrección del contenedor si el campo se deforma */
-.agenda-page .flatpickr-wrapper {
-  width: 100% !important;
 }
 
 /* 🔒 Evita que los recordatorios se vayan para los costados */

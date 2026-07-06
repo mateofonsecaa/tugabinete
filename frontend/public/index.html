@@ -2,25 +2,28 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TuGabinete</title>
 
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
+    <!-- Tipografía -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Librerías de terceros (CSS) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
-
+    <!-- Iconos / favicon -->
     <link rel="icon" type="image/png" href="./icons/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="./icons/favicon-16x16.png" sizes="16x16">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 
+    <!-- 1) TOKENS + RESET GLOBAL (primero: define las variables) -->
     <link rel="stylesheet" href="./css/base.css" />
+
+    <!-- 2) Componentes compartidos (modales, botones, preview de imagen) -->
     <link rel="stylesheet" href="./css/components.css" />
 
+    <!-- 3) HOJAS DE PÁGINA -->
     <link rel="stylesheet" href="./css/pages/principal.css" />
     <link rel="stylesheet" href="./css/pages/legal.css" />
     <link rel="stylesheet" href="./css/pages/about.css" />
@@ -30,21 +33,18 @@
     <link rel="stylesheet" href="./css/pages/dashboard.css" />
     <link rel="stylesheet" href="./css/pages/patients.css" />
     <link rel="stylesheet" href="./css/pages/agenda.css" />
-
-    <link rel="stylesheet" href="./css/interviews/interview-view.css" />
-    <link rel="stylesheet" href="./css/interviews/interview-edit.css" />
-
+    <link rel="stylesheet" href="./css/pages/treatments.css" />
     <link rel="stylesheet" href="./css/pages/profile.css" />
     <link rel="stylesheet" href="./css/pages/edit_profile.css" />
-
-    <link rel="stylesheet" href="./css/pages/treatments.css" />
+    <link rel="stylesheet" href="./css/interviews/interview-view.css" />
+    <link rel="stylesheet" href="./css/interviews/interview-edit.css" />
     <link rel="stylesheet" href="./css/pages/help-page.css" />
     <link rel="stylesheet" href="./css/pages/feedback.css" />
 
+    <!-- 4) GLOBALES ESTRUCTURALES + CAPA AA (al final, orden crítico) -->
     <link rel="stylesheet" href="./css/layout.css" />
     <link rel="stylesheet" href="./css/components/app-shell.css">
     <link rel="stylesheet" href="./css/buttons.css" />
-
 </head>
 <body>
     <div id="app"></div>

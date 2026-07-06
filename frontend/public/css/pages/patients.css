@@ -1,16 +1,4 @@
-/* =============================================================================
-   TuGabinete · Pacientes  (hoja UNIFICADA)
-   Fusiona patients.css + su mobile + patient-new.css + patient-edit.css +
-   patient-details.css + patient-details-mobile.css en un solo archivo.
 
-   · Todo scopeado bajo .patients-page y variantes de wrapper
-     (.patient-new-page / .patient-edit-page / .patient-details-page).
-     NO depende de body.is-* (evita el bug de className que las pisaba).
-   · Colores/radios tokenizados contra base.css. El detalle conserva su capa
-     --pd-*, pero re-apuntada a base.css (se cambian solo las definiciones).
-   · Sin !important salvo [hidden]. Hooks (ids/data-*/estados) intactos.
-   · A11y: inputs 16px, targets 44x44, tipografía holgada, modal grande.
-   ========================================================================== */
 
 /* ===== SHELL: top-bar fijo para TODAS las pantallas de pacientes ===== */
 .patients-page .top-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 3000; }
@@ -101,7 +89,7 @@
     .patients-page .table-container::-webkit-scrollbar-track { background-color: var(--color-secondary); }
 
     .patients-page table { width: 100%; border-collapse: collapse; text-align: left; }
-    .patients-page th, td { padding: 14px 18px; border-bottom: 1px solid rgba(255,173,173,0.3); }
+    .patients-page th, td { padding: 14px 18px; }
     .patients-page th { background: rgba(255,243,194,0.8); position: sticky; top: 0; }
     .patients-page tr:hover { background: rgba(255,255,255,0.7); transition: background 0.2s; }
 
